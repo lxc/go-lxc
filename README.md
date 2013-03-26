@@ -16,7 +16,7 @@ ii  lxc-dev                                   0.8.0~rc1-4ubuntu39.12.10.2       
 
 ## Example
 
-    See [lxc_test.go](https://github.com/caglar10ur/lxc/blob/master/lxc_test.go) as an example.
+See [lxc_test.go](https://github.com/caglar10ur/lxc/blob/master/lxc_test.go) as an example.
 
 ## TODO
 
