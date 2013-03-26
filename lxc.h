@@ -1,0 +1,12 @@
+extern bool container_create(struct lxc_container *, char *, char **);
+extern bool container_defined(struct lxc_container *);
+extern bool container_freeze(struct lxc_container *);
+extern bool container_running(struct lxc_container *);
+extern bool container_shutdown(struct lxc_container *, int);
+extern bool container_start(struct lxc_container *, int, char **);
+extern bool container_stop(struct lxc_container *);
+extern bool container_unfreeze(struct lxc_container *);
+extern char* container_config_file_name(struct lxc_container *);
+extern const char* container_state(struct lxc_container *);
+extern pid_t container_init_pid(struct lxc_container *);
+extern void container_want_daemonize(struct lxc_container *);
