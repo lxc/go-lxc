@@ -1,6 +1,6 @@
 # Go (golang) Bindings for LXC (Linux Containers)
 
-    This package implements [Go](http://golang.org) (golang) bindings for the [LXC](http://lxc.sourceforge.net/) C API.
+This package implements [Go](http://golang.org) (golang) bindings for the [LXC](http://lxc.sourceforge.net/) C API.
 
 ## Installing
 
