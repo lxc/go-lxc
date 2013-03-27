@@ -58,6 +58,6 @@ func TestAll(t *testing.T) {
 		fmt.Printf("State: %+v\n", z.State())
 		fmt.Printf("Stop: %+v\n", z.Stop())
 		fmt.Printf("State: %+v\n", z.State())
+		fmt.Printf("Destroy: %+v\n", z.Destroy())
 	}
-	fmt.Printf("Destroy: %+v\n", z.Destroy())
 }
