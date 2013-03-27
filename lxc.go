@@ -196,8 +196,26 @@ func (c *Container) SetConfigItem(key string, value string) bool {
 	return bool(C.container_set_config_item(c.container, ckey, cvalue))
 }
 
+func (c *Container) ClearConfigItem(key string) bool {
+	ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(ckey))
+	return bool(C.container_clear_config_item(c.container, ckey))
+}
+
 func (c *Container) GetKeys(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 	return strings.Split(C.GoString(C.container_get_keys(c.container, ckey)), "\n")
+}
+
+func (c *Container) LoadConfig(path string) bool {
+	cpath := C.CString(path)
+	defer C.free(unsafe.Pointer(cpath))
+	return bool(C.container_load_config(c.container, cpath))
+}
+
+func (c *Container) SaveConfig(path string) bool {
+	cpath := C.CString(path)
+	defer C.free(unsafe.Pointer(cpath))
+	return bool(C.container_save_config(c.container, cpath))
 }

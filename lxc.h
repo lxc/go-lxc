@@ -20,11 +20,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+extern bool container_clear_config_item(struct lxc_container *, char *);
 extern bool container_create(struct lxc_container *, char *, char **);
 extern bool container_defined(struct lxc_container *);
 extern bool container_destroy(struct lxc_container *);
 extern bool container_freeze(struct lxc_container *);
+extern bool container_load_config(struct lxc_container *, char *);
 extern bool container_running(struct lxc_container *);
+extern bool container_save_config(struct lxc_container *, char *);
 extern bool container_set_config_item(struct lxc_container *, char *, char *);
 extern bool container_shutdown(struct lxc_container *, int);
 extern bool container_start(struct lxc_container *, int, char **);

@@ -32,6 +32,8 @@ func TestAll(t *testing.T) {
 
 	fmt.Printf("Container name: %s\n", z.Name())
 	fmt.Printf("Config file: %+v\n", z.ConfigFileName())
+	fmt.Printf("Load Config File: %+v\n", z.LoadConfig("/var/lib/lxc/rubik/config"))
+	fmt.Printf("Save Config File: %+v\n", z.SaveConfig("config"))
 	fmt.Printf("Daemonize: %+v\n", z.Daemonize())
 	fmt.Printf("Init PID: %+v\n", z.InitPID())
 	fmt.Printf("Defined: %+v\n", z.Defined())
@@ -61,6 +63,8 @@ func TestAll(t *testing.T) {
 	fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem("lxc.utsname", utsname))
 	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.arch"))
 	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.mount"))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.cap.drop"))
+	fmt.Printf("ClearConfigItem: %+v\n", z.ClearConfigItem("lxc.cap.drop"))
 	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.cap.drop"))
 	fmt.Printf("GetKeys: %s\n", z.GetKeys("lxc.network.0"))
 	fmt.Printf("Wait 5 sec. (RUNNING): %+v\n", z.Wait(RUNNING, 5))

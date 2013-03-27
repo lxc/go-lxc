@@ -99,6 +99,10 @@ bool container_set_config_item(struct lxc_container *c, char *key, char *value) 
 	return c->set_config_item(c, key, value);
 }
 
+bool container_clear_config_item(struct lxc_container *c, char *key) {
+	return c->clear_config_item(c, key);
+}
+
 char* container_get_keys(struct lxc_container *c, char *key) {
 	int len = c->get_keys(c, key, NULL, 0);
 	if (len <= 0) {
@@ -110,4 +114,12 @@ char* container_get_keys(struct lxc_container *c, char *key) {
 		return NULL;
 	}
 	return value;	
+}
+
+bool container_load_config(struct lxc_container *c, char *alt_file) {
+	return c->load_config(c, alt_file);
+}
+
+bool container_save_config(struct lxc_container *c, char *alt_file) {
+	return c->save_config(c, alt_file);
 }
