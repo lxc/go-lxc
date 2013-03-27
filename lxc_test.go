@@ -24,7 +24,7 @@ package lxc
 
 import (
 	"fmt"
-//	"strings"
+	"strings"
 	"testing"
 )
 
@@ -57,25 +57,23 @@ func TestAll(t *testing.T) {
 		fmt.Printf("State: %+v\n", z.GetState())
 	}
 
-	/*
-		utsname_key := "lxc.utsname"
-		utsname_value := z.GetConfigItem(utsname_key)[0]
-		fmt.Printf("GetConfigItem: %s\n", utsname_value)
-		fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(utsname_key, "kibur"))
-		fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(utsname_key))
-		fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(utsname_key, utsname_value))
+	utsname_key := "lxc.utsname"
+	utsname_value := z.GetConfigItem(utsname_key)[0]
+	fmt.Printf("GetConfigItem: %s\n", utsname_value)
+	fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(utsname_key, "kibur"))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(utsname_key))
+	fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(utsname_key, utsname_value))
 
-		fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.arch"))
-		fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.mount"))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.arch"))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.mount"))
 
-		caps_key := "lxc.cap.drop"
-		caps_value := strings.Join(z.GetConfigItem(caps_key), " ")
-		fmt.Printf("GetConfigItem: %s\n", caps_value)
-		fmt.Printf("ClearConfigItem: %+v\n", z.ClearConfigItem(caps_key))
-		fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(caps_key))
-		fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(caps_key, caps_value))
-		fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(caps_key))
-	*/
+	caps_key := "lxc.cap.drop"
+	caps_value := strings.Join(z.GetConfigItem(caps_key), " ")
+	fmt.Printf("GetConfigItem: %s\n", caps_value)
+	fmt.Printf("ClearConfigItem: %+v\n", z.ClearConfigItem(caps_key))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(caps_key))
+	fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(caps_key, caps_value))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(caps_key))
 
 	fmt.Printf("GetKeys: %s\n", z.GetKeys("lxc.network.0"))
 	fmt.Printf("Wait 5 sec. (RUNNING): %+v\n", z.Wait(RUNNING, 5))

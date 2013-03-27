@@ -29,6 +29,8 @@ package lxc
 import "C"
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"unsafe"
 )
@@ -209,6 +211,18 @@ func (lxc *Container) GetKeys(key string) []string {
 }
 
 func (lxc *Container) LoadConfigFile(path string) bool {
+	// reject loading config file if it doesn't exist
+	// otherwise container starts without a netns
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return false
+	}
+
+	_, err = os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 	return bool(C.lxc_container_load_config(lxc.container, cpath))
