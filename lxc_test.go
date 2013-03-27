@@ -54,10 +54,20 @@ func TestAll(t *testing.T) {
 		fmt.Printf("State: %+v\n", z.State())
 	}
 
+	utsname := z.GetConfigItem("lxc.utsname")[0]
+	fmt.Printf("GetConfigItem: %s\n", utsname)
+	fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem("lxc.utsname", "kibur"))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.utsname"))
+	fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem("lxc.utsname", utsname))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.arch"))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.mount"))
+	fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.cap.drop"))
+	fmt.Printf("GetKeys: %s\n", z.GetKeys("lxc.network.0"))
 	fmt.Printf("Wait 5 sec. (RUNNING): %+v\n", z.Wait(RUNNING, 5))
+
 	if z.Running() {
 		fmt.Printf("Shutting down container...\n\n")
-		fmt.Printf("Shutdown: %+v\n", z.Shutdown(WAIT_FOREVER))
+		fmt.Printf("Shutdown: %+v\n", z.Shutdown(30))
 		fmt.Printf("State: %+v\n", z.State())
 		fmt.Printf("Stop: %+v\n", z.Stop())
 		fmt.Printf("State: %+v\n", z.State())

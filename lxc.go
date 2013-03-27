@@ -29,6 +29,7 @@ package lxc
 import "C"
 
 import (
+	"strings"
 	"unsafe"
 )
 
@@ -179,4 +180,24 @@ func (c *Container) Wait(state State, timeout int) bool {
 
 func (c *Container) ConfigFileName() string {
 	return C.GoString(C.container_config_file_name(c.container))
+}
+
+func (c *Container) GetConfigItem(key string) []string {
+	ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(ckey))
+	return strings.Split(C.GoString(C.container_get_config_item(c.container, ckey)), "\n")
+}
+
+func (c *Container) SetConfigItem(key string, value string) bool {
+	ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(ckey))
+	cvalue := C.CString(value)
+	defer C.free(unsafe.Pointer(cvalue))
+	return bool(C.container_set_config_item(c.container, ckey, cvalue))
+}
+
+func (c *Container) GetKeys(key string) []string {
+	ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(ckey))
+	return strings.Split(C.GoString(C.container_get_keys(c.container, ckey)), "\n")
 }
