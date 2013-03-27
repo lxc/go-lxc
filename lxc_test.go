@@ -30,17 +30,17 @@ import (
 func TestAll(t *testing.T) {
 	z := NewContainer("rubik")
 
-	fmt.Printf("Container name: %s\n", z.Name())
-	fmt.Printf("Config file: %+v\n", z.ConfigFileName())
-	fmt.Printf("Load Config File: %+v\n", z.LoadConfig("/var/lib/lxc/rubik/config"))
-	fmt.Printf("Save Config File: %+v\n", z.SaveConfig("config"))
-	fmt.Printf("Daemonize: %+v\n", z.Daemonize())
-	fmt.Printf("Init PID: %+v\n", z.InitPID())
+	fmt.Printf("Container name: %s\n", z.GetName())
+	fmt.Printf("Config file: %+v\n", z.GetConfigFileName())
+	fmt.Printf("Load Config File: %+v\n", z.LoadConfigFile("/var/lib/lxc/rubik/config"))
+	fmt.Printf("Save Config File: %+v\n", z.SaveConfigFile("config"))
+	fmt.Printf("Daemonize: %+v\n", z.GetDaemonize())
+	fmt.Printf("Init PID: %+v\n", z.GetInitPID())
 	fmt.Printf("Defined: %+v\n", z.Defined())
 	fmt.Printf("Running: %+v\n", z.Running())
-	fmt.Printf("State: %+v\n", z.State())
+	fmt.Printf("State: %+v\n", z.GetState())
 	z.SetDaemonize()
-	fmt.Printf("Daemonize: %+v\n", z.Daemonize())
+	fmt.Printf("Daemonize: %+v\n", z.GetDaemonize())
 
 	if !z.Defined() {
 		fmt.Printf("Creating container...\n")
@@ -48,12 +48,12 @@ func TestAll(t *testing.T) {
 	} else {
 		fmt.Printf("Starting container...\n\n")
 		fmt.Printf("Start: %+v\n", z.Start(false, nil))
-		fmt.Printf("State: %+v\n", z.State())
-		fmt.Printf("Init PID: %+v\n", z.InitPID())
+		fmt.Printf("State: %+v\n", z.GetState())
+		fmt.Printf("Init PID: %+v\n", z.GetInitPID())
 		fmt.Printf("Freeze: %+v\n", z.Freeze())
-		fmt.Printf("State: %+v\n", z.State())
+		fmt.Printf("State: %+v\n", z.GetState())
 		fmt.Printf("Unfreeze: %+v\n", z.Unfreeze())
-		fmt.Printf("State: %+v\n", z.State())
+		fmt.Printf("State: %+v\n", z.GetState())
 	}
 
 	utsname := z.GetConfigItem("lxc.utsname")[0]
@@ -72,9 +72,9 @@ func TestAll(t *testing.T) {
 	if z.Running() {
 		fmt.Printf("Shutting down container...\n\n")
 		fmt.Printf("Shutdown: %+v\n", z.Shutdown(30))
-		fmt.Printf("State: %+v\n", z.State())
+		fmt.Printf("State: %+v\n", z.GetState())
 		fmt.Printf("Stop: %+v\n", z.Stop())
-		fmt.Printf("State: %+v\n", z.State())
+		fmt.Printf("State: %+v\n", z.GetState())
 		fmt.Printf("Destroy: %+v\n", z.Destroy())
 	}
 }

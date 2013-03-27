@@ -100,7 +100,7 @@ func NewContainer(name string) Container {
 	return Container{C.lxc_container_new(cname)}
 }
 
-func (c *Container) Name() string {
+func (c *Container) GetName() string {
 	return C.GoString(c.container.name)
 }
 
@@ -112,15 +112,15 @@ func (c *Container) Running() bool {
 	return bool(C.container_running(c.container))
 }
 
-func (c *Container) State() string {
+func (c *Container) GetState() string {
 	return C.GoString(C.container_state(c.container))
 }
 
-func (c *Container) InitPID() int {
+func (c *Container) GetInitPID() int {
 	return int(C.container_init_pid(c.container))
 }
 
-func (c *Container) Daemonize() bool {
+func (c *Container) GetDaemonize() bool {
 	return bool(c.container.daemonize != 0)
 }
 
@@ -178,7 +178,7 @@ func (c *Container) Wait(state State, timeout int) bool {
 	return bool(C.container_wait(c.container, cstate, C.int(timeout)))
 }
 
-func (c *Container) ConfigFileName() string {
+func (c *Container) GetConfigFileName() string {
 	return C.GoString(C.container_config_file_name(c.container))
 }
 
@@ -208,13 +208,13 @@ func (c *Container) GetKeys(key string) []string {
 	return strings.Split(C.GoString(C.container_get_keys(c.container, ckey)), "\n")
 }
 
-func (c *Container) LoadConfig(path string) bool {
+func (c *Container) LoadConfigFile(path string) bool {
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 	return bool(C.container_load_config(c.container, cpath))
 }
 
-func (c *Container) SaveConfig(path string) bool {
+func (c *Container) SaveConfigFile(path string) bool {
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 	return bool(C.container_save_config(c.container, cpath))
