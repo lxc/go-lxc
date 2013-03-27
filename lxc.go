@@ -211,6 +211,8 @@ func (lxc *Container) GetKeys(key string) []string {
 }
 
 func (lxc *Container) LoadConfigFile(path string) bool {
+	// TODO: Remove following code from binding as patch sent to lxc-devel
+	// http://sourceforge.net/mailarchive/forum.php?thread_name=1364411217-15616-1-git-send-email-caglar%4010ur.org&forum_name=lxc-devel
 	// reject loading config file if it doesn't exist
 	// otherwise container starts without a netns
 	path, err := filepath.Abs(path)

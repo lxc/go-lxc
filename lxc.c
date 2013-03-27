@@ -82,7 +82,7 @@ bool lxc_container_wait(struct lxc_container *c, char *state, int timeout) {
 	return c->wait(c, state, timeout);
 }
 
-char* lxc_container_get_config_item(struct lxc_container *c, char *key) { 
+char* lxc_container_get_config_item(struct lxc_container *c, char *key) {
 	int len = c->get_config_item(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
@@ -92,7 +92,7 @@ char* lxc_container_get_config_item(struct lxc_container *c, char *key) {
 	if (c->get_config_item(c, key, value, len + 1) != len) {
 		return NULL;
 	}
-	return value;	
+	return value;
 }
 
 bool lxc_container_set_config_item(struct lxc_container *c, char *key, char *value) {
@@ -113,7 +113,7 @@ char* lxc_container_get_keys(struct lxc_container *c, char *key) {
 	if (c->get_keys(c, key, value, len + 1) != len) {
 		return NULL;
 	}
-	return value;	
+	return value;
 }
 
 bool lxc_container_load_config(struct lxc_container *c, char *alt_file) {
