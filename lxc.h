@@ -29,6 +29,7 @@ extern bool container_shutdown(struct lxc_container *, int);
 extern bool container_start(struct lxc_container *, int, char **);
 extern bool container_stop(struct lxc_container *);
 extern bool container_unfreeze(struct lxc_container *);
+extern bool container_wait(struct lxc_container *, char *, int);
 extern char* container_config_file_name(struct lxc_container *);
 extern const char* container_state(struct lxc_container *);
 extern pid_t container_init_pid(struct lxc_container *);

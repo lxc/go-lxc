@@ -22,18 +22,58 @@
 
 package lxc
 
-/*
-#cgo linux CFLAGS: -I/usr/include
-#cgo linux LDFLAGS: -L/usr/lib/x86_64-linux-gnu -llxc -lutil
-#include <lxc/lxc.h>
-#include <lxc/lxccontainer.h>
-#include "lxc.h"
-*/
+// #cgo linux LDFLAGS: -llxc -lutil
+// #include <lxc/lxc.h>
+// #include <lxc/lxccontainer.h>
+// #include "lxc.h"
 import "C"
 
 import (
 	"unsafe"
 )
+
+type State int
+
+const (
+	// Timeout
+	WAIT_FOREVER int = iota
+	DONT_WAIT
+	// State
+	STOPPED   = C.STOPPED
+	STARTING  = C.STARTING
+	RUNNING   = C.RUNNING
+	STOPPING  = C.STOPPING
+	ABORTING  = C.ABORTING
+	FREEZING  = C.FREEZING
+	FROZEN    = C.FROZEN
+	THAWED    = C.THAWED
+	MAX_STATE = C.MAX_STATE
+)
+
+// State as string
+func (t State) String() string {
+	switch t {
+	case STOPPED:
+		return "STOPPED"
+	case STARTING:
+		return "STARTING"
+	case RUNNING:
+		return "RUNNING"
+	case STOPPING:
+		return "STOPPING"
+	case ABORTING:
+		return "ABORTING"
+	case FREEZING:
+		return "FREEZING"
+	case FROZEN:
+		return "FROZEN"
+	case THAWED:
+		return "THAWED"
+	case MAX_STATE:
+		return "MAX_STATE"
+	}
+	return "<INVALID>"
+}
 
 func makeArgs(args []string) []*C.char {
 	ret := make([]*C.char, len(args))
@@ -57,6 +97,10 @@ func NewContainer(name string) Container {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 	return Container{C.lxc_container_new(cname)}
+}
+
+func (c *Container) Name() string {
+	return C.GoString(c.container.name)
 }
 
 func (c *Container) Defined() bool {
@@ -125,6 +169,12 @@ func (c *Container) Shutdown(timeout int) bool {
 
 func (c *Container) Destroy() bool {
 	return bool(C.container_destroy(c.container))
+}
+
+func (c *Container) Wait(state State, timeout int) bool {
+	cstate := C.CString(state.String())
+	defer C.free(unsafe.Pointer(cstate))
+	return bool(C.container_wait(c.container, cstate, C.int(timeout)))
 }
 
 func (c *Container) ConfigFileName() string {

@@ -77,3 +77,7 @@ char* container_config_file_name(struct lxc_container *c) {
 bool container_destroy(struct lxc_container *c) {
 	return c->destroy(c);
 }
+
+bool container_wait(struct lxc_container *c, char *state, int timeout) {
+	return c->wait(c, state, timeout);
+}

@@ -30,7 +30,8 @@ import (
 func TestAll(t *testing.T) {
 	z := NewContainer("rubik")
 
-	fmt.Printf("Config file:%+v\n", z.ConfigFileName())
+	fmt.Printf("Container name: %s\n", z.Name())
+	fmt.Printf("Config file: %+v\n", z.ConfigFileName())
 	fmt.Printf("Daemonize: %+v\n", z.Daemonize())
 	fmt.Printf("Init PID: %+v\n", z.InitPID())
 	fmt.Printf("Defined: %+v\n", z.Defined())
@@ -40,10 +41,10 @@ func TestAll(t *testing.T) {
 	fmt.Printf("Daemonize: %+v\n", z.Daemonize())
 
 	if !z.Defined() {
-		fmt.Printf("Creating rubik container...\n")
+		fmt.Printf("Creating container...\n")
 		fmt.Printf("Create: %+v\n", z.Create("ubuntu", []string{"amd64", "quantal"}))
 	} else {
-		fmt.Printf("Starting rubik container...\n\n")
+		fmt.Printf("Starting container...\n\n")
 		fmt.Printf("Start: %+v\n", z.Start(false, nil))
 		fmt.Printf("State: %+v\n", z.State())
 		fmt.Printf("Init PID: %+v\n", z.InitPID())
@@ -53,8 +54,10 @@ func TestAll(t *testing.T) {
 		fmt.Printf("State: %+v\n", z.State())
 	}
 
+	fmt.Printf("Wait 5 sec. (RUNNING): %+v\n", z.Wait(RUNNING, 5))
 	if z.Running() {
-		fmt.Printf("Shutdown: %+v\n", z.Shutdown(30))
+		fmt.Printf("Shutting down container...\n\n")
+		fmt.Printf("Shutdown: %+v\n", z.Shutdown(WAIT_FOREVER))
 		fmt.Printf("State: %+v\n", z.State())
 		fmt.Printf("Stop: %+v\n", z.Stop())
 		fmt.Printf("State: %+v\n", z.State())
