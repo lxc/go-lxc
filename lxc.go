@@ -224,7 +224,8 @@ func (lxc *Container) GetConfigFileName() string {
 func (lxc *Container) GetConfigItem(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
-	return strings.Split(C.GoString(C.lxc_container_get_config_item(lxc.container, ckey)), "\n")
+	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_config_item(lxc.container, ckey)))
+	return strings.Split(ret, "\n")
 }
 
 // Sets the value of given key
@@ -247,7 +248,8 @@ func (lxc *Container) ClearConfigItem(key string) bool {
 func (lxc *Container) GetKeys(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
-	return strings.Split(C.GoString(C.lxc_container_get_keys(lxc.container, ckey)), "\n")
+	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_keys(lxc.container, ckey)))
+	return strings.Split(ret, "\n")
 }
 
 // Loads the configuration file from given path
@@ -276,4 +278,8 @@ func (lxc *Container) SaveConfigFile(path string) bool {
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 	return bool(C.lxc_container_save_config(lxc.container, cpath))
+}
+
+func (lxc *Container) GetNumberOfNetworkInterfaces() int {
+	return len(lxc.GetConfigItem("lxc.network"))
 }

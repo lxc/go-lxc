@@ -188,6 +188,15 @@ func TestGetKeys(t *testing.T) {
 	}
 }
 
+func TestGetNumberOfNetworkInterfaces(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	fmt.Printf("%d\n", z.GetNumberOfNetworkInterfaces())
+	if z.GetNumberOfNetworkInterfaces() != 1 {
+		t.Errorf("GetNumberOfNetworkInterfaces failed...")
+	}
+}
+
 func TestShutdown(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
