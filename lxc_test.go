@@ -120,7 +120,7 @@ func TestFreeze(t *testing.T) {
 	z.Freeze()
 
 	z.Wait(FROZEN, 5)
-	if z.GetState() != "FROZEN" {
+	if z.GetState() != FROZEN {
 		t.Errorf("Freezing the container failed...")
 	}
 }
@@ -132,7 +132,7 @@ func TestUnfreeze(t *testing.T) {
 	z.Unfreeze()
 
 	z.Wait(RUNNING, 5)
-	if z.GetState() != "RUNNING" {
+	if z.GetState() != RUNNING {
 		t.Errorf("Unfreezing the container failed...")
 	}
 }

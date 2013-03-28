@@ -35,6 +35,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"unsafe"
 )
 
@@ -45,16 +46,26 @@ const (
 	WAIT_FOREVER int = iota
 	DONT_WAIT
 	// State
-	STOPPED   = C.STOPPED
-	STARTING  = C.STARTING
-	RUNNING   = C.RUNNING
-	STOPPING  = C.STOPPING
-	ABORTING  = C.ABORTING
-	FREEZING  = C.FREEZING
-	FROZEN    = C.FROZEN
-	THAWED    = C.THAWED
-	MAX_STATE = C.MAX_STATE
+	STOPPED  = C.STOPPED
+	STARTING = C.STARTING
+	RUNNING  = C.RUNNING
+	STOPPING = C.STOPPING
+	ABORTING = C.ABORTING
+	FREEZING = C.FREEZING
+	FROZEN   = C.FROZEN
+	THAWED   = C.THAWED
 )
+
+var stateMap = map[string]State{
+	"STOPPED":  STOPPED,
+	"STARTING": STARTING,
+	"RUNNING":  RUNNING,
+	"STOPPING": STOPPING,
+	"ABORTING": ABORTING,
+	"FREEZING": FREEZING,
+	"FROZEN":   FROZEN,
+	"THAWED":   THAWED,
+}
 
 // State as string
 func (t State) String() string {
@@ -75,8 +86,6 @@ func (t State) String() string {
 		return "FROZEN"
 	case THAWED:
 		return "THAWED"
-	case MAX_STATE:
-		return "MAX_STATE"
 	}
 	return "<INVALID>"
 }
@@ -97,6 +106,14 @@ func freeArgs(cArgs []*C.char) {
 
 type Container struct {
 	container *C.struct_lxc_container
+}
+
+func (lxc *Container) Error() string {
+	return C.GoString(lxc.container.error_string)
+}
+
+func (lxc *Container) GetError() error {
+	return syscall.Errno(int(lxc.container.error_num))
 }
 
 func NewContainer(name string) Container {
@@ -121,8 +138,8 @@ func (lxc *Container) Running() bool {
 }
 
 // Returns the container's state
-func (lxc *Container) GetState() string {
-	return C.GoString(C.lxc_container_state(lxc.container))
+func (lxc *Container) GetState() State {
+	return stateMap[C.GoString(C.lxc_container_state(lxc.container))]
 }
 
 // Returns the container's PID
