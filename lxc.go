@@ -39,56 +39,13 @@ import (
 	"unsafe"
 )
 
-type State int
-
 const (
 	// Timeout
 	WAIT_FOREVER int = iota
 	DONT_WAIT
-	// State
-	STOPPED  = C.STOPPED
-	STARTING = C.STARTING
-	RUNNING  = C.RUNNING
-	STOPPING = C.STOPPING
-	ABORTING = C.ABORTING
-	FREEZING = C.FREEZING
-	FROZEN   = C.FROZEN
-	THAWED   = C.THAWED
+
+	LXC_NETWORK_KEY = "lxc.network"
 )
-
-var stateMap = map[string]State{
-	"STOPPED":  STOPPED,
-	"STARTING": STARTING,
-	"RUNNING":  RUNNING,
-	"STOPPING": STOPPING,
-	"ABORTING": ABORTING,
-	"FREEZING": FREEZING,
-	"FROZEN":   FROZEN,
-	"THAWED":   THAWED,
-}
-
-// State as string
-func (t State) String() string {
-	switch t {
-	case STOPPED:
-		return "STOPPED"
-	case STARTING:
-		return "STARTING"
-	case RUNNING:
-		return "RUNNING"
-	case STOPPING:
-		return "STOPPING"
-	case ABORTING:
-		return "ABORTING"
-	case FREEZING:
-		return "FREEZING"
-	case FROZEN:
-		return "FROZEN"
-	case THAWED:
-		return "THAWED"
-	}
-	return "<INVALID>"
-}
 
 func makeArgs(args []string) []*C.char {
 	ret := make([]*C.char, len(args))
@@ -281,5 +238,5 @@ func (lxc *Container) SaveConfigFile(path string) bool {
 }
 
 func (lxc *Container) GetNumberOfNetworkInterfaces() int {
-	return len(lxc.GetConfigItem("lxc.network"))
+	return len(lxc.GetConfigItem(LXC_NETWORK_KEY))
 }

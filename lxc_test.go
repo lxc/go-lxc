@@ -191,7 +191,6 @@ func TestGetKeys(t *testing.T) {
 func TestGetNumberOfNetworkInterfaces(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	fmt.Printf("%d\n", z.GetNumberOfNetworkInterfaces())
 	if z.GetNumberOfNetworkInterfaces() != 1 {
 		t.Errorf("GetNumberOfNetworkInterfaces failed...")
 	}
@@ -202,6 +201,7 @@ func TestShutdown(t *testing.T) {
 
 	fmt.Printf("Shutting down the container...\n")
 	z.Shutdown(30)
+
 	if z.Running() {
 		t.Errorf("Shutting down the container failed...")
 	}
