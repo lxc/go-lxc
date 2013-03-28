@@ -29,7 +29,7 @@ import (
 )
 
 const (
-	CONTAINER_NAME = "rubik"
+	CONTAINER_NAME   = "rubik"
 	CONFIG_FILE_NAME = "/var/lib/lxc/rubik/config"
 )
 
@@ -68,7 +68,7 @@ func TestDefined_Positive(t *testing.T) {
 }
 
 func TestInitPID_Negative(t *testing.T) {
-   	z := NewContainer(CONTAINER_NAME)
+	z := NewContainer(CONTAINER_NAME)
 
 	if z.GetInitPID() != -1 {
 		t.Errorf("GetInitPID failed...")
@@ -89,7 +89,7 @@ func TestStart(t *testing.T) {
 }
 
 func TestSetDaemonize(t *testing.T) {
-        z := NewContainer(CONTAINER_NAME)
+	z := NewContainer(CONTAINER_NAME)
 
 	z.SetDaemonize()
 	if !z.GetDaemonize() {
@@ -98,16 +98,15 @@ func TestSetDaemonize(t *testing.T) {
 }
 
 func TestInitPID_Positive(t *testing.T) {
-   	z := NewContainer(CONTAINER_NAME)
+	z := NewContainer(CONTAINER_NAME)
 
 	if z.GetInitPID() == -1 {
 		t.Errorf("GetInitPID failed...")
 	}
 }
 
-
 func TestGetName(t *testing.T) {
-   	z := NewContainer(CONTAINER_NAME)
+	z := NewContainer(CONTAINER_NAME)
 
 	if z.GetName() != CONTAINER_NAME {
 		t.Errorf("GetName failed...")
@@ -155,7 +154,7 @@ func TestSaveConfigFile(t *testing.T) {
 }
 
 func TestGetConfigItem(t *testing.T) {
-        z := NewContainer(CONTAINER_NAME)
+	z := NewContainer(CONTAINER_NAME)
 
 	if z.GetConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
 		t.Errorf("GetConfigItem failed...")
@@ -163,23 +162,22 @@ func TestGetConfigItem(t *testing.T) {
 }
 
 func TestSetConfigItem(t *testing.T) {
-        z := NewContainer(CONTAINER_NAME)
+	z := NewContainer(CONTAINER_NAME)
 
-	z.SetConfigItem("lxc.utsname", CONTAINER_NAME) 
+	z.SetConfigItem("lxc.utsname", CONTAINER_NAME)
 	if z.GetConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
 		t.Errorf("GetConfigItem failed...")
 	}
 }
 
 func TestClearConfigItem(t *testing.T) {
-        z := NewContainer(CONTAINER_NAME)
+	z := NewContainer(CONTAINER_NAME)
 
 	z.ClearConfigItem("lxc.cap.drop")
 	if z.GetConfigItem("lxc.cap.drop")[0] != "" {
 		t.Errorf("ClearConfigItem failed...")
 	}
 }
-
 
 func TestGetKeys(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
