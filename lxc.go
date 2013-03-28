@@ -102,42 +102,53 @@ func NewContainer(name string) Container {
 	return Container{C.lxc_container_new(cname)}
 }
 
+
+// Returns container's name
 func (lxc *Container) GetName() string {
 	return C.GoString(lxc.container.name)
 }
 
+// Returns whether the container is already defined or not
 func (lxc *Container) Defined() bool {
 	return bool(C.lxc_container_defined(lxc.container))
 }
 
+// Returns whether the container is already running or not
 func (lxc *Container) Running() bool {
 	return bool(C.lxc_container_running(lxc.container))
 }
 
+// Returns the container's state
 func (lxc *Container) GetState() string {
 	return C.GoString(C.lxc_container_state(lxc.container))
 }
 
+// Returns the container's PID
 func (lxc *Container) GetInitPID() int {
 	return int(C.lxc_container_init_pid(lxc.container))
 }
 
+// Returns whether the daemonize flag is set
 func (lxc *Container) GetDaemonize() bool {
 	return bool(lxc.container.daemonize != 0)
 }
 
+// Sets the daemonize flag
 func (lxc *Container) SetDaemonize() {
 	C.lxc_container_want_daemonize(lxc.container)
 }
 
+// Freezes the running container
 func (lxc *Container) Freeze() bool {
 	return bool(C.lxc_container_freeze(lxc.container))
 }
 
+// Unfreezes the frozen container
 func (lxc *Container) Unfreeze() bool {
 	return bool(C.lxc_container_unfreeze(lxc.container))
 }
 
+// Creates the container using given template and arguments
 func (lxc *Container) Create(template string, args []string) bool {
 	ctemplate := C.CString(template)
 	defer C.free(unsafe.Pointer(ctemplate))
@@ -149,6 +160,7 @@ func (lxc *Container) Create(template string, args []string) bool {
 	return bool(C.lxc_container_create(lxc.container, ctemplate, nil))
 }
 
+// Starts the container
 func (lxc *Container) Start(useinit bool, args []string) bool {
 	cuseinit := 0
 	if useinit {
@@ -162,34 +174,42 @@ func (lxc *Container) Start(useinit bool, args []string) bool {
 	return bool(C.lxc_container_start(lxc.container, C.int(cuseinit), nil))
 }
 
+// Stops the container
 func (lxc *Container) Stop() bool {
 	return bool(C.lxc_container_stop(lxc.container))
 }
 
+// Shutdowns the container
 func (lxc *Container) Shutdown(timeout int) bool {
 	return bool(C.lxc_container_shutdown(lxc.container, C.int(timeout)))
 }
 
+// Destroys the container
 func (lxc *Container) Destroy() bool {
 	return bool(C.lxc_container_destroy(lxc.container))
 }
 
+// Waits till the container changes its state or timeouts
 func (lxc *Container) Wait(state State, timeout int) bool {
 	cstate := C.CString(state.String())
 	defer C.free(unsafe.Pointer(cstate))
 	return bool(C.lxc_container_wait(lxc.container, cstate, C.int(timeout)))
 }
 
+// Returns the container's configuration file's name
 func (lxc *Container) GetConfigFileName() string {
 	return C.GoString(C.lxc_container_config_file_name(lxc.container))
 }
 
+// Returns the value of the given key
 func (lxc *Container) GetConfigItem(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 	return strings.Split(C.GoString(C.lxc_container_get_config_item(lxc.container, ckey)), "\n")
 }
 
+
+// Sets the value of given key
 func (lxc *Container) SetConfigItem(key string, value string) bool {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
@@ -198,18 +218,21 @@ func (lxc *Container) SetConfigItem(key string, value string) bool {
 	return bool(C.lxc_container_set_config_item(lxc.container, ckey, cvalue))
 }
 
+// Clears the value of given key
 func (lxc *Container) ClearConfigItem(key string) bool {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 	return bool(C.lxc_container_clear_config_item(lxc.container, ckey))
 }
 
+// Returns the keys
 func (lxc *Container) GetKeys(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 	return strings.Split(C.GoString(C.lxc_container_get_keys(lxc.container, ckey)), "\n")
 }
 
+// Loads the configuration file from given path
 func (lxc *Container) LoadConfigFile(path string) bool {
 	// TODO: Remove following code from binding as patch sent to lxc-devel
 	// http://sourceforge.net/mailarchive/forum.php?thread_name=1364411217-15616-1-git-send-email-caglar%4010ur.org&forum_name=lxc-devel
@@ -230,6 +253,7 @@ func (lxc *Container) LoadConfigFile(path string) bool {
 	return bool(C.lxc_container_load_config(lxc.container, cpath))
 }
 
+// Saves the configuration file to given path
 func (lxc *Container) SaveConfigFile(path string) bool {
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
