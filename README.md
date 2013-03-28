@@ -14,6 +14,10 @@ ii  liblxc0    0.8.0~rc1-4ubuntu39.12.10.2          amd64        Linux Container
 
     go get github.com/caglar10ur/lxc
 
+## Documentation
+
+Please see [GoDoc](http://godoc.org/github.com/caglar10ur/lxc)
+
 ## Example
 
 See [lxc_test.go](https://github.com/caglar10ur/lxc/blob/master/lxc_test.go) as an example.
