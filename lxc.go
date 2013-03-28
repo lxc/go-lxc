@@ -20,6 +20,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+//Go (golang) Bindings for LXC (Linux Containers)
+//
+//This package implements Go bindings for the LXC C API.
 package lxc
 
 // #cgo linux LDFLAGS: -llxc -lutil
@@ -101,7 +104,6 @@ func NewContainer(name string) Container {
 	defer C.free(unsafe.Pointer(cname))
 	return Container{C.lxc_container_new(cname)}
 }
-
 
 // Returns container's name
 func (lxc *Container) GetName() string {
@@ -207,7 +209,6 @@ func (lxc *Container) GetConfigItem(key string) []string {
 	defer C.free(unsafe.Pointer(ckey))
 	return strings.Split(C.GoString(C.lxc_container_get_config_item(lxc.container, ckey)), "\n")
 }
-
 
 // Sets the value of given key
 func (lxc *Container) SetConfigItem(key string, value string) bool {
