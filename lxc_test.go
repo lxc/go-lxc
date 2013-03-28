@@ -24,130 +24,199 @@ package lxc
 
 import (
 	"fmt"
-	//  "strings"
+	"strings"
 	"testing"
 )
 
+const (
+	CONTAINER_NAME = "rubik"
+	CONFIG_FILE_NAME = "/var/lib/lxc/rubik/config"
+)
+
+func TestDefined_Negative(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	if z.Defined() {
+		t.Errorf("Defined_Negative failed...")
+	}
+}
+
 func TestCreate(t *testing.T) {
-	z := NewContainer("rubik")
-	z.SetDaemonize()
-	fmt.Printf("Creating container...\n")
-	fmt.Printf("Create: %+v\n", z.Create("ubuntu", []string{"amd64", "quantal"}))
+	z := NewContainer(CONTAINER_NAME)
+
+	fmt.Printf("Creating the container...\n")
+	z.Create("ubuntu", []string{"amd64", "quantal"})
 
 	if !z.Defined() {
-		t.Errorf("Creating a container failed...")
+		t.Errorf("Creating the container failed...")
+	}
+}
+
+func TestGetConfigFileName(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+	if z.GetConfigFileName() != CONFIG_FILE_NAME {
+		t.Errorf("GetConfigFileName failed...")
+	}
+}
+
+func TestDefined_Positive(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	if !z.Defined() {
+		t.Errorf("Defined failed...")
+	}
+}
+
+func TestInitPID_Negative(t *testing.T) {
+   	z := NewContainer(CONTAINER_NAME)
+
+	if z.GetInitPID() != -1 {
+		t.Errorf("GetInitPID failed...")
 	}
 }
 
 func TestStart(t *testing.T) {
-	z := NewContainer("rubik")
-	z.SetDaemonize()
-	fmt.Printf("Starting container...\n")
-	fmt.Printf("Start: %+v\n", z.Start(false, nil))
+	z := NewContainer(CONTAINER_NAME)
 
+	fmt.Printf("Starting the container...\n")
+	z.SetDaemonize()
+	z.Start(false, nil)
+
+	z.Wait(RUNNING, 5)
 	if !z.Running() {
-		t.Errorf("Starting a container failed...")
+		t.Errorf("Starting the container failed...")
+	}
+}
+
+func TestSetDaemonize(t *testing.T) {
+        z := NewContainer(CONTAINER_NAME)
+
+	z.SetDaemonize()
+	if !z.GetDaemonize() {
+		t.Errorf("GetDaemonize failed...")
+	}
+}
+
+func TestInitPID_Positive(t *testing.T) {
+   	z := NewContainer(CONTAINER_NAME)
+
+	if z.GetInitPID() == -1 {
+		t.Errorf("GetInitPID failed...")
+	}
+}
+
+
+func TestGetName(t *testing.T) {
+   	z := NewContainer(CONTAINER_NAME)
+
+	if z.GetName() != CONTAINER_NAME {
+		t.Errorf("GetName failed...")
 	}
 }
 
 func TestFreeze(t *testing.T) {
-	z := NewContainer("rubik")
-	z.SetDaemonize()
-	fmt.Printf("Freezing container...\n")
-	fmt.Printf("Freeze: %+v\n", z.Freeze())
+	z := NewContainer(CONTAINER_NAME)
 
+	fmt.Printf("Freezing the container...\n")
+	z.Freeze()
+
+	z.Wait(FROZEN, 5)
 	if z.GetState() != "FROZEN" {
-		t.Errorf("Freezing a container failed...")
+		t.Errorf("Freezing the container failed...")
 	}
 }
 
 func TestUnfreeze(t *testing.T) {
-	z := NewContainer("rubik")
-	z.SetDaemonize()
-	fmt.Printf("Unfreezing container...\n")
-	fmt.Printf("Unfreeze: %+v\n", z.Unfreeze())
+	z := NewContainer(CONTAINER_NAME)
 
+	fmt.Printf("Unfreezing the container...\n")
+	z.Unfreeze()
+
+	z.Wait(RUNNING, 5)
 	if z.GetState() != "RUNNING" {
-		t.Errorf("Unfreezing a container failed...")
+		t.Errorf("Unfreezing the container failed...")
 	}
 }
 
-/*
-func TestAll(t *testing.T) {
-    z := NewContainer("rubik")
+func TestLoadConfigFile(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
 
-    fmt.Printf("Container name: %s\n", z.GetName())
-    fmt.Printf("Config file: %+v\n", z.GetConfigFileName())
-    fmt.Printf("Load Config File: %+v\n", z.LoadConfigFile("/var/lib/lxc/rubik/config"))
-    fmt.Printf("Save Config File: %+v\n", z.SaveConfigFile("config"))
-    fmt.Printf("Daemonize: %+v\n", z.GetDaemonize())
-    fmt.Printf("Init PID: %+v\n", z.GetInitPID())
-    fmt.Printf("Defined: %+v\n", z.Defined())
-    fmt.Printf("Running: %+v\n", z.Running())
-    fmt.Printf("State: %+v\n", z.GetState())
-    z.SetDaemonize()
-    fmt.Printf("Daemonize: %+v\n", z.GetDaemonize())
-
-    if !z.Defined() {
-        fmt.Printf("Creating container...\n")
-        fmt.Printf("Create: %+v\n", z.Create("ubuntu", []string{"amd64", "quantal"}))
-    } else {
-        fmt.Printf("Starting container...\n\n")
-        fmt.Printf("Start: %+v\n", z.Start(false, nil))
-        fmt.Printf("State: %+v\n", z.GetState())
-        fmt.Printf("Init PID: %+v\n", z.GetInitPID())
-        fmt.Printf("Freeze: %+v\n", z.Freeze())
-        fmt.Printf("State: %+v\n", z.GetState())
-        fmt.Printf("Unfreeze: %+v\n", z.Unfreeze())
-        fmt.Printf("State: %+v\n", z.GetState())
-    }
-
-    utsname_key := "lxc.utsname"
-    utsname_value := z.GetConfigItem(utsname_key)[0]
-    fmt.Printf("GetConfigItem: %s\n", utsname_value)
-    fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(utsname_key, "kibur"))
-    fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(utsname_key))
-    fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(utsname_key, utsname_value))
-
-    fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.arch"))
-    fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem("lxc.mount"))
-
-    caps_key := "lxc.cap.drop"
-    caps_value := strings.Join(z.GetConfigItem(caps_key), " ")
-    fmt.Printf("GetConfigItem: %s\n", caps_value)
-    fmt.Printf("ClearConfigItem: %+v\n", z.ClearConfigItem(caps_key))
-    fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(caps_key))
-    fmt.Printf("SetConfigItem: %+v\n", z.SetConfigItem(caps_key, caps_value))
-    fmt.Printf("GetConfigItem: %s\n", z.GetConfigItem(caps_key))
-
-    fmt.Printf("GetKeys: %s\n", z.GetKeys("lxc.network.0"))
-    fmt.Printf("Wait 5 sec. (RUNNING): %+v\n", z.Wait(RUNNING, 5))
-
-    if z.Running() {
-        fmt.Printf("Shutting down container...\n\n")
-        fmt.Printf("Shutdown: %+v\n", z.Shutdown(30))
-        fmt.Printf("State: %+v\n", z.GetState())
-        fmt.Printf("Stop: %+v\n", z.Stop())
-        fmt.Printf("State: %+v\n", z.GetState())
-        fmt.Printf("Destroy: %+v\n", z.Destroy())
-    }
+	if !z.LoadConfigFile(CONFIG_FILE_NAME) {
+		t.Errorf("LoadConfigFile failed...")
+	}
 }
-*/
+
+func TestSaveConfigFile(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	if !z.SaveConfigFile(CONFIG_FILE_NAME) {
+		t.Errorf("LoadConfigFile failed...")
+	}
+}
+
+func TestGetConfigItem(t *testing.T) {
+        z := NewContainer(CONTAINER_NAME)
+
+	if z.GetConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
+		t.Errorf("GetConfigItem failed...")
+	}
+}
+
+func TestSetConfigItem(t *testing.T) {
+        z := NewContainer(CONTAINER_NAME)
+
+	z.SetConfigItem("lxc.utsname", CONTAINER_NAME) 
+	if z.GetConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
+		t.Errorf("GetConfigItem failed...")
+	}
+}
+
+func TestClearConfigItem(t *testing.T) {
+        z := NewContainer(CONTAINER_NAME)
+
+	z.ClearConfigItem("lxc.cap.drop")
+	if z.GetConfigItem("lxc.cap.drop")[0] != "" {
+		t.Errorf("ClearConfigItem failed...")
+	}
+}
+
+
+func TestGetKeys(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	keys := strings.Join(z.GetKeys("lxc.network.0"), " ")
+	if !strings.Contains(keys, "mtu") {
+		t.Errorf("GetKeys failed...")
+	}
+}
 
 func TestShutdown(t *testing.T) {
-	z := NewContainer("rubik")
-	fmt.Printf("Shutting down a container...\n")
-	fmt.Printf("Shut down: %+v\n", z.Shutdown(30))
+	z := NewContainer(CONTAINER_NAME)
+
+	fmt.Printf("Shutting down the container...\n")
+	z.Shutdown(30)
 	if z.Running() {
-		t.Errorf("Shutting down a container failed...")
+		t.Errorf("Shutting down the container failed...")
+	}
+}
+
+func TestStop(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	fmt.Printf("Stopping the container...\n")
+	z.Stop()
+	if z.Running() {
+		t.Errorf("Stopping the container failed...")
 	}
 }
 
 func TestDestroy(t *testing.T) {
-	z := NewContainer("rubik")
-	fmt.Printf("Destroying container...\n")
-	fmt.Printf("Destroy: %+v\n", z.Destroy())
+	z := NewContainer(CONTAINER_NAME)
+
+	fmt.Printf("Destroying the container...\n")
+	z.Destroy()
+
 	if z.Defined() {
-		t.Errorf("Destroying a container failed...")
+		t.Errorf("Destroying the container failed...")
 	}
 }
