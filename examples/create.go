@@ -38,11 +38,11 @@ func init() {
 }
 
 func main() {
-	z := lxc.NewContainer(name)
+	c := lxc.NewContainer(name)
 
-	if !z.Defined() {
+	if !c.Defined() {
 		fmt.Printf("Creating container...\n")
-		z.Create("ubuntu", []string{"amd64", "quantal"})
+		c.Create("ubuntu", []string{"amd64", "quantal"})
 	} else {
 		fmt.Printf("Container is already created...\n")
 	}

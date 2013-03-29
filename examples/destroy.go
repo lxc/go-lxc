@@ -38,11 +38,11 @@ func init() {
 }
 
 func main() {
-	z := lxc.NewContainer(name)
+	c := lxc.NewContainer(name)
 
-	if z.Defined() {
+	if c.Defined() {
 		fmt.Printf("Destroying container...\n")
-		z.Destroy()
+		c.Destroy()
 	} else {
 		fmt.Printf("No such container...\n")
 	}

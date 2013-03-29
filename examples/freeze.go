@@ -38,13 +38,13 @@ func init() {
 }
 
 func main() {
-	z := lxc.NewContainer(name)
+	c := lxc.NewContainer(name)
 
-	if z.Defined() {
-		if z.Running() {
+	if c.Defined() {
+		if c.Running() {
 			fmt.Printf("Freezing the container...\n")
-			z.Freeze()
-			z.Wait(lxc.FROZEN, 10)
+			c.Freeze()
+			c.Wait(lxc.FROZEN, 10)
 		} else {
 			fmt.Printf("Container is not running...\n")
 		}

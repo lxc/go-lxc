@@ -38,13 +38,13 @@ func init() {
 }
 
 func main() {
-	z := lxc.NewContainer(name)
+	c := lxc.NewContainer(name)
 
-	if z.Defined() {
-		if !z.Running() {
+	if c.Defined() {
+		if !c.Running() {
 			fmt.Printf("Starting the container...\n")
-			z.SetDaemonize()
-			z.Start(false, nil)
+			c.SetDaemonize()
+			c.Start(false, nil)
 		} else {
 			fmt.Printf("Container is already running...\n")
 		}
