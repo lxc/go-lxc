@@ -32,8 +32,6 @@ package lxc
 import "C"
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"syscall"
 	"unsafe"
@@ -76,7 +74,16 @@ func (lxc *Container) GetError() error {
 func NewContainer(name string) Container {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
-	return Container{C.lxc_container_new(cname)}
+	return Container{C.lxc_container_new(cname, nil)}
+}
+
+// Returns LXC version
+func GetVersion() string {
+	return C.GoString(C.lxc_get_version())
+}
+
+func GetDefaultConfigPath() string {
+	return C.GoString(C.lxc_get_default_config_path())
 }
 
 // Returns container's name
@@ -194,6 +201,23 @@ func (lxc *Container) SetConfigItem(key string, value string) bool {
 	return bool(C.lxc_container_set_config_item(lxc.container, ckey, cvalue))
 }
 
+// Returns the value of the given key
+func (lxc *Container) GetCgroupItem(key string) []string {
+	ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(ckey))
+	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_cgroup_item(lxc.container, ckey)))
+	return strings.Split(ret, "\n")
+}
+
+// Sets the value of given key
+func (lxc *Container) SetCgroupItem(key string, value string) bool {
+	ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(ckey))
+	cvalue := C.CString(value)
+	defer C.free(unsafe.Pointer(cvalue))
+	return bool(C.lxc_container_set_cgroup_item(lxc.container, ckey, cvalue))
+}
+
 // Clears the value of given key
 func (lxc *Container) ClearConfigItem(key string) bool {
 	ckey := C.CString(key)
@@ -211,20 +235,6 @@ func (lxc *Container) GetKeys(key string) []string {
 
 // Loads the configuration file from given path
 func (lxc *Container) LoadConfigFile(path string) bool {
-	// TODO: Remove following code from binding as patch sent to lxc-devel
-	// http://sourceforge.net/mailarchive/forum.php?thread_name=1364411217-15616-1-git-send-email-caglar%4010ur.org&forum_name=lxc-devel
-	// reject loading config file if it doesn't exist
-	// otherwise container starts without a netns
-	path, err := filepath.Abs(path)
-	if err != nil {
-		return false
-	}
-
-	_, err = os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 	return bool(C.lxc_container_load_config(lxc.container, cpath))
@@ -235,6 +245,16 @@ func (lxc *Container) SaveConfigFile(path string) bool {
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 	return bool(C.lxc_container_save_config(lxc.container, cpath))
+}
+
+func (lxc *Container) GetConfigPath() string {
+	return C.GoString(C.lxc_container_get_config_path(lxc.container))
+}
+
+func (lxc *Container) SetConfigPath(path string) bool {
+	cpath := C.CString(path)
+	defer C.free(unsafe.Pointer(cpath))
+	return bool(C.lxc_container_set_config_path(lxc.container, cpath))
 }
 
 func (lxc *Container) GetNumberOfNetworkInterfaces() int {

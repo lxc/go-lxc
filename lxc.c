@@ -116,6 +116,31 @@ char* lxc_container_get_keys(struct lxc_container *c, char *key) {
 	return value;
 }
 
+char* lxc_container_get_cgroup_item(struct lxc_container *c, char *key) {
+	int len = c->get_cgroup_item(c, key, NULL, 0);
+	if (len <= 0) {
+		return NULL;
+	}
+
+	char* value = (char*)malloc(sizeof(char)*len + 1);
+	if (c->get_cgroup_item(c, key, value, len + 1) != len) {
+		return NULL;
+	}
+	return value;
+}
+
+bool lxc_container_set_cgroup_item(struct lxc_container *c, char *key, char *value) {
+	return c->set_cgroup_item(c, key, value);
+}
+
+const char* lxc_container_get_config_path(struct lxc_container *c) {
+	return c->get_config_path(c);
+}
+
+bool lxc_container_set_config_path(struct lxc_container *c, char *path) {
+	return c->set_config_path(c, path);
+}
+
 bool lxc_container_load_config(struct lxc_container *c, char *alt_file) {
 	return c->load_config(c, alt_file);
 }

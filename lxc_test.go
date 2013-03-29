@@ -30,8 +30,34 @@ import (
 
 const (
 	CONTAINER_NAME   = "rubik"
+	CONFIG_FILE_PATH = "/var/lib/lxc"
 	CONFIG_FILE_NAME = "/var/lib/lxc/rubik/config"
 )
+
+func TestGetVersion(t *testing.T) {
+
+	if GetVersion() == "" {
+		t.Errorf("GetVersion failed...")
+	}
+}
+
+func TestGetDefaultConfigPath(t *testing.T) {
+	if GetDefaultConfigPath() != CONFIG_FILE_PATH {
+		t.Errorf("GetDefaultConfigPath failed...")
+	}
+}
+
+func TestGetSetConfigPath(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	current_path := z.GetConfigPath()
+	z.SetConfigPath("/tmp")
+	new_path := z.GetConfigPath()
+
+	if current_path == new_path {
+		t.Errorf("GetSetConfigPath failed...")
+	}
+}
 
 func TestDefined_Negative(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
@@ -167,6 +193,19 @@ func TestSetConfigItem(t *testing.T) {
 	z.SetConfigItem("lxc.utsname", CONTAINER_NAME)
 	if z.GetConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
 		t.Errorf("GetConfigItem failed...")
+	}
+}
+
+func TestGetSetCgroupItem(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	max_mem := z.GetCgroupItem("memory.max_usage_in_bytes")[0]
+	current_mem := z.GetCgroupItem("memory.limit_in_bytes")[0]
+	z.SetCgroupItem("memory.limit_in_bytes", max_mem)
+	new_mem := z.GetCgroupItem("memory.limit_in_bytes")[0]
+
+	if new_mem == current_mem {
+		t.Errorf("GetSetCgroupItem failed...")
 	}
 }
 
