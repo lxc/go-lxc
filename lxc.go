@@ -39,7 +39,7 @@ import (
 
 const (
 	// Timeout
-	WAIT_FOREVER int = iota
+	WAIT_FOREVER int = iota - 1
 	DONT_WAIT
 
 	LXC_NETWORK_KEY = "lxc.network"
