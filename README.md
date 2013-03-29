@@ -14,4 +14,4 @@ Checkout the documentation at [GoDoc](http://godoc.org/github.com/caglar10ur/lxc
 
 ## Example
 
-See [lxc_test.go](https://github.com/caglar10ur/lxc/blob/master/lxc_test.go) as an example.
+Checkout the [examples](https://github.com/caglar10ur/lxc/examples) directory.
