@@ -15,3 +15,7 @@ Checkout the documentation at [GoDoc](http://godoc.org/github.com/caglar10ur/lxc
 ## Example
 
 Checkout the [examples](https://github.com/caglar10ur/lxc/tree/master/examples) directory.
+
+## Note
+
+Note that as we don’t have full user namespaces support at the moment, any code using the LXC API needs to run as root.
