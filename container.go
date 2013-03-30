@@ -28,8 +28,9 @@ package lxc
 import "C"
 
 import (
+	"strconv"
 	"strings"
-//	"syscall"
+	//	"syscall"
 	"unsafe"
 )
 
@@ -221,5 +222,53 @@ func (lxc *Container) SetConfigPath(path string) bool {
 }
 
 func (lxc *Container) GetNumberOfNetworkInterfaces() int {
-	return len(lxc.GetConfigItem(LXC_NETWORK_KEY))
+	if lxc.Running() {
+		return len(lxc.GetConfigItem(LXC_NETWORK_KEY))
+	} else {
+		return -1
+	}
+}
+
+func (lxc *Container) GetMemoryUsageInBytes() (ByteSize, error) {
+	if lxc.Running() {
+		mem_used, err := strconv.ParseFloat(lxc.GetCgroupItem("memory.usage_in_bytes")[0], 64)
+		if err != nil {
+			return -1, err
+		}
+		return ByteSize(mem_used), err
+	}
+	return -1, nil
+}
+
+func (lxc *Container) GetSwapUsageInBytes() (ByteSize, error) {
+	if lxc.Running() {
+		swap_used, err := strconv.ParseFloat(lxc.GetCgroupItem("memory.memsw.usage_in_bytes")[0], 64)
+		if err != nil {
+			return -1, err
+		}
+		return ByteSize(swap_used), err
+	}
+	return -1, nil
+}
+
+func (lxc *Container) GetMemoryLimitInBytes() (ByteSize, error) {
+	if lxc.Running() {
+		mem_limit, err := strconv.ParseFloat(lxc.GetCgroupItem("memory.limit_in_bytes")[0], 64)
+		if err != nil {
+			return -1, err
+		}
+		return ByteSize(mem_limit), err
+	}
+	return -1, nil
+}
+
+func (lxc *Container) GetSwapLimitInBytes() (ByteSize, error) {
+	if lxc.Running() {
+		swap_limit, err := strconv.ParseFloat(lxc.GetCgroupItem("memory.memsw.limit_in_bytes")[0], 64)
+		if err != nil {
+			return -1, err
+		}
+		return ByteSize(swap_limit), err
+	}
+	return -1, nil
 }

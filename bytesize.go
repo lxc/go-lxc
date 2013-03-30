@@ -1,5 +1,5 @@
 /*
- * lxc.go: Go bindings for lxc
+ * bytesize.go: Go bindings for lxc
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -20,40 +20,45 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-//Go (golang) Bindings for LXC (Linux Containers)
-//
-//This package implements Go bindings for the LXC C API.
 package lxc
 
-// #cgo linux LDFLAGS: -llxc -lutil
-// #include <lxc/lxc.h>
-// #include <lxc/lxccontainer.h>
-// #include "lxc.h"
-import "C"
-
 import (
-	"unsafe"
+	"fmt"
 )
+
+// Taken from http://golang.org/doc/effective_go.html#constants
+type ByteSize float64
 
 const (
-	// Timeout
-	WAIT_FOREVER int = iota - 1
-	DONT_WAIT
-
-	LXC_NETWORK_KEY = "lxc.network"
+	_           = iota
+	KB ByteSize = 1 << (10 * iota)
+	MB
+	GB
+	TB
+	PB
+	EB
+	ZB
+	YB
 )
 
-func NewContainer(name string) Container {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
-	return Container{C.lxc_container_new(cname, nil)}
-}
-
-// Returns LXC version
-func GetVersion() string {
-	return C.GoString(C.lxc_get_version())
-}
-
-func GetDefaultConfigPath() string {
-	return C.GoString(C.lxc_get_default_config_path())
+func (b ByteSize) String() string {
+	switch {
+	case b >= YB:
+		return fmt.Sprintf("%.2fYB", b/YB)
+	case b >= ZB:
+		return fmt.Sprintf("%.2fZB", b/ZB)
+	case b >= EB:
+		return fmt.Sprintf("%.2fEB", b/EB)
+	case b >= PB:
+		return fmt.Sprintf("%.2fPB", b/PB)
+	case b >= TB:
+		return fmt.Sprintf("%.2fTB", b/TB)
+	case b >= GB:
+		return fmt.Sprintf("%.2fGB", b/GB)
+	case b >= MB:
+		return fmt.Sprintf("%.2fMB", b/MB)
+	case b >= KB:
+		return fmt.Sprintf("%.2fKB", b/KB)
+	}
+	return fmt.Sprintf("%.2fB", b)
 }

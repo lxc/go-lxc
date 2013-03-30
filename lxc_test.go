@@ -107,7 +107,7 @@ func TestStart(t *testing.T) {
 	z.SetDaemonize()
 	z.Start(false, nil)
 
-	z.Wait(RUNNING, 5)
+	z.Wait(RUNNING, 30)
 	if !z.Running() {
 		t.Errorf("Starting the container failed...")
 	}
@@ -144,7 +144,7 @@ func TestFreeze(t *testing.T) {
 	t.Logf("Freezing the container...\n")
 	z.Freeze()
 
-	z.Wait(FROZEN, 5)
+	z.Wait(FROZEN, 30)
 	if z.GetState() != FROZEN {
 		t.Errorf("Freezing the container failed...")
 	}
@@ -156,7 +156,7 @@ func TestUnfreeze(t *testing.T) {
 	t.Logf("Unfreezing the container...\n")
 	z.Unfreeze()
 
-	z.Wait(RUNNING, 5)
+	z.Wait(RUNNING, 30)
 	if z.GetState() != RUNNING {
 		t.Errorf("Unfreezing the container failed...")
 	}
@@ -232,6 +232,24 @@ func TestGetNumberOfNetworkInterfaces(t *testing.T) {
 	if z.GetNumberOfNetworkInterfaces() != 1 {
 		t.Errorf("GetNumberOfNetworkInterfaces failed...")
 	}
+}
+
+func TestGetMemoryUsageInBytes(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	mem_used, _ := z.GetMemoryUsageInBytes()
+	swap_used, _ := z.GetSwapUsageInBytes()
+	mem_limit, _ := z.GetMemoryLimitInBytes()
+	swap_limit, _ := z.GetSwapLimitInBytes()
+
+	t.Logf("Mem usage: %0.0f\n", mem_used)
+	t.Logf("Mem usage: %s\n", mem_used)
+	t.Logf("Swap usage: %0.0f\n", swap_used)
+	t.Logf("Swap usage: %s\n", swap_used)
+	t.Logf("Mem limit: %0.0f\n", mem_limit)
+	t.Logf("Mem limit: %s\n", mem_limit)
+	t.Logf("Swap limit: %0.0f\n", swap_limit)
+	t.Logf("Swap limit: %s\n", swap_limit)
 }
 
 func TestShutdown(t *testing.T) {
