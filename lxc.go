@@ -40,7 +40,7 @@ const (
 	WAIT_FOREVER int = iota - 1
 	DONT_WAIT
 
-	lxc_NETWORK_KEY = "lxc.network"
+	LXC_NETWORK_KEY = "lxc.network"
 )
 
 func NewContainer(name string) Container {
