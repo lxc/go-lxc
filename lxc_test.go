@@ -23,7 +23,6 @@
 package lxc
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
@@ -70,7 +69,7 @@ func TestDefined_Negative(t *testing.T) {
 func TestCreate(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	fmt.Printf("Creating the container...\n")
+	t.Logf("Creating the container...\n")
 	z.Create("ubuntu", []string{"amd64", "quantal"})
 
 	if !z.Defined() {
@@ -104,7 +103,7 @@ func TestInitPID_Negative(t *testing.T) {
 func TestStart(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	fmt.Printf("Starting the container...\n")
+	t.Logf("Starting the container...\n")
 	z.SetDaemonize()
 	z.Start(false, nil)
 
@@ -142,7 +141,7 @@ func TestGetName(t *testing.T) {
 func TestFreeze(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	fmt.Printf("Freezing the container...\n")
+	t.Logf("Freezing the container...\n")
 	z.Freeze()
 
 	z.Wait(FROZEN, 5)
@@ -154,7 +153,7 @@ func TestFreeze(t *testing.T) {
 func TestUnfreeze(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	fmt.Printf("Unfreezing the container...\n")
+	t.Logf("Unfreezing the container...\n")
 	z.Unfreeze()
 
 	z.Wait(RUNNING, 5)
@@ -238,7 +237,7 @@ func TestGetNumberOfNetworkInterfaces(t *testing.T) {
 func TestShutdown(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	fmt.Printf("Shutting down the container...\n")
+	t.Logf("Shutting down the container...\n")
 	z.Shutdown(30)
 
 	if z.Running() {
@@ -249,7 +248,7 @@ func TestShutdown(t *testing.T) {
 func TestStop(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	fmt.Printf("Stopping the container...\n")
+	t.Logf("Stopping the container...\n")
 	z.Stop()
 	if z.Running() {
 		t.Errorf("Stopping the container failed...")
@@ -259,7 +258,7 @@ func TestStop(t *testing.T) {
 func TestDestroy(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	fmt.Printf("Destroying the container...\n")
+	t.Logf("Destroying the container...\n")
 	z.Destroy()
 
 	if z.Defined() {

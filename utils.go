@@ -1,5 +1,5 @@
 /*
- * lxc.go: Go bindings for lxc
+ * utils.go: Go bindings for lxc
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -25,36 +25,23 @@
 //This package implements Go bindings for the LXC C API.
 package lxc
 
-// #cgo linux LDFLAGS: -llxc -lutil
-// #include <lxc/lxc.h>
-// #include <lxc/lxccontainer.h>
-// #include "lxc.h"
+// #include <stdlib.h>
 import "C"
 
 import (
 	"unsafe"
 )
 
-const (
-	// Timeout
-	WAIT_FOREVER int = iota - 1
-	DONT_WAIT
-
-	lxc_NETWORK_KEY = "lxc.network"
-)
-
-func NewContainer(name string) Container {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
-	return Container{C.lxc_container_new(cname, nil)}
+func makeArgs(args []string) []*C.char {
+	ret := make([]*C.char, len(args))
+	for i, s := range args {
+		ret[i] = C.CString(s)
+	}
+	return ret
 }
 
-// Returns LXC version
-func GetVersion() string {
-	return C.GoString(C.lxc_get_version())
+func freeArgs(cArgs []*C.char) {
+	for _, s := range cArgs {
+		C.free(unsafe.Pointer(s))
+	}
 }
-
-func GetDefaultConfigPath() string {
-	return C.GoString(C.lxc_get_default_config_path())
-}
-
