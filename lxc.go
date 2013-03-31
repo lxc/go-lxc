@@ -32,6 +32,7 @@ package lxc
 import "C"
 
 import (
+	"path/filepath"
 	"unsafe"
 )
 
@@ -54,6 +55,31 @@ func GetVersion() string {
 	return C.GoString(C.lxc_get_version())
 }
 
+// Returns default config path
 func GetDefaultConfigPath() string {
 	return C.GoString(C.lxc_get_default_config_path())
+}
+
+// Returns the names of containers on the system.
+func GetContainerNames() []string {
+	// FIXME: Support custom config paths
+	matches, err := filepath.Glob(filepath.Join(GetDefaultConfigPath(), "/*/config"))
+	if err != nil {
+		return nil
+	}
+
+	for i, v := range matches {
+		matches[i] = filepath.Base(filepath.Dir(v))
+	}
+	return matches
+}
+
+// Returns the containers on the system.
+func GetContainers() []Container {
+	var containers []Container
+
+	for _, v := range GetContainerNames() {
+		containers = append(containers, NewContainer(v))
+	}
+	return containers
 }

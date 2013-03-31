@@ -46,6 +46,16 @@ func TestGetDefaultConfigPath(t *testing.T) {
 	}
 }
 
+func TestGetContainerNames(t *testing.T) {
+	t.Logf("Containers:%+v\n", GetContainerNames())
+}
+
+func TestGetContainers(t *testing.T) {
+	for _, v := range GetContainers() {
+		t.Logf("%s: %s", v.GetName(), v.GetState())
+	}
+}
+
 func TestGetSetConfigPath(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
