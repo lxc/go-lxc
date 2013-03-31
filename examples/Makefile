@@ -7,7 +7,8 @@ all:
 	go build unfreeze.go
 	go build shutdown.go
 	go build stats.go
+	go build list.go
 clean:
-	rm -f create destroy start stop freeze unfreeze shutdown stats
+	rm -f create destroy start stop freeze unfreeze shutdown stats list
 format:
 	gofmt -s -w *.go
