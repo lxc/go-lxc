@@ -80,9 +80,7 @@ func TestCreate(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
 	t.Logf("Creating the container...\n")
-	z.Create("ubuntu", []string{"amd64", "quantal"})
-
-	if !z.Defined() {
+	if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
 		t.Errorf("Creating the container failed...")
 	}
 }
@@ -278,6 +276,7 @@ func TestStop(t *testing.T) {
 
 	t.Logf("Stopping the container...\n")
 	z.Stop()
+
 	if z.Running() {
 		t.Errorf("Stopping the container failed...")
 	}
@@ -287,9 +286,7 @@ func TestDestroy(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
 	t.Logf("Destroying the container...\n")
-	z.Destroy()
-
-	if z.Defined() {
+	if !z.Destroy() {
 		t.Errorf("Destroying the container failed...")
 	}
 }
