@@ -1,0 +1,9 @@
+examples/create
+examples/destroy
+examples/freeze
+examples/list
+examples/shutdown
+examples/start
+examples/stats
+examples/stop
+examples/unfreeze
