@@ -23,7 +23,9 @@
 package lxc
 
 import (
+	"runtime"
 	"strings"
+	_ "sync"
 	"testing"
 )
 
@@ -32,6 +34,10 @@ const (
 	CONFIG_FILE_PATH = "/var/lib/lxc"
 	CONFIG_FILE_NAME = "/var/lib/lxc/rubik/config"
 )
+
+func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
 
 func TestGetVersion(t *testing.T) {
 
@@ -67,6 +73,25 @@ func TestGetSetConfigPath(t *testing.T) {
 		t.Errorf("GetSetConfigPath failed...")
 	}
 }
+
+/*
+func TestConcurrentDefined_Negative(t *testing.T) {
+	var wg sync.WaitGroup
+	z := NewContainer(CONTAINER_NAME)
+
+	for i := 1; i <= 100; i++ {
+		go func() {
+			if z.Defined() {
+				t.Errorf("Defined_Negative failed...")
+			}
+			wg.Done()
+		}()
+		wg.Add(1)
+	}
+	wg.Wait()
+	t.Logf("TestConcurrentDefined_Negative completed...\n")
+}
+*/
 
 func TestDefined_Negative(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)

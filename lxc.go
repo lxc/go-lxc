@@ -44,10 +44,10 @@ const (
 	LXC_NETWORK_KEY = "lxc.network"
 )
 
-func NewContainer(name string) Container {
+func NewContainer(name string) *Container {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
-	return Container{C.lxc_container_new(cname, nil)}
+	return &Container{container: C.lxc_container_new(cname, nil)}
 }
 
 // Returns LXC version
@@ -79,7 +79,7 @@ func GetContainers() []Container {
 	var containers []Container
 
 	for _, v := range GetContainerNames() {
-		containers = append(containers, NewContainer(v))
+		containers = append(containers, *NewContainer(v))
 	}
 	return containers
 }
