@@ -23,10 +23,13 @@
 package lxc
 
 import (
+	"math/rand"
 	"runtime"
+	"strconv"
 	"strings"
-	_ "sync"
+	"sync"
 	"testing"
+	"time"
 )
 
 const (
@@ -74,24 +77,25 @@ func TestGetSetConfigPath(t *testing.T) {
 	}
 }
 
-/*
 func TestConcurrentDefined_Negative(t *testing.T) {
 	var wg sync.WaitGroup
-	z := NewContainer(CONTAINER_NAME)
 
-	for i := 1; i <= 100; i++ {
+	for i := 0; i <= 100; i++ {
+		wg.Add(1)
 		go func() {
+			z := NewContainer(strconv.Itoa(rand.Intn(10)))
+
+			// sleep for a while to simulate some dummy work
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
+
 			if z.Defined() {
 				t.Errorf("Defined_Negative failed...")
 			}
 			wg.Done()
 		}()
-		wg.Add(1)
 	}
 	wg.Wait()
-	t.Logf("TestConcurrentDefined_Negative completed...\n")
 }
-*/
 
 func TestDefined_Negative(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
@@ -110,6 +114,27 @@ func TestCreate(t *testing.T) {
 	}
 }
 
+func TestConcurrentCreate(t *testing.T) {
+	var wg sync.WaitGroup
+
+	for i := 0; i <= 10; i++ {
+		wg.Add(1)
+		go func(i int) {
+			z := NewContainer(strconv.Itoa(i))
+
+			// sleep for a while to simulate some dummy work
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
+
+			t.Logf("Creating the container...\n")
+			if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
+				t.Errorf("Creating the container (%d) failed...", i)
+			}
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+}
+
 func TestGetConfigFileName(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 	if z.GetConfigFileName() != CONFIG_FILE_NAME {
@@ -121,8 +146,28 @@ func TestDefined_Positive(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
 	if !z.Defined() {
-		t.Errorf("Defined failed...")
+		t.Errorf("Defined_Positive failed...")
 	}
+}
+
+func TestConcurrentDefined_Positive(t *testing.T) {
+	var wg sync.WaitGroup
+
+	for i := 0; i <= 100; i++ {
+		wg.Add(1)
+		go func() {
+			z := NewContainer(strconv.Itoa(rand.Intn(10)))
+
+			// sleep for a while to simulate some dummy work
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
+
+			if !z.Defined() {
+				t.Errorf("Defined_Positive failed...")
+			}
+			wg.Done()
+		}()
+	}
+	wg.Wait()
 }
 
 func TestInitPID_Negative(t *testing.T) {
@@ -314,4 +359,25 @@ func TestDestroy(t *testing.T) {
 	if !z.Destroy() {
 		t.Errorf("Destroying the container failed...")
 	}
+}
+
+func TestConcurrentDestroy(t *testing.T) {
+	var wg sync.WaitGroup
+
+	for i := 0; i <= 10; i++ {
+		wg.Add(1)
+		go func(i int) {
+			z := NewContainer(strconv.Itoa(i))
+
+			// sleep for a while to simulate some dummy work
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
+
+			t.Logf("Destroying the container...\n")
+			if !z.Destroy() {
+				t.Errorf("Destroying the container failed...")
+			}
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
 }
