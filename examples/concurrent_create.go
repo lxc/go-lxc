@@ -37,11 +37,9 @@ func init() {
 func main() {
 	var wg sync.WaitGroup
 
-	for i := 1; i <= 10; i++ {
+	for i := 0; i <= 10; i++ {
 		wg.Add(1)
 		go func(i int) {
-			// time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
-
 			z := lxc.NewContainer(strconv.Itoa(i))
 
 			fmt.Printf("Creating the container (%d)...\n", i)
