@@ -1,6 +1,8 @@
 all:
 	go build concurrent_create.go
 	go build concurrent_destroy.go
+	go build concurrent_start.go
+	go build concurrent_stop.go
 	go build create.go
 	go build destroy.go
 	go build freeze.go
@@ -13,6 +15,8 @@ all:
 clean:
 	rm -f concurrent_create
 	rm -f concurrent_destroy
+	rm -f concurrent_start
+	rm -f concurrent_stop
 	rm -f create
 	rm -f destroy
 	rm -f freeze
