@@ -1,5 +1,5 @@
 /*
- * concurrent_destroy.go
+ * concurrent_stop.go
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -41,10 +41,12 @@ func main() {
 		wg.Add(1)
 		go func(i int) {
 			z := lxc.NewContainer(strconv.Itoa(i))
-
-			fmt.Printf("Destroying the container (%d)...\n", i)
-			if !z.Destroy() {
-				fmt.Printf("Destroying the container (%d) failed...\n", i)
+			
+			if z.Defined() && z.Running() {
+				fmt.Printf("Shutting down the container (%d)...\n", i)
+				if !z.Shutdown(30) {
+					fmt.Printf("Shutting down the container (%d) failed...\n", i)
+				}
 			}
 			wg.Done()
 		}(i)

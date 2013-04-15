@@ -37,14 +37,16 @@ func init() {
 func main() {
 	var wg sync.WaitGroup
 
-	for i := 0; i <= 10; i++ {
+	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
 			z := lxc.NewContainer(strconv.Itoa(i))
-
-			fmt.Printf("Stopping the container...\n")
-			if !z.Stop() {
-				fmt.Printf("Stopping the container (%d) failed...\n", i)
+			
+			if z.Defined() && z.Running() {
+				fmt.Printf("Stopping the container (%d)...\n", i)
+				if !z.Stop() {
+					fmt.Printf("Stopping the container (%d) failed...\n", i)
+				}
 			}
 			wg.Done()
 		}(i)
