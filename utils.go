@@ -20,9 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-//Go (golang) Bindings for LXC (Linux Containers)
-//
-//This package implements Go bindings for the LXC C API.
 package lxc
 
 // #include <stdlib.h>
