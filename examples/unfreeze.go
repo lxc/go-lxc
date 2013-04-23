@@ -41,7 +41,7 @@ func main() {
 	c := lxc.NewContainer(name)
 
 	if c.Defined() {
-		if c.GetState() == lxc.FROZEN {
+		if c.State() == lxc.FROZEN {
 			fmt.Printf("Unfreezing the container...\n")
 			c.Unfreeze()
 			c.Wait(lxc.RUNNING, 10)

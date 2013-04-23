@@ -42,38 +42,38 @@ func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-func TestGetVersion(t *testing.T) {
+func TestVersion(t *testing.T) {
 
-	if GetVersion() == "" {
-		t.Errorf("GetVersion failed...")
+	if Version() == "" {
+		t.Errorf("Version failed...")
 	}
 }
 
-func TestGetDefaultConfigPath(t *testing.T) {
-	if GetDefaultConfigPath() != CONFIG_FILE_PATH {
-		t.Errorf("GetDefaultConfigPath failed...")
+func TestDefaultConfigPath(t *testing.T) {
+	if DefaultConfigPath() != CONFIG_FILE_PATH {
+		t.Errorf("DefaultConfigPath failed...")
 	}
 }
 
-func TestGetContainerNames(t *testing.T) {
-	t.Logf("Containers:%+v\n", GetContainerNames())
+func TestContainerNames(t *testing.T) {
+	t.Logf("Containers:%+v\n", ContainerNames())
 }
 
-func TestGetContainers(t *testing.T) {
-	for _, v := range GetContainers() {
-		t.Logf("%s: %s", v.GetName(), v.GetState())
+func TestContainers(t *testing.T) {
+	for _, v := range Containers() {
+		t.Logf("%s: %s", v.Name(), v.State())
 	}
 }
 
-func TestGetSetConfigPath(t *testing.T) {
+func TestSetConfigPath(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	current_path := z.GetConfigPath()
+	current_path := z.ConfigPath()
 	z.SetConfigPath("/tmp")
-	new_path := z.GetConfigPath()
+	new_path := z.ConfigPath()
 
 	if current_path == new_path {
-		t.Errorf("GetSetConfigPath failed...")
+		t.Errorf("SetConfigPath failed...")
 	}
 }
 
@@ -135,10 +135,10 @@ func TestConcurrentCreate(t *testing.T) {
 	wg.Wait()
 }
 
-func TestGetConfigFileName(t *testing.T) {
+func TestConfigFileName(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
-	if z.GetConfigFileName() != CONFIG_FILE_NAME {
-		t.Errorf("GetConfigFileName failed...")
+	if z.ConfigFileName() != CONFIG_FILE_NAME {
+		t.Errorf("ConfigFileName failed...")
 	}
 }
 
@@ -173,8 +173,8 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 func TestInitPID_Negative(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	if z.GetInitPID() != -1 {
-		t.Errorf("GetInitPID failed...")
+	if z.InitPID() != -1 {
+		t.Errorf("InitPID failed...")
 	}
 }
 
@@ -195,24 +195,24 @@ func TestSetDaemonize(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
 	z.SetDaemonize()
-	if !z.GetDaemonize() {
-		t.Errorf("GetDaemonize failed...")
+	if !z.Daemonize() {
+		t.Errorf("Daemonize failed...")
 	}
 }
 
 func TestInitPID_Positive(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	if z.GetInitPID() == -1 {
-		t.Errorf("GetInitPID failed...")
+	if z.InitPID() == -1 {
+		t.Errorf("InitPID failed...")
 	}
 }
 
-func TestGetName(t *testing.T) {
+func TestName(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	if z.GetName() != CONTAINER_NAME {
-		t.Errorf("GetName failed...")
+	if z.Name() != CONTAINER_NAME {
+		t.Errorf("Name failed...")
 	}
 }
 
@@ -223,7 +223,7 @@ func TestFreeze(t *testing.T) {
 	z.Freeze()
 
 	z.Wait(FROZEN, 30)
-	if z.GetState() != FROZEN {
+	if z.State() != FROZEN {
 		t.Errorf("Freezing the container failed...")
 	}
 }
@@ -235,7 +235,7 @@ func TestUnfreeze(t *testing.T) {
 	z.Unfreeze()
 
 	z.Wait(RUNNING, 30)
-	if z.GetState() != RUNNING {
+	if z.State() != RUNNING {
 		t.Errorf("Unfreezing the container failed...")
 	}
 }
@@ -256,11 +256,11 @@ func TestSaveConfigFile(t *testing.T) {
 	}
 }
 
-func TestGetConfigItem(t *testing.T) {
+func TestConfigItem(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	if z.GetConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
-		t.Errorf("GetConfigItem failed...")
+	if z.ConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
+		t.Errorf("ConfigItem failed...")
 	}
 }
 
@@ -268,21 +268,21 @@ func TestSetConfigItem(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
 	z.SetConfigItem("lxc.utsname", CONTAINER_NAME)
-	if z.GetConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
-		t.Errorf("GetConfigItem failed...")
+	if z.ConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
+		t.Errorf("ConfigItem failed...")
 	}
 }
 
-func TestGetSetCgroupItem(t *testing.T) {
+func TestSetCgroupItem(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	max_mem := z.GetCgroupItem("memory.max_usage_in_bytes")[0]
-	current_mem := z.GetCgroupItem("memory.limit_in_bytes")[0]
+	max_mem := z.CgroupItem("memory.max_usage_in_bytes")[0]
+	current_mem := z.CgroupItem("memory.limit_in_bytes")[0]
 	z.SetCgroupItem("memory.limit_in_bytes", max_mem)
-	new_mem := z.GetCgroupItem("memory.limit_in_bytes")[0]
+	new_mem := z.CgroupItem("memory.limit_in_bytes")[0]
 
 	if new_mem == current_mem {
-		t.Errorf("GetSetCgroupItem failed...")
+		t.Errorf("SetCgroupItem failed...")
 	}
 }
 
@@ -290,35 +290,35 @@ func TestClearConfigItem(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
 	z.ClearConfigItem("lxc.cap.drop")
-	if z.GetConfigItem("lxc.cap.drop")[0] != "" {
+	if z.ConfigItem("lxc.cap.drop")[0] != "" {
 		t.Errorf("ClearConfigItem failed...")
 	}
 }
 
-func TestGetKeys(t *testing.T) {
+func TestKeys(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	keys := strings.Join(z.GetKeys("lxc.network.0"), " ")
+	keys := strings.Join(z.Keys("lxc.network.0"), " ")
 	if !strings.Contains(keys, "mtu") {
-		t.Errorf("GetKeys failed...")
+		t.Errorf("Keys failed...")
 	}
 }
 
-func TestGetNumberOfNetworkInterfaces(t *testing.T) {
+func TestNumberOfNetworkInterfaces(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	if z.GetNumberOfNetworkInterfaces() != 1 {
-		t.Errorf("GetNumberOfNetworkInterfaces failed...")
+	if z.NumberOfNetworkInterfaces() != 1 {
+		t.Errorf("NumberOfNetworkInterfaces failed...")
 	}
 }
 
-func TestGetMemoryUsageInBytes(t *testing.T) {
+func TestMemoryUsageInBytes(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
-	mem_used, _ := z.GetMemoryUsageInBytes()
-	swap_used, _ := z.GetSwapUsageInBytes()
-	mem_limit, _ := z.GetMemoryLimitInBytes()
-	swap_limit, _ := z.GetSwapLimitInBytes()
+	mem_used, _ := z.MemoryUsageInBytes()
+	swap_used, _ := z.SwapUsageInBytes()
+	mem_limit, _ := z.MemoryLimitInBytes()
+	swap_limit, _ := z.SwapLimitInBytes()
 
 	t.Logf("Mem usage: %0.0f\n", mem_used)
 	t.Logf("Mem usage: %s\n", mem_used)

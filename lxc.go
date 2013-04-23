@@ -51,19 +51,19 @@ func NewContainer(name string) *Container {
 }
 
 // Returns LXC version
-func GetVersion() string {
+func Version() string {
 	return C.GoString(C.lxc_get_version())
 }
 
 // Returns default config path
-func GetDefaultConfigPath() string {
+func DefaultConfigPath() string {
 	return C.GoString(C.lxc_get_default_config_path())
 }
 
 // Returns the names of containers on the system.
-func GetContainerNames() []string {
+func ContainerNames() []string {
 	// FIXME: Support custom config paths
-	matches, err := filepath.Glob(filepath.Join(GetDefaultConfigPath(), "/*/config"))
+	matches, err := filepath.Glob(filepath.Join(DefaultConfigPath(), "/*/config"))
 	if err != nil {
 		return nil
 	}
@@ -75,10 +75,10 @@ func GetContainerNames() []string {
 }
 
 // Returns the containers on the system.
-func GetContainers() []Container {
+func Containers() []Container {
 	var containers []Container
 
-	for _, v := range GetContainerNames() {
+	for _, v := range ContainerNames() {
 		containers = append(containers, *NewContainer(v))
 	}
 	return containers

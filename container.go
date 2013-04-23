@@ -31,7 +31,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	//	"syscall"
+//	"syscall"
 	"sync"
 	"unsafe"
 )
@@ -46,13 +46,13 @@ func (lxc *Container) Error() string {
 	return C.GoString(lxc.container.error_string)
 }
 
-func (lxc *Container) GetError() error {
+func (lxc *Container) Error() error {
 	return syscall.Errno(int(lxc.container.error_num))
 }
 */
 
 // Returns container's name
-func (lxc *Container) GetName() string {
+func (lxc *Container) Name() string {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	return C.GoString(lxc.container.name)
@@ -73,21 +73,21 @@ func (lxc *Container) Running() bool {
 }
 
 // Returns the container's state
-func (lxc *Container) GetState() State {
+func (lxc *Container) State() State {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	return stateMap[C.GoString(C.lxc_container_state(lxc.container))]
 }
 
 // Returns the container's PID
-func (lxc *Container) GetInitPID() int {
+func (lxc *Container) InitPID() int {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	return int(C.lxc_container_init_pid(lxc.container))
 }
 
 // Returns whether the daemonize flag is set
-func (lxc *Container) GetDaemonize() bool {
+func (lxc *Container) Daemonize() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	return bool(lxc.container.daemonize != 0)
@@ -177,14 +177,14 @@ func (lxc *Container) Wait(state State, timeout int) bool {
 }
 
 // Returns the container's configuration file's name
-func (lxc *Container) GetConfigFileName() string {
+func (lxc *Container) ConfigFileName() string {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	return C.GoString(C.lxc_container_config_file_name(lxc.container))
 }
 
 // Returns the value of the given key
-func (lxc *Container) GetConfigItem(key string) []string {
+func (lxc *Container) ConfigItem(key string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	ckey := C.CString(key)
@@ -205,7 +205,7 @@ func (lxc *Container) SetConfigItem(key string, value string) bool {
 }
 
 // Returns the value of the given key
-func (lxc *Container) GetCgroupItem(key string) []string {
+func (lxc *Container) CgroupItem(key string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	ckey := C.CString(key)
@@ -235,7 +235,7 @@ func (lxc *Container) ClearConfigItem(key string) bool {
 }
 
 // Returns the keys
-func (lxc *Container) GetKeys(key string) []string {
+func (lxc *Container) Keys(key string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	ckey := C.CString(key)
@@ -263,7 +263,7 @@ func (lxc *Container) SaveConfigFile(path string) bool {
 }
 
 // Returns the configuration file's path
-func (lxc *Container) GetConfigPath() string {
+func (lxc *Container) ConfigPath() string {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	return C.GoString(C.lxc_container_get_config_path(lxc.container))
@@ -271,26 +271,28 @@ func (lxc *Container) GetConfigPath() string {
 
 // Sets the configuration file's path
 func (lxc *Container) SetConfigPath(path string) bool {
+	lxc.Lock()
+	defer lxc.Unlock()
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 	return bool(C.lxc_container_set_config_path(lxc.container, cpath))
 }
 
-func (lxc *Container) GetNumberOfNetworkInterfaces() int {
+func (lxc *Container) NumberOfNetworkInterfaces() int {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	if lxc.Running() {
-		return len(lxc.GetConfigItem(LXC_NETWORK_KEY))
+		return len(lxc.ConfigItem(LXC_NETWORK_KEY))
 	} else {
 		return -1
 	}
 }
 
-func (lxc *Container) GetMemoryUsageInBytes() (ByteSize, error) {
+func (lxc *Container) MemoryUsageInBytes() (ByteSize, error) {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	if lxc.Running() {
-		memUsed, err := strconv.ParseFloat(lxc.GetCgroupItem("memory.usage_in_bytes")[0], 64)
+		memUsed, err := strconv.ParseFloat(lxc.CgroupItem("memory.usage_in_bytes")[0], 64)
 		if err != nil {
 			return -1, err
 		}
@@ -299,11 +301,11 @@ func (lxc *Container) GetMemoryUsageInBytes() (ByteSize, error) {
 	return -1, nil
 }
 
-func (lxc *Container) GetSwapUsageInBytes() (ByteSize, error) {
+func (lxc *Container) SwapUsageInBytes() (ByteSize, error) {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	if lxc.Running() {
-		swapUsed, err := strconv.ParseFloat(lxc.GetCgroupItem("memory.memsw.usage_in_bytes")[0], 64)
+		swapUsed, err := strconv.ParseFloat(lxc.CgroupItem("memory.memsw.usage_in_bytes")[0], 64)
 		if err != nil {
 			return -1, err
 		}
@@ -312,11 +314,11 @@ func (lxc *Container) GetSwapUsageInBytes() (ByteSize, error) {
 	return -1, nil
 }
 
-func (lxc *Container) GetMemoryLimitInBytes() (ByteSize, error) {
+func (lxc *Container) MemoryLimitInBytes() (ByteSize, error) {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	if lxc.Running() {
-		memLimit, err := strconv.ParseFloat(lxc.GetCgroupItem("memory.limit_in_bytes")[0], 64)
+		memLimit, err := strconv.ParseFloat(lxc.CgroupItem("memory.limit_in_bytes")[0], 64)
 		if err != nil {
 			return -1, err
 		}
@@ -325,11 +327,11 @@ func (lxc *Container) GetMemoryLimitInBytes() (ByteSize, error) {
 	return -1, nil
 }
 
-func (lxc *Container) GetSwapLimitInBytes() (ByteSize, error) {
+func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	if lxc.Running() {
-		swapLimit, err := strconv.ParseFloat(lxc.GetCgroupItem("memory.memsw.limit_in_bytes")[0], 64)
+		swapLimit, err := strconv.ParseFloat(lxc.CgroupItem("memory.memsw.limit_in_bytes")[0], 64)
 		if err != nil {
 			return -1, err
 		}
@@ -339,11 +341,11 @@ func (lxc *Container) GetSwapLimitInBytes() (ByteSize, error) {
 }
 
 // Returns the total CPU time (in nanoseconds) consumed by all tasks in this cgroup (including tasks lower in the hierarchy).
-func (lxc *Container) GetCPUTime() (time.Duration, error) {
+func (lxc *Container) CPUTime() (time.Duration, error) {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	if lxc.Running() {
-		cpuUsage, err := strconv.ParseInt(lxc.GetCgroupItem("cpuacct.usage")[0], 10, 64)
+		cpuUsage, err := strconv.ParseInt(lxc.CgroupItem("cpuacct.usage")[0], 10, 64)
 		if err != nil {
 			return -1, err
 		}
@@ -353,13 +355,13 @@ func (lxc *Container) GetCPUTime() (time.Duration, error) {
 }
 
 // Returns the CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup (including tasks lower in the hierarchy).
-func (lxc *Container) GetCPUTimePerCPU() ([]time.Duration, error) {
+func (lxc *Container) CPUTimePerCPU() ([]time.Duration, error) {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	var cpuTimes []time.Duration
 
 	if lxc.Running() {
-		for _, v := range strings.Split(lxc.GetCgroupItem("cpuacct.usage_percpu")[0], " ") {
+		for _, v := range strings.Split(lxc.CgroupItem("cpuacct.usage_percpu")[0], " ") {
 			cpuUsage, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
 				return nil, err
@@ -372,11 +374,11 @@ func (lxc *Container) GetCPUTimePerCPU() ([]time.Duration, error) {
 }
 
 // Returns the number of CPU cycles (in the units defined by USER_HZ on the system) consumed by tasks in this cgroup and its children in both user mode and system (kernel) mode.
-func (lxc *Container) GetCPUStats() ([]int64, error) {
+func (lxc *Container) CPUStats() ([]int64, error) {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	if lxc.Running() {
-		cpuStat := lxc.GetCgroupItem("cpuacct.stat")
+		cpuStat := lxc.CgroupItem("cpuacct.stat")
 		user, _ := strconv.ParseInt(strings.Split(cpuStat[0], " ")[1], 10, 64)
 		system, _ := strconv.ParseInt(strings.Split(cpuStat[1], " ")[1], 10, 64)
 		return []int64{user, system}, nil

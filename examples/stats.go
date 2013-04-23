@@ -42,17 +42,17 @@ func main() {
 
 	if c.Running() {
 		// mem
-		mem_used, _ := c.GetMemoryUsageInBytes()
+		mem_used, _ := c.MemoryUsageInBytes()
 		fmt.Printf("mem_used: %s\n", mem_used)
 
-		mem_limit, _ := c.GetMemoryLimitInBytes()
+		mem_limit, _ := c.MemoryLimitInBytes()
 		fmt.Printf("mem_limit: %s\n", mem_limit)
 
 		// swap
-		swap_used, _ := c.GetSwapUsageInBytes()
+		swap_used, _ := c.SwapUsageInBytes()
 		fmt.Printf("memsw_used: %s\n", swap_used)
 
-		swap_limit, _ := c.GetSwapLimitInBytes()
+		swap_limit, _ := c.SwapLimitInBytes()
 		fmt.Printf("memsw_used: %s\n", swap_limit)
 	} else {
 		fmt.Printf("Container is not running...\n")
