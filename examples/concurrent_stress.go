@@ -1,5 +1,5 @@
 /*
- * concurrent_stop.go
+ * concurrent_stress.go
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -25,9 +25,11 @@ package main
 import (
 	"fmt"
 	"github.com/caglar10ur/lxc"
+	"math/rand"
 	"runtime"
 	"strconv"
 	"sync"
+	"time"
 )
 
 func init() {
@@ -37,15 +39,32 @@ func init() {
 func main() {
 	var wg sync.WaitGroup
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		go func(i int) {
-			z := lxc.NewContainer(strconv.Itoa(i))
+			name := strconv.Itoa(rand.Intn(10))
 
-			if z.Defined() && z.Running() {
-				fmt.Printf("Shutting down the container (%d)...\n", i)
-				if !z.Shutdown(30) {
-					fmt.Printf("Shutting down the container (%d) failed...\n", i)
+			z := lxc.NewContainer(name)
+
+			// sleep for a while to simulate some dummy work
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(500)))
+
+			if z.Defined() {
+				if !z.Running() {
+					z.SetDaemonize()
+					//					fmt.Printf("Starting the container (%s)...\n", name)
+					if !z.Start(false, nil) {
+						fmt.Printf("Starting the container (%s) failed...\n", name)
+					}
+				} else {
+					//					fmt.Printf("Stopping the container (%s)...\n", name)
+					if !z.Stop() {
+						fmt.Printf("Stopping the container (%s) failed...\n", name)
+					}
+				}
+			} else {
+				if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
+					fmt.Printf("Creating the container (%s) failed...\n", name)
 				}
 			}
 			wg.Done()

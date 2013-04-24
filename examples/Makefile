@@ -2,6 +2,7 @@ all:
 	go build concurrent_create.go
 	go build concurrent_destroy.go
 	go build concurrent_start.go
+	go build concurrent_stress.go
 	go build concurrent_stop.go
 	go build concurrent_shutdown.go
 	go build create.go
@@ -17,6 +18,7 @@ clean:
 	rm -f concurrent_create
 	rm -f concurrent_destroy
 	rm -f concurrent_start
+	rm -f concurrent_stress
 	rm -f concurrent_stop
 	rm -f concurrent_shutdown
 	rm -f create

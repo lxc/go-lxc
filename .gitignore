@@ -11,4 +11,5 @@ examples/concurrent_create
 examples/concurrent_destroy
 examples/concurrent_stop
 examples/concurrent_start
+examples/concurrent_stress
 examples/concurrent_shutdown
