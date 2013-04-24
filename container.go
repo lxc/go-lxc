@@ -31,7 +31,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-//	"syscall"
+	//	"syscall"
 	"sync"
 	"unsafe"
 )
@@ -165,6 +165,22 @@ func (lxc *Container) Destroy() bool {
 	lxc.Lock()
 	defer lxc.Unlock()
 	return bool(C.lxc_container_destroy(lxc.container))
+}
+
+// FIXME: consider other parameters
+// FIXME: Clone or CloneToOverlayFS, CloneToLVM, SnapshotToLVM etc?
+func (lxc *Container) Clone(name string, backend Backend) bool {
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+
+	if backend == OVERLAYFS {
+		return bool(C.lxc_container_clone(lxc.container, cname, C.int(LXC_CLONE_SNAPSHOT), C.CString("overlayfs")))
+	} else {
+		return bool(C.lxc_container_clone(lxc.container, cname, 0, nil))
+	}
 }
 
 // Waits till the container changes its state or timeouts

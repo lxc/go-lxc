@@ -148,3 +148,7 @@ bool lxc_container_load_config(struct lxc_container *c, char *alt_file) {
 bool lxc_container_save_config(struct lxc_container *c, char *alt_file) {
 	return c->save_config(c, alt_file);
 }
+
+bool lxc_container_clone(struct lxc_container *c, const char *newname, int flags, const char *bdevtype) {
+    return c->clone(c, newname, NULL, flags, bdevtype, NULL, 0) != NULL;
+}

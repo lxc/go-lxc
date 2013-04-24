@@ -44,3 +44,5 @@ extern const char* lxc_container_get_config_path(struct lxc_container *);
 extern const char* lxc_container_state(struct lxc_container *);
 extern pid_t lxc_container_init_pid(struct lxc_container *);
 extern void lxc_container_want_daemonize(struct lxc_container *);
+
+extern bool lxc_container_clone(struct lxc_container *, const char *, int, const char *);

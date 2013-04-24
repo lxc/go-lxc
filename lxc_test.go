@@ -38,6 +38,21 @@ const (
 	CONFIG_FILE_NAME = "/var/lib/lxc/rubik/config"
 )
 
+func TestClone(t *testing.T) {
+	z := NewContainer("caglar")
+	z.Destroy()
+	PutContainer(z)
+
+	z = NewContainer("caglar-overlayfs")
+	z.Destroy()
+	PutContainer(z)
+
+	z = NewContainer("bleach")
+	t.Logf("Clone %v\n", z.Clone("caglar", DIRECTORY))
+	t.Logf("Clone %v\n", z.Clone("caglar-overlayfs", OVERLAYFS))
+	PutContainer(z)
+}
+
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }

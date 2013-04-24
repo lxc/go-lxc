@@ -44,10 +44,25 @@ const (
 	LXC_NETWORK_KEY = "lxc.network"
 )
 
+const (
+	LXC_CLONE_KEEPNAME int = 1 << iota
+	LXC_CLONE_COPYHOOKS
+	LXC_CLONE_KEEPMACADDR
+	LXC_CLONE_SNAPSHOT
+)
+
 func NewContainer(name string) *Container {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 	return &Container{container: C.lxc_container_new(cname, nil)}
+}
+
+func GetContainer(lxc *Container) bool {
+	return C.lxc_container_get(lxc.container) == 1
+}
+
+func PutContainer(lxc *Container) bool {
+	return C.lxc_container_put(lxc.container) == 1
 }
 
 // Returns LXC version
