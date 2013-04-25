@@ -1,5 +1,5 @@
 /*
- * backend.go: Go bindings for lxc
+ * backendstore.go: Go bindings for lxc
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -22,16 +22,16 @@
 
 package lxc
 
-type Backend int
+type BackendStore int
 const (
-        BTRFS Backend = iota
+        BTRFS BackendStore = iota
         DIRECTORY
         LVM
         OVERLAYFS
 )
 
-// Backend as string
-func (t Backend) String() string {
+// BackendStore as string
+func (t BackendStore) String() string {
 	switch t {
 	case DIRECTORY:
 		return "Directory"

@@ -169,7 +169,7 @@ func (lxc *Container) Destroy() bool {
 
 // FIXME: consider other parameters
 // FIXME: Clone or CloneToOverlayFS, CloneToLVM, SnapshotToLVM etc?
-func (lxc *Container) Clone(name string, backend Backend) bool {
+func (lxc *Container) Clone(name string, backend BackendStore) bool {
 	lxc.Lock()
 	defer lxc.Unlock()
 
@@ -181,6 +181,10 @@ func (lxc *Container) Clone(name string, backend Backend) bool {
 	} else {
 		return bool(C.lxc_container_clone(lxc.container, cname, 0, nil))
 	}
+}
+
+func (lxc *Container) CloneToOverlayFS(name string) bool {
+    lxc.Clone(name, OVERLAYFS)
 }
 
 // Waits till the container changes its state or timeouts
