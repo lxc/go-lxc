@@ -184,7 +184,7 @@ func (lxc *Container) Clone(name string, backend BackendStore) bool {
 }
 
 func (lxc *Container) CloneToOverlayFS(name string) bool {
-    lxc.Clone(name, OVERLAYFS)
+	return lxc.Clone(name, OVERLAYFS)
 }
 
 // Waits till the container changes its state or timeouts

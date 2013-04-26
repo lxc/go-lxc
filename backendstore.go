@@ -23,11 +23,12 @@
 package lxc
 
 type BackendStore int
+
 const (
-        BTRFS BackendStore = iota
-        DIRECTORY
-        LVM
-        OVERLAYFS
+	BTRFS BackendStore = iota
+	DIRECTORY
+	LVM
+	OVERLAYFS
 )
 
 // BackendStore as string
