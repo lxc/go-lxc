@@ -30,9 +30,8 @@ import "C"
 import (
 	"strconv"
 	"strings"
-	"time"
-//	"syscall"
 	"sync"
+	"time"
 	"unsafe"
 )
 
@@ -40,16 +39,6 @@ type Container struct {
 	container *C.struct_lxc_container
 	sync.RWMutex
 }
-
-/* FIXME: NOT USED
-func (lxc *Container) Error() string {
-	return C.GoString(lxc.container.error_string)
-}
-
-func (lxc *Container) Error() error {
-	return syscall.Errno(int(lxc.container.error_num))
-}
-*/
 
 // Returns container's name
 func (lxc *Container) Name() string {

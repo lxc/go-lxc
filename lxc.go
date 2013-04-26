@@ -32,6 +32,7 @@ package lxc
 import "C"
 
 import (
+	"os"
 	"path/filepath"
 	"unsafe"
 )
@@ -43,6 +44,12 @@ const (
 
 	LXC_NETWORK_KEY = "lxc.network"
 )
+
+func init() {
+	if os.Geteuid() != 0 {
+		panic("Running as non-root.")
+	}
+}
 
 func NewContainer(name string) *Container {
 	cname := C.CString(name)
