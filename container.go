@@ -275,6 +275,8 @@ func (lxc *Container) NumberOfNetworkInterfaces() int {
 	} else {
 		return -1
 	}
+	// Unreachable code but required for compatibility with Go 1.0.3 see -- https://groups.google.com/d/msg/golang-nuts/OXcMGoGYSLg/nfH_zvhnBHsJ
+	panic("unreachable")
 }
 
 func (lxc *Container) MemoryUsageInBytes() (ByteSize, error) {
