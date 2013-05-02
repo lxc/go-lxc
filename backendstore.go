@@ -28,6 +28,7 @@ const (
 	BTRFS BackendStore = iota
 	DIRECTORY
 	LVM
+	ZFS
 	OVERLAYFS
 )
 
@@ -36,6 +37,8 @@ func (t BackendStore) String() string {
 	switch t {
 	case DIRECTORY:
 		return "Directory"
+	case ZFS:
+		return "ZFS"
 	case BTRFS:
 		return "BtrFS"
 	case LVM:
