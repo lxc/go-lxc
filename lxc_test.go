@@ -410,7 +410,6 @@ func TestConcurrentShutdown(t *testing.T) {
 	wg.Wait()
 }
 
-
 func TestShutdown(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 
