@@ -24,7 +24,7 @@ package lxc
 
 import (
 	"math/rand"
-	_ "runtime"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -40,11 +40,10 @@ const (
 	CONFIG_FILE_NAME             = "/var/lib/lxc/rubik/config"
 )
 
-/*
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
-*/
+
 func TestVersion(t *testing.T) {
 
 	if Version() == "" {
@@ -144,6 +143,30 @@ func TestConcurrentCreate(t *testing.T) {
 			if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
 				t.Errorf("Creating the container (%d) failed...", i)
 			}
+			PutContainer(z)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+}
+
+func TestConcurrentStart(t *testing.T) {
+	var wg sync.WaitGroup
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(i int) {
+			z := NewContainer(strconv.Itoa(i))
+
+			t.Logf("Starting the container...\n")
+
+			z.SetDaemonize()
+			z.Start(false, nil)
+			z.Wait(RUNNING, 30)
+			if !z.Running() {
+				t.Errorf("Starting the container failed...")
+			}
+
 			PutContainer(z)
 			wg.Done()
 		}(i)
@@ -365,6 +388,28 @@ func TestMemoryUsageInBytes(t *testing.T) {
 
 	PutContainer(z)
 }
+
+func TestConcurrentShutdown(t *testing.T) {
+	var wg sync.WaitGroup
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(i int) {
+			z := NewContainer(strconv.Itoa(i))
+			t.Logf("Shutting down the container...\n")
+			z.Shutdown(30)
+
+			if z.Running() {
+				t.Errorf("Shutting down the container failed...")
+			}
+
+			PutContainer(z)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+}
+
 
 func TestShutdown(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
