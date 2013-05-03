@@ -30,10 +30,11 @@ import (
 )
 
 func makeArgs(args []string) []*C.char {
-	ret := make([]*C.char, len(args))
+	ret := make([]*C.char, len(args) + 1)
 	for i, s := range args {
 		ret[i] = C.CString(s)
 	}
+	ret[len(ret) - 1] = nil
 	return ret
 }
 
