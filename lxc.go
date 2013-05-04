@@ -57,6 +57,14 @@ func NewContainer(name string) *Container {
 	return &Container{container: C.lxc_container_new(cname, nil)}
 }
 
+func GetContainer(lxc *Container) bool {
+	return C.lxc_container_get(lxc.container) == 1
+}
+
+func PutContainer(lxc *Container) bool {
+	return C.lxc_container_put(lxc.container) == 1
+}
+
 // Returns LXC version
 func Version() string {
 	return C.GoString(C.lxc_get_version())
