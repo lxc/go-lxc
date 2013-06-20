@@ -55,7 +55,7 @@ void lxc_container_want_daemonize(struct lxc_container *c) {
 }
 
 bool lxc_container_create(struct lxc_container *c, char *t, char **argv) {
-	return c->create(c, t, argv);
+    return c->create(c, t, NULL, NULL, argv);
 }
 
 bool lxc_container_start(struct lxc_container *c, int useinit, char ** argv) {
@@ -150,5 +150,5 @@ bool lxc_container_save_config(struct lxc_container *c, char *alt_file) {
 }
 
 bool lxc_container_clone(struct lxc_container *c, const char *newname, int flags, const char *bdevtype) {
-    return c->clone(c, newname, NULL, flags, bdevtype, NULL, 0) != NULL;
+    return c->clone(c, newname, NULL, flags, bdevtype, NULL, 0, NULL) != NULL;
 }
