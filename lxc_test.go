@@ -389,6 +389,18 @@ func TestMemoryUsageInBytes(t *testing.T) {
 	PutContainer(z)
 }
 
+func TestReboot(t *testing.T) {
+	z := NewContainer(CONTAINER_NAME)
+
+	t.Logf("Rebooting the container...\n")
+	z.Reboot()
+
+	if z.Running() {
+		t.Errorf("Rebooting the container failed...")
+	}
+	PutContainer(z)
+}
+
 func TestConcurrentShutdown(t *testing.T) {
 	var wg sync.WaitGroup
 

@@ -30,6 +30,7 @@ const (
 	LVM
 	ZFS
 	OVERLAYFS
+	LOOPBACK
 )
 
 // BackendStore as string
@@ -45,6 +46,8 @@ func (t BackendStore) String() string {
 		return "LVM"
 	case OVERLAYFS:
 		return "OverlayFS"
+	case LOOPBACK:
+		return "Loopback"
 	}
 	return "<INVALID>"
 }

@@ -142,6 +142,13 @@ func (lxc *Container) Stop() bool {
 	return bool(C.lxc_container_stop(lxc.container))
 }
 
+// Reboots the container
+func (lxc *Container) Reboot() bool {
+	lxc.Lock()
+	defer lxc.Unlock()
+	return bool(C.lxc_container_reboot(lxc.container))
+}
+
 // Shutdowns the container
 func (lxc *Container) Shutdown(timeout int) bool {
 	lxc.Lock()

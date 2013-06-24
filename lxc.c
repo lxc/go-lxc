@@ -66,6 +66,10 @@ bool lxc_container_stop(struct lxc_container *c) {
 	return c->stop(c);
 }
 
+bool lxc_container_reboot(struct lxc_container *c) {
+	return c->reboot(c);
+}
+
 bool lxc_container_shutdown(struct lxc_container *c, int timeout) {
 	return c->shutdown(c, timeout);
 }
