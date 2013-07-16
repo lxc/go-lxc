@@ -52,6 +52,10 @@ const (
 	LXC_CLONE_SNAPSHOT
 )
 
+const (
+	LXC_CREATE_QUIET int = 1 << iota
+)
+
 func init() {
 	if os.Geteuid() != 0 {
 		panic("Running as non-root.")

@@ -55,7 +55,7 @@ void lxc_container_want_daemonize(struct lxc_container *c) {
 }
 
 bool lxc_container_create(struct lxc_container *c, char *t, char **argv) {
-    return c->create(c, t, NULL, NULL, argv);
+    return c->create(c, t, NULL, NULL, LXC_CREATE_QUIET, argv);
 }
 
 bool lxc_container_start(struct lxc_container *c, int useinit, char ** argv) {
