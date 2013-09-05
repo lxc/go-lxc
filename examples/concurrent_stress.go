@@ -53,7 +53,7 @@ func main() {
 				if !z.Running() {
 					z.SetDaemonize()
 					//					fmt.Printf("Starting the container (%s)...\n", name)
-					if !z.Start(false, nil) {
+					if !z.Start(false) {
 						fmt.Printf("Starting the container (%s) failed...\n", name)
 					}
 				} else {
@@ -63,7 +63,7 @@ func main() {
 					}
 				}
 			} else {
-				if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
+				if !z.Create("ubuntu", "amd64", "quantal") {
 					fmt.Printf("Creating the container (%s) failed...\n", name)
 				}
 			}

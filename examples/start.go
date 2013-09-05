@@ -44,7 +44,7 @@ func main() {
 		if !c.Running() {
 			fmt.Printf("Starting the container...\n")
 			c.SetDaemonize()
-			c.Start(false, nil)
+			c.Start(false)
 		} else {
 			fmt.Printf("Container is already running...\n")
 		}

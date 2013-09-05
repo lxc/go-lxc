@@ -45,7 +45,7 @@ func main() {
 			if z.Defined() && !z.Running() {
 				z.SetDaemonize()
 				fmt.Printf("Starting the container (%d)...\n", i)
-				if !z.Start(false, nil) {
+				if !z.Start(false) {
 					fmt.Printf("Starting the container (%d) failed...\n", i)
 				}
 			}

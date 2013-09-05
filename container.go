@@ -104,7 +104,7 @@ func (lxc *Container) Unfreeze() bool {
 }
 
 // Creates the container using given template and arguments
-func (lxc *Container) Create(template string, args []string) bool {
+func (lxc *Container) Create(template string, args ...string) bool {
 	lxc.Lock()
 	defer lxc.Unlock()
 
@@ -119,7 +119,7 @@ func (lxc *Container) Create(template string, args []string) bool {
 }
 
 // Starts the container
-func (lxc *Container) Start(useinit bool, args []string) bool {
+func (lxc *Container) Start(useinit bool, args ...string) bool {
 	lxc.Lock()
 	defer lxc.Unlock()
 

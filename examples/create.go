@@ -42,7 +42,7 @@ func main() {
 
 	if !c.Defined() {
 		fmt.Printf("Creating container...\n")
-		c.Create("ubuntu", []string{"amd64", "quantal"})
+		c.Create("ubuntu", "amd64", "quantal")
 	} else {
 		fmt.Printf("Container is already created...\n")
 	}

@@ -43,7 +43,7 @@ func main() {
 			z := lxc.NewContainer(strconv.Itoa(i))
 
 			fmt.Printf("Creating the container (%d)...\n", i)
-			if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
+			if !z.Create("ubuntu", "amd64", "quantal") {
 				fmt.Printf("Creating the container (%d) failed...\n", i)
 			}
 			wg.Done()

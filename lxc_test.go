@@ -115,7 +115,7 @@ func TestCreate(t *testing.T) {
 	defer PutContainer(z)
 
 	t.Logf("Creating the container...\n")
-	if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
+	if !z.Create("ubuntu", "amd64", "quantal") {
 		t.Errorf("Creating the container failed...")
 	}
 }
@@ -141,7 +141,7 @@ func TestConcurrentCreate(t *testing.T) {
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
 			t.Logf("Creating the container...\n")
-			if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
+			if !z.Create("ubuntu", "amd64", "quantal") {
 				t.Errorf("Creating the container (%d) failed...", i)
 			}
 			wg.Done()
@@ -162,7 +162,7 @@ func TestConcurrentStart(t *testing.T) {
 			t.Logf("Starting the container...\n")
 
 			z.SetDaemonize()
-			z.Start(false, nil)
+			z.Start(false)
 			z.Wait(RUNNING, 30)
 			if !z.Running() {
 				t.Errorf("Starting the container failed...")
@@ -227,7 +227,7 @@ func TestStart(t *testing.T) {
 
 	t.Logf("Starting the container...\n")
 	z.SetDaemonize()
-	z.Start(false, nil)
+	z.Start(false)
 
 	z.Wait(RUNNING, 30)
 	if !z.Running() {
