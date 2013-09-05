@@ -47,3 +47,11 @@ extern pid_t lxc_container_init_pid(struct lxc_container *);
 extern void lxc_container_want_daemonize(struct lxc_container *);
 
 extern bool lxc_container_clone(struct lxc_container *, const char *, int, const char *);
+extern int lxc_container_console_getfd(struct lxc_container *, int);
+extern bool lxc_container_console(struct lxc_container *, int, int, int, int, int);
+
+//FIXME: Missing API functionality
+//    char** (*get_ips)(struct lxc_container *c, char* interface, char* family, int scope);
+//    int (*attach)(struct lxc_container *c, lxc_attach_exec_t exec_function, void *exec_payload, lxc_attach_options_t *options, pid_t *attached_process);
+//    int (*attach_run_wait)(struct lxc_container *c, lxc_attach_options_t *options, const char *program, const char * const argv[]);
+//

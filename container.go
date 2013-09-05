@@ -403,3 +403,23 @@ func (lxc *Container) CPUStats() ([]int64, error) {
 	}
 	return nil, nil
 }
+
+func (lxc *Container) ConsoleGetFD(ttynum int) int {
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	if lxc.Running() {
+		return int(C.lxc_container_console_getfd(lxc.container, C.int(ttynum)))
+	}
+	return -1
+}
+
+func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) bool {
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	if lxc.Running() {
+		return bool(C.lxc_container_console(lxc.container, C.int(ttynum), C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), C.int(escape)))
+	}
+	return false
+}

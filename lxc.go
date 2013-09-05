@@ -68,10 +68,12 @@ func NewContainer(name string) *Container {
 	return &Container{container: C.lxc_container_new(cname, nil)}
 }
 
+// Increments reference counter of the container object
 func GetContainer(lxc *Container) bool {
 	return C.lxc_container_get(lxc.container) == 1
 }
 
+// Decrements reference counter of the container object
 func PutContainer(lxc *Container) bool {
 	return C.lxc_container_put(lxc.container) == 1
 }
@@ -84,6 +86,16 @@ func Version() string {
 // Returns default config path
 func DefaultConfigPath() string {
 	return C.GoString(C.lxc_get_default_config_path())
+}
+
+// Returns default LVM volume group
+func DefaultLvmVg() string {
+	return C.GoString(C.lxc_get_default_lvm_vg())
+}
+
+// Returns default ZFS root
+func DefaultZfsRoot() string {
+	return C.GoString(C.lxc_get_default_zfs_root())
 }
 
 // Returns the names of containers on the system.

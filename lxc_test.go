@@ -69,6 +69,7 @@ func TestContainers(t *testing.T) {
 
 func TestSetConfigPath(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	current_path := z.ConfigPath()
 	z.SetConfigPath("/tmp")
@@ -77,7 +78,6 @@ func TestSetConfigPath(t *testing.T) {
 	if current_path == new_path {
 		t.Errorf("SetConfigPath failed...")
 	}
-	PutContainer(z)
 }
 
 func TestConcurrentDefined_Negative(t *testing.T) {
@@ -87,6 +87,7 @@ func TestConcurrentDefined_Negative(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			z := NewContainer(strconv.Itoa(rand.Intn(10)))
+			defer PutContainer(z)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
@@ -94,7 +95,6 @@ func TestConcurrentDefined_Negative(t *testing.T) {
 			if z.Defined() {
 				t.Errorf("Defined_Negative failed...")
 			}
-			PutContainer(z)
 			wg.Done()
 		}()
 	}
@@ -103,29 +103,29 @@ func TestConcurrentDefined_Negative(t *testing.T) {
 
 func TestDefined_Negative(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if z.Defined() {
 		t.Errorf("Defined_Negative failed...")
 	}
-	PutContainer(z)
 }
 
 func TestCreate(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Creating the container...\n")
 	if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
 		t.Errorf("Creating the container failed...")
 	}
-	PutContainer(z)
 }
 
 func TestClone(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Clone %v\n", z.Clone(CLONE_CONTAINER_NAME, DIRECTORY))
 	t.Logf("Clone %v\n", z.Clone(CLONE_OVERLAY_CONTAINER_NAME, OVERLAYFS))
-	PutContainer(z)
 }
 
 func TestConcurrentCreate(t *testing.T) {
@@ -135,6 +135,7 @@ func TestConcurrentCreate(t *testing.T) {
 		wg.Add(1)
 		go func(i int) {
 			z := NewContainer(strconv.Itoa(i))
+			defer PutContainer(z)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
@@ -143,7 +144,6 @@ func TestConcurrentCreate(t *testing.T) {
 			if !z.Create("ubuntu", []string{"amd64", "quantal"}) {
 				t.Errorf("Creating the container (%d) failed...", i)
 			}
-			PutContainer(z)
 			wg.Done()
 		}(i)
 	}
@@ -157,6 +157,7 @@ func TestConcurrentStart(t *testing.T) {
 		wg.Add(1)
 		go func(i int) {
 			z := NewContainer(strconv.Itoa(i))
+			defer PutContainer(z)
 
 			t.Logf("Starting the container...\n")
 
@@ -167,7 +168,6 @@ func TestConcurrentStart(t *testing.T) {
 				t.Errorf("Starting the container failed...")
 			}
 
-			PutContainer(z)
 			wg.Done()
 		}(i)
 	}
@@ -176,19 +176,19 @@ func TestConcurrentStart(t *testing.T) {
 
 func TestConfigFileName(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 	if z.ConfigFileName() != CONFIG_FILE_NAME {
 		t.Errorf("ConfigFileName failed...")
 	}
-	PutContainer(z)
 }
 
 func TestDefined_Positive(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if !z.Defined() {
 		t.Errorf("Defined_Positive failed...")
 	}
-	PutContainer(z)
 }
 
 func TestConcurrentDefined_Positive(t *testing.T) {
@@ -198,6 +198,7 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			z := NewContainer(strconv.Itoa(rand.Intn(10)))
+			defer PutContainer(z)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
@@ -205,7 +206,6 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 			if !z.Defined() {
 				t.Errorf("Defined_Positive failed...")
 			}
-			PutContainer(z)
 			wg.Done()
 		}()
 	}
@@ -214,15 +214,16 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 
 func TestInitPID_Negative(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if z.InitPID() != -1 {
 		t.Errorf("InitPID failed...")
 	}
-	PutContainer(z)
 }
 
 func TestStart(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Starting the container...\n")
 	z.SetDaemonize()
@@ -232,39 +233,39 @@ func TestStart(t *testing.T) {
 	if !z.Running() {
 		t.Errorf("Starting the container failed...")
 	}
-	PutContainer(z)
 }
 
 func TestSetDaemonize(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	z.SetDaemonize()
 	if !z.Daemonize() {
 		t.Errorf("Daemonize failed...")
 	}
-	PutContainer(z)
 }
 
 func TestInitPID_Positive(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if z.InitPID() == -1 {
 		t.Errorf("InitPID failed...")
 	}
-	PutContainer(z)
 }
 
 func TestName(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if z.Name() != CONTAINER_NAME {
 		t.Errorf("Name failed...")
 	}
-	PutContainer(z)
 }
 
 func TestFreeze(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Freezing the container...\n")
 	z.Freeze()
@@ -273,11 +274,11 @@ func TestFreeze(t *testing.T) {
 	if z.State() != FROZEN {
 		t.Errorf("Freezing the container failed...")
 	}
-	PutContainer(z)
 }
 
 func TestUnfreeze(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Unfreezing the container...\n")
 	z.Unfreeze()
@@ -286,48 +287,48 @@ func TestUnfreeze(t *testing.T) {
 	if z.State() != RUNNING {
 		t.Errorf("Unfreezing the container failed...")
 	}
-	PutContainer(z)
 }
 
 func TestLoadConfigFile(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if !z.LoadConfigFile(CONFIG_FILE_NAME) {
 		t.Errorf("LoadConfigFile failed...")
 	}
-	PutContainer(z)
 }
 
 func TestSaveConfigFile(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if !z.SaveConfigFile(CONFIG_FILE_NAME) {
 		t.Errorf("LoadConfigFile failed...")
 	}
-	PutContainer(z)
 }
 
 func TestConfigItem(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if z.ConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
 		t.Errorf("ConfigItem failed...")
 	}
-	PutContainer(z)
 }
 
 func TestSetConfigItem(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	z.SetConfigItem("lxc.utsname", CONTAINER_NAME)
 	if z.ConfigItem("lxc.utsname")[0] != CONTAINER_NAME {
 		t.Errorf("ConfigItem failed...")
 	}
-	PutContainer(z)
 }
 
 func TestSetCgroupItem(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	max_mem := z.CgroupItem("memory.max_usage_in_bytes")[0]
 	current_mem := z.CgroupItem("memory.limit_in_bytes")[0]
@@ -337,40 +338,40 @@ func TestSetCgroupItem(t *testing.T) {
 	if new_mem == current_mem {
 		t.Errorf("SetCgroupItem failed...")
 	}
-	PutContainer(z)
 }
 
 func TestClearConfigItem(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	z.ClearConfigItem("lxc.cap.drop")
 	if z.ConfigItem("lxc.cap.drop")[0] != "" {
 		t.Errorf("ClearConfigItem failed...")
 	}
-	PutContainer(z)
 }
 
 func TestKeys(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	keys := strings.Join(z.Keys("lxc.network.0"), " ")
 	if !strings.Contains(keys, "mtu") {
 		t.Errorf("Keys failed...")
 	}
-	PutContainer(z)
 }
 
 func TestNumberOfNetworkInterfaces(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	if z.NumberOfNetworkInterfaces() != 1 {
 		t.Errorf("NumberOfNetworkInterfaces failed...")
 	}
-	PutContainer(z)
 }
 
 func TestMemoryUsageInBytes(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	mem_used, _ := z.MemoryUsageInBytes()
 	swap_used, _ := z.SwapUsageInBytes()
@@ -386,11 +387,12 @@ func TestMemoryUsageInBytes(t *testing.T) {
 	t.Logf("Swap limit: %0.0f\n", swap_limit)
 	t.Logf("Swap limit: %s\n", swap_limit)
 
-	PutContainer(z)
 }
 
+/*
 func TestReboot(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Rebooting the container...\n")
 	z.Reboot()
@@ -398,8 +400,8 @@ func TestReboot(t *testing.T) {
 	if z.Running() {
 		t.Errorf("Rebooting the container failed...")
 	}
-	PutContainer(z)
 }
+*/
 
 func TestConcurrentShutdown(t *testing.T) {
 	var wg sync.WaitGroup
@@ -408,6 +410,7 @@ func TestConcurrentShutdown(t *testing.T) {
 		wg.Add(1)
 		go func(i int) {
 			z := NewContainer(strconv.Itoa(i))
+			defer PutContainer(z)
 			t.Logf("Shutting down the container...\n")
 			z.Shutdown(30)
 
@@ -415,7 +418,6 @@ func TestConcurrentShutdown(t *testing.T) {
 				t.Errorf("Shutting down the container failed...")
 			}
 
-			PutContainer(z)
 			wg.Done()
 		}(i)
 	}
@@ -424,6 +426,7 @@ func TestConcurrentShutdown(t *testing.T) {
 
 func TestShutdown(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Shutting down the container...\n")
 	z.Shutdown(30)
@@ -431,11 +434,11 @@ func TestShutdown(t *testing.T) {
 	if z.Running() {
 		t.Errorf("Shutting down the container failed...")
 	}
-	PutContainer(z)
 }
 
 func TestStop(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Stopping the container...\n")
 	z.Stop()
@@ -443,29 +446,30 @@ func TestStop(t *testing.T) {
 	if z.Running() {
 		t.Errorf("Stopping the container failed...")
 	}
-	PutContainer(z)
 }
 
 func TestDestroy(t *testing.T) {
-	z := NewContainer(CONTAINER_NAME)
+	z := NewContainer(CLONE_OVERLAY_CONTAINER_NAME)
+	defer PutContainer(z)
 
 	t.Logf("Destroying the container...\n")
 	if !z.Destroy() {
 		t.Errorf("Destroying the container failed...")
 	}
-	PutContainer(z)
 
 	z = NewContainer(CLONE_CONTAINER_NAME)
-	if !z.Destroy() {
-		t.Errorf("Destroying the container failed...")
-	}
-	PutContainer(z)
+	defer PutContainer(z)
 
-	z = NewContainer(CLONE_OVERLAY_CONTAINER_NAME)
 	if !z.Destroy() {
 		t.Errorf("Destroying the container failed...")
 	}
-	PutContainer(z)
+
+	z = NewContainer(CONTAINER_NAME)
+	defer PutContainer(z)
+
+	if !z.Destroy() {
+		t.Errorf("Destroying the container failed...")
+	}
 }
 
 func TestConcurrentDestroy(t *testing.T) {
@@ -475,6 +479,7 @@ func TestConcurrentDestroy(t *testing.T) {
 		wg.Add(1)
 		go func(i int) {
 			z := NewContainer(strconv.Itoa(i))
+			defer PutContainer(z)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
@@ -483,7 +488,6 @@ func TestConcurrentDestroy(t *testing.T) {
 			if !z.Destroy() {
 				t.Errorf("Destroying the container failed...")
 			}
-			PutContainer(z)
 			wg.Done()
 		}(i)
 	}

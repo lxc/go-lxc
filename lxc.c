@@ -156,3 +156,20 @@ bool lxc_container_save_config(struct lxc_container *c, char *alt_file) {
 bool lxc_container_clone(struct lxc_container *c, const char *newname, int flags, const char *bdevtype) {
     return c->clone(c, newname, NULL, flags, bdevtype, NULL, 0, NULL) != NULL;
 }
+
+extern int lxc_container_console_getfd(struct lxc_container *c, int ttynum) {
+    int masterfd;
+
+    if (c->console_getfd(c, &ttynum, &masterfd) < 0) {
+        return -1;
+    }
+    return masterfd;
+}
+
+extern bool lxc_container_console(struct lxc_container *c, int ttynum, int stdinfd, int stdoutfd, int stderrfd, int escape) {
+
+    if (c->console(c, ttynum, stdinfd, stdoutfd, stderrfd, escape) == 0) {
+        return true;
+    }
+    return false;
+}
