@@ -4,7 +4,7 @@ This package implements [Go](http://golang.org) (golang) bindings for the [LXC](
 
 ## Installing
 
-This package requires [LXC 0.9](http://lxc.git.sourceforge.net/git/gitweb.cgi?p=lxc/lxc;a=summary) or newer versions.
+This package requires [LXC 0.9](http://lxc.git.sourceforge.net/git/gitweb.cgi?p=lxc/lxc;a=summary) (or newer versions) and [Go 1.1](https://code.google.com/p/go/downloads/list). .
 
 It has been tested on Ubuntu 12.10 (quantal) by manually installing LXC 0.9 or on Ubuntu 13.04 (raring) by using distribution [provided packages](https://launchpad.net/ubuntu/raring/+package/lxc).
 
