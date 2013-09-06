@@ -6,18 +6,19 @@
  * Authors:
  * S.Çağlar Onur <caglar@10ur.org>
  *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2, as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 package lxc
@@ -33,6 +34,10 @@ import (
 	"sync"
 	"time"
 	"unsafe"
+)
+
+const (
+	network_key = "lxc.network"
 )
 
 type Container struct {
@@ -173,7 +178,7 @@ func (lxc *Container) Clone(name string, backend BackendStore) bool {
 	defer C.free(unsafe.Pointer(cname))
 
 	if backend == OVERLAYFS {
-		return bool(C.lxc_container_clone(lxc.container, cname, C.int(LXC_CLONE_SNAPSHOT), C.CString("overlayfs")))
+		return bool(C.lxc_container_clone(lxc.container, cname, C.int(CLONE_SNAPSHOT), C.CString("overlayfs")))
 	} else {
 		return bool(C.lxc_container_clone(lxc.container, cname, 0, nil))
 	}
@@ -298,7 +303,7 @@ func (lxc *Container) NumberOfNetworkInterfaces() int {
 	lxc.RLock()
 	defer lxc.RUnlock()
 	if lxc.Running() {
-		return len(lxc.ConfigItem(LXC_NETWORK_KEY))
+		return len(lxc.ConfigItem(network_key))
 	} else {
 		return -1
 	}

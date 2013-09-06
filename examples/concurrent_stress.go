@@ -45,6 +45,7 @@ func main() {
 			name := strconv.Itoa(rand.Intn(10))
 
 			z := lxc.NewContainer(name)
+			defer lxc.PutContainer(z)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(500)))

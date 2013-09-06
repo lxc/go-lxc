@@ -41,6 +41,7 @@ func main() {
 		wg.Add(1)
 		go func(i int) {
 			z := lxc.NewContainer(strconv.Itoa(i))
+			defer lxc.PutContainer(z)
 
 			if z.Defined() && z.Running() {
 				fmt.Printf("Stopping the container (%d)...\n", i)

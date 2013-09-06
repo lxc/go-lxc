@@ -41,6 +41,7 @@ func main() {
 		wg.Add(1)
 		go func(i int) {
 			z := lxc.NewContainer(strconv.Itoa(i))
+			defer lxc.PutContainer(z)
 
 			fmt.Printf("Destroying the container (%d)...\n", i)
 			if !z.Destroy() {

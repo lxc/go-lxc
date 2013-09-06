@@ -39,6 +39,7 @@ func init() {
 
 func main() {
 	c := lxc.NewContainer(name)
+	defer lxc.PutContainer(c)
 
 	if c.Running() {
 		// mem

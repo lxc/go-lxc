@@ -6,20 +6,20 @@
  * Authors:
  * S.Çağlar Onur <caglar@10ur.org>
  *
- * This library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2, as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 package lxc
 
 import (
@@ -45,25 +45,12 @@ func init() {
 }
 
 func TestVersion(t *testing.T) {
-
-	if Version() == "" {
-		t.Errorf("Version failed...")
-	}
+	t.Logf("LXC version: %s", Version())
 }
 
 func TestDefaultConfigPath(t *testing.T) {
 	if DefaultConfigPath() != CONFIG_FILE_PATH {
 		t.Errorf("DefaultConfigPath failed...")
-	}
-}
-
-func TestContainerNames(t *testing.T) {
-	t.Logf("Containers:%+v\n", ContainerNames())
-}
-
-func TestContainers(t *testing.T) {
-	for _, v := range Containers() {
-		t.Logf("%s: %s", v.Name(), v.State())
 	}
 }
 
@@ -114,7 +101,6 @@ func TestCreate(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 	defer PutContainer(z)
 
-	t.Logf("Creating the container...\n")
 	if !z.Create("ubuntu", "amd64", "quantal") {
 		t.Errorf("Creating the container failed...")
 	}
@@ -124,8 +110,13 @@ func TestClone(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 	defer PutContainer(z)
 
-	t.Logf("Clone %v\n", z.Clone(CLONE_CONTAINER_NAME, DIRECTORY))
-	t.Logf("Clone %v\n", z.Clone(CLONE_OVERLAY_CONTAINER_NAME, OVERLAYFS))
+	if !z.Clone(CLONE_CONTAINER_NAME, DIRECTORY) {
+		t.Errorf("Cloning the DIRECTORY backed container failed...")
+	}
+
+	if !z.Clone(CLONE_OVERLAY_CONTAINER_NAME, OVERLAYFS) {
+		t.Errorf("Cloning the OVERLAYFS backed container failed...")
+	}
 }
 
 func TestConcurrentCreate(t *testing.T) {
@@ -140,7 +131,6 @@ func TestConcurrentCreate(t *testing.T) {
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
-			t.Logf("Creating the container...\n")
 			if !z.Create("ubuntu", "amd64", "quantal") {
 				t.Errorf("Creating the container (%d) failed...", i)
 			}
@@ -148,6 +138,16 @@ func TestConcurrentCreate(t *testing.T) {
 		}(i)
 	}
 	wg.Wait()
+}
+
+func TestContainerNames(t *testing.T) {
+	t.Logf("Containers: %+v\n", ContainerNames())
+}
+
+func TestContainers(t *testing.T) {
+	for _, v := range Containers() {
+		t.Logf("%s: %s", v.Name(), v.State())
+	}
 }
 
 func TestConcurrentStart(t *testing.T) {
@@ -158,8 +158,6 @@ func TestConcurrentStart(t *testing.T) {
 		go func(i int) {
 			z := NewContainer(strconv.Itoa(i))
 			defer PutContainer(z)
-
-			t.Logf("Starting the container...\n")
 
 			z.SetDaemonize()
 			z.Start(false)
@@ -225,7 +223,6 @@ func TestStart(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 	defer PutContainer(z)
 
-	t.Logf("Starting the container...\n")
 	z.SetDaemonize()
 	z.Start(false)
 
@@ -267,7 +264,6 @@ func TestFreeze(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 	defer PutContainer(z)
 
-	t.Logf("Freezing the container...\n")
 	z.Freeze()
 
 	z.Wait(FROZEN, 30)
@@ -280,7 +276,6 @@ func TestUnfreeze(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 	defer PutContainer(z)
 
-	t.Logf("Unfreezing the container...\n")
 	z.Unfreeze()
 
 	z.Wait(RUNNING, 30)
@@ -411,7 +406,7 @@ func TestConcurrentShutdown(t *testing.T) {
 		go func(i int) {
 			z := NewContainer(strconv.Itoa(i))
 			defer PutContainer(z)
-			t.Logf("Shutting down the container...\n")
+
 			z.Shutdown(30)
 
 			if z.Running() {
@@ -428,7 +423,6 @@ func TestShutdown(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 	defer PutContainer(z)
 
-	t.Logf("Shutting down the container...\n")
 	z.Shutdown(30)
 
 	if z.Running() {
@@ -440,7 +434,6 @@ func TestStop(t *testing.T) {
 	z := NewContainer(CONTAINER_NAME)
 	defer PutContainer(z)
 
-	t.Logf("Stopping the container...\n")
 	z.Stop()
 
 	if z.Running() {
@@ -452,7 +445,6 @@ func TestDestroy(t *testing.T) {
 	z := NewContainer(CLONE_OVERLAY_CONTAINER_NAME)
 	defer PutContainer(z)
 
-	t.Logf("Destroying the container...\n")
 	if !z.Destroy() {
 		t.Errorf("Destroying the container failed...")
 	}
@@ -484,7 +476,6 @@ func TestConcurrentDestroy(t *testing.T) {
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
-			t.Logf("Destroying the container...\n")
 			if !z.Destroy() {
 				t.Errorf("Destroying the container failed...")
 			}
