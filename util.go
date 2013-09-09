@@ -1,5 +1,5 @@
 /*
- * utils.go: Go bindings for lxc
+ * util.go: Go bindings for lxc
  *
  * Copyright © 2013, S.Çağlar Onur
  *

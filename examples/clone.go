@@ -1,5 +1,5 @@
 /*
- * unfreeze.go
+ * clone.go
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -33,7 +33,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&name, "name", "rubik", "Name of the container")
+	flag.StringVar(&name, "name", "rubik", "Name of the original container")
 	flag.Parse()
 }
 
@@ -41,9 +41,16 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	fmt.Printf("Unfreezing the container...\n")
-	if err := c.Unfreeze(); err != nil {
+	directoryClone := name + "Directory"
+	overlayClone := name + "OverlayFS"
+
+	fmt.Printf("Cloning the container using Directory backend...\n")
+	if err := c.CloneToDirectory(directoryClone); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	}
-	c.Wait(lxc.RUNNING, 10)
+
+	fmt.Printf("Cloning the container using OverlayFS backend...\n")
+	if err := c.CloneToOverlayFS(overlayClone); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
 }

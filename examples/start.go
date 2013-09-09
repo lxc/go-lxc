@@ -41,15 +41,9 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	if c.Defined() {
-		if !c.Running() {
-			fmt.Printf("Starting the container...\n")
-			c.SetDaemonize()
-			c.Start(false)
-		} else {
-			fmt.Printf("Container is already running...\n")
-		}
-	} else {
-		fmt.Printf("No such container...\n")
+	fmt.Printf("Starting the container...\n")
+	c.SetDaemonize()
+	if err := c.Start(false); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }

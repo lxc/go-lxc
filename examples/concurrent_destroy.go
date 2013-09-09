@@ -44,8 +44,8 @@ func main() {
 			defer lxc.PutContainer(z)
 
 			fmt.Printf("Destroying the container (%d)...\n", i)
-			if !z.Destroy() {
-				fmt.Printf("Destroying the container (%d) failed...\n", i)
+			if err := z.Destroy(); err != nil {
+				fmt.Printf("ERROR: %s\n", err.Error())
 			}
 			wg.Done()
 		}(i)

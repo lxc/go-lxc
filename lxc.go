@@ -21,9 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-//Go (golang) Bindings for LXC (Linux Containers)
-//
-//This package implements Go bindings for the LXC C API.
+// Package lxc provides Go (golang) Bindings for LXC (Linux Containers) C API.
 package lxc
 
 // #cgo linux LDFLAGS: -llxc -lutil
@@ -39,20 +37,21 @@ import (
 )
 
 const (
-	// Timeout
-	WAIT_FOREVER int = iota - 1
-	DONT_WAIT
+	// WaitForever timeout
+	WaitForever int = iota - 1
+	// DontWait timeout
+	DontWait
 )
 
 const (
-	CLONE_KEEPNAME int = 1 << iota
-	CLONE_COPYHOOKS
-	CLONE_KEEPMACADDR
-	CLONE_SNAPSHOT
-)
-
-const (
-	CREATE_QUIET int = 1 << iota
+	// CloneKeepName means don't edit the rootfs to change the hostname.
+	CloneKeepName int = 1 << iota
+	// CloneCopyHooks means copy all hooks into the container directory.
+	CloneCopyHooks
+	// CloneKeepMACAddr means don't change the mac address on network interfaces.
+	CloneKeepMACAddr
+	// CloneSnapshot means snapshot the original filesystem(s).
+	CloneSnapshot
 )
 
 func init() {
@@ -61,57 +60,62 @@ func init() {
 	}
 }
 
+// NewContainer returns a new container struct
 func NewContainer(name string) *Container {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
-	return &Container{container: C.lxc_container_new(cname, nil)}
+
+	return &Container{container: C.lxc_container_new(cname, nil), verbosity: Quiet}
 }
 
-// Increments reference counter of the container object
+// GetContainer increments reference counter of the container object
 func GetContainer(lxc *Container) bool {
 	return C.lxc_container_get(lxc.container) == 1
 }
 
-// Decrements reference counter of the container object
+// PutContainer decrements reference counter of the container object
 func PutContainer(lxc *Container) bool {
 	return C.lxc_container_put(lxc.container) == 1
 }
 
-// Returns LXC version
+// Version returns LXC version
 func Version() string {
 	return C.GoString(C.lxc_get_version())
 }
 
-// Returns default config path
+// DefaultConfigPath returns default config path
 func DefaultConfigPath() string {
 	return C.GoString(C.lxc_get_default_config_path())
 }
 
-// Returns default LVM volume group
+// DefaultLvmVg returns default LVM volume group
 func DefaultLvmVg() string {
 	return C.GoString(C.lxc_get_default_lvm_vg())
 }
 
-// Returns default ZFS root
+// DefaultZfsRoot returns default ZFS root
 func DefaultZfsRoot() string {
 	return C.GoString(C.lxc_get_default_zfs_root())
 }
 
-// Returns the names of containers on the system.
-func ContainerNames() []string {
-	// FIXME: Support custom config paths
-	matches, err := filepath.Glob(filepath.Join(DefaultConfigPath(), "/*/config"))
-	if err != nil {
-		return nil
-	}
+// ContainerNames returns the names of containers on the system.
+func ContainerNames(paths ...string) []string {
+	if paths == nil {
+		matches, err := filepath.Glob(filepath.Join(DefaultConfigPath(), "/*/config"))
+		if err != nil {
+			return nil
+		}
 
-	for i, v := range matches {
-		matches[i] = filepath.Base(filepath.Dir(v))
+		for i, v := range matches {
+			matches[i] = filepath.Base(filepath.Dir(v))
+		}
+		return matches
 	}
-	return matches
+	// FIXME: Support custom config paths
+	return nil
 }
 
-// Returns the containers on the system.
+// Containers returns the containers on the system.
 func Containers() []Container {
 	var containers []Container
 

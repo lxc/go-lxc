@@ -43,11 +43,10 @@ func main() {
 			z := lxc.NewContainer(strconv.Itoa(i))
 			defer lxc.PutContainer(z)
 
-			if z.Defined() && z.Running() {
-				fmt.Printf("Stopping the container (%d)...\n", i)
-				if !z.Stop() {
-					fmt.Printf("Stopping the container (%d) failed...\n", i)
-				}
+			z.SetDaemonize()
+			fmt.Printf("Stoping the container (%d)...\n", i)
+			if err := z.Stop(); err != nil {
+				fmt.Printf("ERROR: %s\n", err.Error())
 			}
 			wg.Done()
 		}(i)

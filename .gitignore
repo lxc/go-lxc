@@ -1,3 +1,4 @@
+examples/clone
 examples/concurrent_create
 examples/concurrent_destroy
 examples/concurrent_shutdown

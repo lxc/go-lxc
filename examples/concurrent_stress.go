@@ -44,28 +44,28 @@ func main() {
 		go func(i int) {
 			name := strconv.Itoa(rand.Intn(10))
 
-			z := lxc.NewContainer(name)
-			defer lxc.PutContainer(z)
+			c := lxc.NewContainer(name)
+			defer lxc.PutContainer(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(500)))
 
-			if z.Defined() {
-				if !z.Running() {
-					z.SetDaemonize()
-					//					fmt.Printf("Starting the container (%s)...\n", name)
-					if !z.Start(false) {
-						fmt.Printf("Starting the container (%s) failed...\n", name)
+			if c.Defined() {
+				if !c.Running() {
+					c.SetDaemonize()
+					fmt.Printf("Starting the container (%s)...\n", name)
+					if err := c.Start(false); err != nil {
+						fmt.Printf("ERROR: %s\n", err.Error())
 					}
 				} else {
-					//					fmt.Printf("Stopping the container (%s)...\n", name)
-					if !z.Stop() {
-						fmt.Printf("Stopping the container (%s) failed...\n", name)
+					fmt.Printf("Stopping the container (%s)...\n", name)
+					if err := c.Stop(); err != nil {
+						fmt.Printf("ERROR: %s\n", err.Error())
 					}
 				}
 			} else {
-				if !z.Create("ubuntu", "amd64", "quantal") {
-					fmt.Printf("Creating the container (%s) failed...\n", name)
+				if err := c.Create("ubuntu", "amd64", "quantal"); err != nil {
+					fmt.Printf("ERROR: %s\n", err.Error())
 				}
 			}
 			wg.Done()

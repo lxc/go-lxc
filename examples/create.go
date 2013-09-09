@@ -41,10 +41,9 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	if !c.Defined() {
-		fmt.Printf("Creating container...\n")
-		c.Create("ubuntu", "amd64", "quantal")
-	} else {
-		fmt.Printf("Container is already created...\n")
+	fmt.Printf("Creating container...\n")
+	c.SetVerbosity(lxc.Verbose)
+	if err := c.Create("ubuntu", "amd64", "quantal"); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }

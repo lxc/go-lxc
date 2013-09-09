@@ -41,14 +41,8 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	if c.Defined() {
-		if c.Running() {
-			fmt.Printf("Shutting down the container...\n")
-			c.Shutdown(30)
-		} else {
-			fmt.Printf("Container is already stopped...\n")
-		}
-	} else {
-		fmt.Printf("No such container...\n")
+	fmt.Printf("Shutting down the container...\n")
+	if err := c.Shutdown(30); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }

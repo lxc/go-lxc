@@ -41,15 +41,9 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	if c.Defined() {
-		if c.Running() {
-			fmt.Printf("Freezing the container...\n")
-			c.Freeze()
-			c.Wait(lxc.FROZEN, 10)
-		} else {
-			fmt.Printf("Container is not running...\n")
-		}
-	} else {
-		fmt.Printf("No such container...\n")
+	fmt.Printf("Freezing the container...\n")
+	if err := c.Freeze(); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
+	c.Wait(lxc.FROZEN, 10)
 }

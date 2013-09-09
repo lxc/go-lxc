@@ -43,11 +43,9 @@ func main() {
 			z := lxc.NewContainer(strconv.Itoa(i))
 			defer lxc.PutContainer(z)
 
-			if z.Defined() && z.Running() {
-				fmt.Printf("Shutting down the container (%d)...\n", i)
-				if !z.Shutdown(30) {
-					fmt.Printf("Shutting down the container (%d) failed...\n", i)
-				}
+			fmt.Printf("Shutting down the container (%d)...\n", i)
+			if err := z.Shutdown(30); err != nil {
+				fmt.Printf("ERROR: %s\n", err.Error())
 			}
 			wg.Done()
 		}(i)

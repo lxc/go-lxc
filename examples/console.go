@@ -41,14 +41,8 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	if c.Defined() {
-		if c.Running() {
-			fmt.Printf("Attaching to container's console...\n")
-			c.Console(-1, 0, 1, 2, 1)
-		} else {
-			fmt.Printf("Container is not running...\n")
-		}
-	} else {
-		fmt.Printf("No such container...\n")
+	fmt.Printf("Attaching to container's console...\n")
+	if err := c.Console(-1, 0, 1, 2, 1); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }

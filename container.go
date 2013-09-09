@@ -29,6 +29,7 @@ package lxc
 import "C"
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -36,395 +37,645 @@ import (
 	"unsafe"
 )
 
-const (
-	network_key = "lxc.network"
-)
-
+// Container struct
 type Container struct {
 	container *C.struct_lxc_container
+	verbosity Verbosity
 	sync.RWMutex
 }
 
-// Returns container's name
+// Name returns container's name
 func (lxc *Container) Name() string {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	return C.GoString(lxc.container.name)
 }
 
-// Returns whether the container is already defined or not
+// Defined returns whether the container is already defined or not
 func (lxc *Container) Defined() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	return bool(C.lxc_container_defined(lxc.container))
 }
 
-// Returns whether the container is already running or not
+// Running returns whether the container is already running or not
 func (lxc *Container) Running() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	return bool(C.lxc_container_running(lxc.container))
 }
 
-// Returns the container's state
+// State returns the container's state
 func (lxc *Container) State() State {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	return stateMap[C.GoString(C.lxc_container_state(lxc.container))]
 }
 
-// Returns the container's PID
+// InitPID returns the container's PID
 func (lxc *Container) InitPID() int {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	return int(C.lxc_container_init_pid(lxc.container))
 }
 
-// Returns whether the daemonize flag is set
+// Daemonize returns whether the daemonize flag is set
 func (lxc *Container) Daemonize() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	return bool(lxc.container.daemonize != 0)
 }
 
-// Sets the daemonize flag
+// SetDaemonize sets the daemonize flag
 func (lxc *Container) SetDaemonize() {
 	lxc.Lock()
 	defer lxc.Unlock()
+
 	C.lxc_container_want_daemonize(lxc.container)
 }
 
-// Freezes the running container
-func (lxc *Container) Freeze() bool {
+// SetVerbosity sets the verbosity level of some API calls
+func (lxc *Container) SetVerbosity(verbosity Verbosity) {
 	lxc.Lock()
 	defer lxc.Unlock()
-	return bool(C.lxc_container_freeze(lxc.container))
+
+	lxc.verbosity = verbosity
 }
 
-// Unfreezes the frozen container
-func (lxc *Container) Unfreeze() bool {
+// Freeze freezes the running container
+func (lxc *Container) Freeze() error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	if lxc.State() == FROZEN {
+		return fmt.Errorf("container %q is already frozen", lxc.Name())
+	}
+
 	lxc.Lock()
 	defer lxc.Unlock()
-	return bool(C.lxc_container_unfreeze(lxc.container))
+
+	if !bool(C.lxc_container_freeze(lxc.container)) {
+		return fmt.Errorf("freezing the container %q failed", lxc.Name())
+	}
+
+	return nil
 }
 
-// Creates the container using given template and arguments
-func (lxc *Container) Create(template string, args ...string) bool {
+// Unfreeze unfreezes the frozen container
+func (lxc *Container) Unfreeze() error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	if lxc.State() != FROZEN {
+		return fmt.Errorf("container %q is not frozen", lxc.Name())
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	if !bool(C.lxc_container_unfreeze(lxc.container)) {
+		return fmt.Errorf("unfreezing the container %q failed", lxc.Name())
+	}
+
+	return nil
+}
+
+// Create creates the container using given template and arguments
+func (lxc *Container) Create(template string, args ...string) error {
+	if lxc.Defined() {
+		return fmt.Errorf("container %q is already defined", lxc.Name())
+	}
+
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	ctemplate := C.CString(template)
 	defer C.free(unsafe.Pointer(ctemplate))
+
+	ret := false
 	if args != nil {
 		cargs := makeArgs(args)
 		defer freeArgs(cargs)
-		return bool(C.lxc_container_create(lxc.container, ctemplate, &cargs[0]))
+
+		ret = bool(C.lxc_container_create(lxc.container, ctemplate, C.int(lxc.verbosity), &cargs[0]))
+	} else {
+		ret = bool(C.lxc_container_create(lxc.container, ctemplate, C.int(lxc.verbosity), nil))
 	}
-	return bool(C.lxc_container_create(lxc.container, ctemplate, nil))
+
+	if !ret {
+		return fmt.Errorf("creating the container %q failed", lxc.Name())
+	}
+	return nil
 }
 
-// Starts the container
-func (lxc *Container) Start(useinit bool, args ...string) bool {
+// Start starts the container
+func (lxc *Container) Start(useinit bool, args ...string) error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if lxc.Running() {
+		return fmt.Errorf("container %q is already running", lxc.Name())
+	}
+
 	lxc.Lock()
 	defer lxc.Unlock()
+
+	ret := false
 
 	cuseinit := 0
 	if useinit {
 		cuseinit = 1
 	}
+
 	if args != nil {
 		cargs := makeArgs(args)
 		defer freeArgs(cargs)
-		return bool(C.lxc_container_start(lxc.container, C.int(cuseinit), &cargs[0]))
+
+		ret = bool(C.lxc_container_start(lxc.container, C.int(cuseinit), &cargs[0]))
+	} else {
+		ret = bool(C.lxc_container_start(lxc.container, C.int(cuseinit), nil))
 	}
-	return bool(C.lxc_container_start(lxc.container, C.int(cuseinit), nil))
+
+	if !ret {
+		return fmt.Errorf("starting the container %q failed", lxc.Name())
+	}
+	return nil
 }
 
-// Stops the container
-func (lxc *Container) Stop() bool {
+// Stop stops the container
+func (lxc *Container) Stop() error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is already stoped", lxc.Name())
+	}
+
 	lxc.Lock()
 	defer lxc.Unlock()
-	return bool(C.lxc_container_stop(lxc.container))
+
+	if !bool(C.lxc_container_stop(lxc.container)) {
+		return fmt.Errorf("stoping the container %q failed", lxc.Name())
+	}
+	return nil
 }
 
-// Reboots the container
-func (lxc *Container) Reboot() bool {
+// Reboot reboots the container
+func (lxc *Container) Reboot() error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
 	lxc.Lock()
 	defer lxc.Unlock()
-	return bool(C.lxc_container_reboot(lxc.container))
+
+	if !bool(C.lxc_container_reboot(lxc.container)) {
+		return fmt.Errorf("rebooting the container %q failed", lxc.Name())
+	}
+	return nil
 }
 
-// Shutdowns the container
-func (lxc *Container) Shutdown(timeout int) bool {
+// Shutdown shutdowns the container
+func (lxc *Container) Shutdown(timeout int) error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
 	lxc.Lock()
 	defer lxc.Unlock()
-	return bool(C.lxc_container_shutdown(lxc.container, C.int(timeout)))
+
+	if !bool(C.lxc_container_shutdown(lxc.container, C.int(timeout))) {
+		return fmt.Errorf("shutting down the container %q failed", lxc.Name())
+	}
+	return nil
 }
 
-// Destroys the container
-func (lxc *Container) Destroy() bool {
+// Destroy destroys the container
+func (lxc *Container) Destroy() error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if lxc.Running() {
+		return fmt.Errorf("container %q is running", lxc.Name())
+	}
+
 	lxc.Lock()
 	defer lxc.Unlock()
-	return bool(C.lxc_container_destroy(lxc.container))
+
+	if !bool(C.lxc_container_destroy(lxc.container)) {
+		return fmt.Errorf("destroying the container %q failed", lxc.Name())
+	}
+	return nil
 }
 
-// FIXME: consider other parameters
-// FIXME: Clone or CloneToOverlayFS, CloneToLVM, SnapshotToLVM etc?
-func (lxc *Container) Clone(name string, backend BackendStore) bool {
+// Clone clones the container
+func (lxc *Container) Clone(name string, flags int, backend BackendStore) error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if lxc.Running() {
+		return fmt.Errorf("container %q is running", lxc.Name())
+	}
+
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	if backend == OVERLAYFS {
-		return bool(C.lxc_container_clone(lxc.container, cname, C.int(CLONE_SNAPSHOT), C.CString("overlayfs")))
-	} else {
-		return bool(C.lxc_container_clone(lxc.container, cname, 0, nil))
+	if !bool(C.lxc_container_clone(lxc.container, cname, C.int(flags), C.CString(backend.String()))) {
+		return fmt.Errorf("cloning the container %q failed", lxc.Name())
 	}
+	return nil
 }
 
-func (lxc *Container) CloneToOverlayFS(name string) bool {
-	return lxc.Clone(name, OVERLAYFS)
+// CloneToDirectory clones the container using Directory backendstore
+func (lxc *Container) CloneToDirectory(name string) error {
+	return lxc.Clone(name, 0, Directory)
 }
 
-// Waits till the container changes its state or timeouts
+// CloneToOverlayFS clones the container using OverlayFS backendstore
+func (lxc *Container) CloneToOverlayFS(name string) error {
+	return lxc.Clone(name, CloneSnapshot, OverlayFS)
+}
+
+// Wait waits till the container changes its state or timeouts
 func (lxc *Container) Wait(state State, timeout int) bool {
 	lxc.Lock()
 	defer lxc.Unlock()
+
 	cstate := C.CString(state.String())
 	defer C.free(unsafe.Pointer(cstate))
+
 	return bool(C.lxc_container_wait(lxc.container, cstate, C.int(timeout)))
 }
 
-// Returns the container's configuration file's name
+// ConfigFileName returns the container's configuration file's name
 func (lxc *Container) ConfigFileName() string {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	return C.GoString(C.lxc_container_config_file_name(lxc.container))
 }
 
-// Returns the value of the given key
+// ConfigItem returns the value of the given key
 func (lxc *Container) ConfigItem(key string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
+
 	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_config_item(lxc.container, ckey)))
 	return strings.Split(ret, "\n")
 }
 
-// Sets the value of given key
-func (lxc *Container) SetConfigItem(key string, value string) bool {
+// SetConfigItem sets the value of given key
+func (lxc *Container) SetConfigItem(key string, value string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
+
 	cvalue := C.CString(value)
 	defer C.free(unsafe.Pointer(cvalue))
-	return bool(C.lxc_container_set_config_item(lxc.container, ckey, cvalue))
+
+	if !bool(C.lxc_container_set_config_item(lxc.container, ckey, cvalue)) {
+		return fmt.Errorf("setting config item for the container %q failed (key: %s, value: %s)", lxc.Name(), key, value)
+	}
+	return nil
 }
 
-// Returns the value of the given key
+// CgroupItem returns the value of the given key
 func (lxc *Container) CgroupItem(key string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
+
 	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_cgroup_item(lxc.container, ckey)))
 	return strings.Split(ret, "\n")
 }
 
-// Sets the value of given key
-func (lxc *Container) SetCgroupItem(key string, value string) bool {
+// SetCgroupItem sets the value of given key
+func (lxc *Container) SetCgroupItem(key string, value string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
+
 	cvalue := C.CString(value)
 	defer C.free(unsafe.Pointer(cvalue))
-	return bool(C.lxc_container_set_cgroup_item(lxc.container, ckey, cvalue))
+
+	if !bool(C.lxc_container_set_cgroup_item(lxc.container, ckey, cvalue)) {
+		return fmt.Errorf("setting cgroup item for the container %q failed (key: %s, value: %s)", lxc.Name(), key, value)
+	}
+	return nil
 }
 
-// Clears the value of given key
-func (lxc *Container) ClearConfigItem(key string) bool {
+// ClearConfigItem clears the value of given key
+func (lxc *Container) ClearConfigItem(key string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
-	return bool(C.lxc_container_clear_config_item(lxc.container, ckey))
+
+	if !bool(C.lxc_container_clear_config_item(lxc.container, ckey)) {
+		return fmt.Errorf("clearing cgroup item for the container %q failed (key: %s)", lxc.Name(), key)
+	}
+	return nil
 }
 
-// Returns the keys
+// Keys returns the keys
 func (lxc *Container) Keys(key string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
+
 	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_keys(lxc.container, ckey)))
 	return strings.Split(ret, "\n")
 }
 
-// Loads the configuration file from given path
-func (lxc *Container) LoadConfigFile(path string) bool {
+// LoadConfigFile loads the configuration file from given path
+func (lxc *Container) LoadConfigFile(path string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
+
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
-	return bool(C.lxc_container_load_config(lxc.container, cpath))
+
+	if !bool(C.lxc_container_load_config(lxc.container, cpath)) {
+		return fmt.Errorf("loading config file for the container %q failed (path: %s)", lxc.Name(), path)
+	}
+	return nil
 }
 
-// Saves the configuration file to given path
-func (lxc *Container) SaveConfigFile(path string) bool {
+// SaveConfigFile saves the configuration file to given path
+func (lxc *Container) SaveConfigFile(path string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
+
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
-	return bool(C.lxc_container_save_config(lxc.container, cpath))
+
+	if !bool(C.lxc_container_save_config(lxc.container, cpath)) {
+		return fmt.Errorf("saving config file for the container %q failed (path: %s)", lxc.Name(), path)
+	}
+	return nil
 }
 
-// Returns the configuration file's path
+// ConfigPath returns the configuration file's path
 func (lxc *Container) ConfigPath() string {
 	lxc.RLock()
 	defer lxc.RUnlock()
+
 	return C.GoString(C.lxc_container_get_config_path(lxc.container))
 }
 
-// Sets the configuration file's path
-func (lxc *Container) SetConfigPath(path string) bool {
+// SetConfigPath sets the configuration file's path
+func (lxc *Container) SetConfigPath(path string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
+
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
-	return bool(C.lxc_container_set_config_path(lxc.container, cpath))
+
+	if !bool(C.lxc_container_set_config_path(lxc.container, cpath)) {
+		return fmt.Errorf("setting config file for the container %q failed (path: %s)", lxc.Name(), path)
+	}
+	return nil
 }
 
+// NumberOfNetworkInterfaces returns the number of network interfaces
 func (lxc *Container) NumberOfNetworkInterfaces() int {
 	lxc.RLock()
 	defer lxc.RUnlock()
-	if lxc.Running() {
-		return len(lxc.ConfigItem(network_key))
-	} else {
-		return -1
-	}
-	// Unreachable code but required for compatibility with Go 1.0.3 see -- https://groups.google.com/d/msg/golang-nuts/OXcMGoGYSLg/nfH_zvhnBHsJ
-	panic("unreachable")
-}
-
-func (lxc *Container) MemoryUsageInBytes() (ByteSize, error) {
-	lxc.RLock()
-	defer lxc.RUnlock()
-	if lxc.Running() {
-		memUsed, err := strconv.ParseFloat(lxc.CgroupItem("memory.usage_in_bytes")[0], 64)
-		if err != nil {
-			return -1, err
-		}
-		return ByteSize(memUsed), err
-	}
-	return -1, nil
-}
-
-func (lxc *Container) SwapUsageInBytes() (ByteSize, error) {
-	lxc.RLock()
-	defer lxc.RUnlock()
-	if lxc.Running() {
-		swapUsed, err := strconv.ParseFloat(lxc.CgroupItem("memory.memsw.usage_in_bytes")[0], 64)
-		if err != nil {
-			return -1, err
-		}
-		return ByteSize(swapUsed), err
-	}
-	return -1, nil
-}
-
-func (lxc *Container) MemoryLimitInBytes() (ByteSize, error) {
-	lxc.RLock()
-	defer lxc.RUnlock()
-	if lxc.Running() {
-		memLimit, err := strconv.ParseFloat(lxc.CgroupItem("memory.limit_in_bytes")[0], 64)
-		if err != nil {
-			return -1, err
-		}
-		return ByteSize(memLimit), err
-	}
-	return -1, nil
-}
-
-func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
-	lxc.RLock()
-	defer lxc.RUnlock()
-	if lxc.Running() {
-		swapLimit, err := strconv.ParseFloat(lxc.CgroupItem("memory.memsw.limit_in_bytes")[0], 64)
-		if err != nil {
-			return -1, err
-		}
-		return ByteSize(swapLimit), err
-	}
-	return -1, nil
-}
-
-// Returns the total CPU time (in nanoseconds) consumed by all tasks in this cgroup (including tasks lower in the hierarchy).
-func (lxc *Container) CPUTime() (time.Duration, error) {
-	lxc.RLock()
-	defer lxc.RUnlock()
-	if lxc.Running() {
-		cpuUsage, err := strconv.ParseInt(lxc.CgroupItem("cpuacct.usage")[0], 10, 64)
-		if err != nil {
-			return -1, err
-		}
-		return time.Duration(cpuUsage), err
-	}
-	return -1, nil
-}
-
-// Returns the CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup (including tasks lower in the hierarchy).
-func (lxc *Container) CPUTimePerCPU() ([]time.Duration, error) {
-	lxc.RLock()
-	defer lxc.RUnlock()
-	var cpuTimes []time.Duration
 
 	if lxc.Running() {
-		for _, v := range strings.Split(lxc.CgroupItem("cpuacct.usage_percpu")[0], " ") {
-			cpuUsage, err := strconv.ParseInt(v, 10, 64)
-			if err != nil {
-				return nil, err
-			}
-			cpuTimes = append(cpuTimes, time.Duration(cpuUsage))
-		}
-		return cpuTimes, nil
-	}
-	return nil, nil
-}
-
-// Returns the number of CPU cycles (in the units defined by USER_HZ on the system) consumed by tasks in this cgroup and its children in both user mode and system (kernel) mode.
-func (lxc *Container) CPUStats() ([]int64, error) {
-	lxc.RLock()
-	defer lxc.RUnlock()
-	if lxc.Running() {
-		cpuStat := lxc.CgroupItem("cpuacct.stat")
-		user, _ := strconv.ParseInt(strings.Split(cpuStat[0], " ")[1], 10, 64)
-		system, _ := strconv.ParseInt(strings.Split(cpuStat[1], " ")[1], 10, 64)
-		return []int64{user, system}, nil
-	}
-	return nil, nil
-}
-
-func (lxc *Container) ConsoleGetFD(ttynum int) int {
-	lxc.RLock()
-	defer lxc.RUnlock()
-
-	if lxc.Running() {
-		return int(C.lxc_container_console_getfd(lxc.container, C.int(ttynum)))
+		return len(lxc.ConfigItem("lxc.network"))
 	}
 	return -1
 }
 
-func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) bool {
+// MemoryUsageInBytes returns memory usage in bytes
+func (lxc *Container) MemoryUsageInBytes() (ByteSize, error) {
+	if !lxc.Defined() {
+		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
 	lxc.RLock()
 	defer lxc.RUnlock()
 
-	if lxc.Running() {
-		return bool(C.lxc_container_console(lxc.container, C.int(ttynum), C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), C.int(escape)))
+	memUsed, err := strconv.ParseFloat(lxc.CgroupItem("memory.usage_in_bytes")[0], 64)
+	if err != nil {
+		return -1, err
 	}
-	return false
+	return ByteSize(memUsed), err
+}
+
+// SwapUsageInBytes returns swap usage in bytes
+func (lxc *Container) SwapUsageInBytes() (ByteSize, error) {
+	if !lxc.Defined() {
+		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	swapUsed, err := strconv.ParseFloat(lxc.CgroupItem("memory.memsw.usage_in_bytes")[0], 64)
+	if err != nil {
+		return -1, err
+	}
+	return ByteSize(swapUsed), err
+}
+
+// MemoryLimitInBytes returns memory limit in bytes
+func (lxc *Container) MemoryLimitInBytes() (ByteSize, error) {
+	if !lxc.Defined() {
+		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	memLimit, err := strconv.ParseFloat(lxc.CgroupItem("memory.limit_in_bytes")[0], 64)
+	if err != nil {
+		return -1, err
+	}
+	return ByteSize(memLimit), err
+}
+
+// SwapLimitInBytes returns the swap limit in bytes
+func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
+	if !lxc.Defined() {
+		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	swapLimit, err := strconv.ParseFloat(lxc.CgroupItem("memory.memsw.limit_in_bytes")[0], 64)
+	if err != nil {
+		return -1, err
+	}
+	return ByteSize(swapLimit), err
+}
+
+// CPUTime returns the total CPU time (in nanoseconds) consumed by all tasks in this cgroup (including tasks lower in the hierarchy).
+func (lxc *Container) CPUTime() (time.Duration, error) {
+	if !lxc.Defined() {
+		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	cpuUsage, err := strconv.ParseInt(lxc.CgroupItem("cpuacct.usage")[0], 10, 64)
+	if err != nil {
+		return -1, err
+	}
+	return time.Duration(cpuUsage), err
+}
+
+// CPUTimePerCPU returns the CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup (including tasks lower in the hierarchy).
+func (lxc *Container) CPUTimePerCPU() ([]time.Duration, error) {
+	if !lxc.Defined() {
+		return nil, fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return nil, fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	var cpuTimes []time.Duration
+
+	for _, v := range strings.Split(lxc.CgroupItem("cpuacct.usage_percpu")[0], " ") {
+		cpuUsage, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		cpuTimes = append(cpuTimes, time.Duration(cpuUsage))
+	}
+	return cpuTimes, nil
+}
+
+// CPUStats returns the number of CPU cycles (in the units defined by USER_HZ on the system) consumed by tasks in this cgroup and its children in both user mode and system (kernel) mode.
+func (lxc *Container) CPUStats() ([]int64, error) {
+	if !lxc.Defined() {
+		return nil, fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return nil, fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	cpuStat := lxc.CgroupItem("cpuacct.stat")
+	user, err := strconv.ParseInt(strings.Split(cpuStat[0], " ")[1], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	system, err := strconv.ParseInt(strings.Split(cpuStat[1], " ")[1], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	return []int64{user, system}, nil
+}
+
+// ConsoleGetFD allocates a console tty from container
+func (lxc *Container) ConsoleGetFD(ttynum int) (int, error) {
+	if !lxc.Defined() {
+		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	ret := int(C.lxc_container_console_getfd(lxc.container, C.int(ttynum)))
+	if ret < 0 {
+		return -1, fmt.Errorf("allocating a console tty container %q failed", lxc.Name())
+	}
+	return ret, nil
+}
+
+// Console allocates and runs a console tty from container
+func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", lxc.Name())
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", lxc.Name())
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	if !bool(C.lxc_container_console(lxc.container, C.int(ttynum), C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), C.int(escape))) {
+		return fmt.Errorf("allocating a console for the container %q failed", lxc.Name())
+	}
+	return nil
 }

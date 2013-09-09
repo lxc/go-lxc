@@ -22,18 +22,20 @@
  */
 
 extern bool lxc_container_clear_config_item(struct lxc_container *, char *);
-extern bool lxc_container_create(struct lxc_container *, char *, char **);
+extern bool lxc_container_clone(struct lxc_container *, const char *, int, const char *);
+extern bool lxc_container_console(struct lxc_container *, int, int, int, int, int);
+extern bool lxc_container_create(struct lxc_container *, char *, int, char **);
 extern bool lxc_container_defined(struct lxc_container *);
 extern bool lxc_container_destroy(struct lxc_container *);
 extern bool lxc_container_freeze(struct lxc_container *);
 extern bool lxc_container_load_config(struct lxc_container *, char *);
+extern bool lxc_container_reboot(struct lxc_container *);
 extern bool lxc_container_running(struct lxc_container *);
 extern bool lxc_container_save_config(struct lxc_container *, char *);
 extern bool lxc_container_set_cgroup_item(struct lxc_container *, char *key, char *);
 extern bool lxc_container_set_config_item(struct lxc_container *, char *, char *);
 extern bool lxc_container_set_config_path(struct lxc_container *, char *);
 extern bool lxc_container_shutdown(struct lxc_container *, int);
-extern bool lxc_container_reboot(struct lxc_container *);
 extern bool lxc_container_start(struct lxc_container *, int, char **);
 extern bool lxc_container_stop(struct lxc_container *);
 extern bool lxc_container_unfreeze(struct lxc_container *);
@@ -44,12 +46,9 @@ extern char* lxc_container_get_config_item(struct lxc_container *, char *);
 extern char* lxc_container_get_keys(struct lxc_container *, char *);
 extern const char* lxc_container_get_config_path(struct lxc_container *);
 extern const char* lxc_container_state(struct lxc_container *);
+extern int lxc_container_console_getfd(struct lxc_container *, int);
 extern pid_t lxc_container_init_pid(struct lxc_container *);
 extern void lxc_container_want_daemonize(struct lxc_container *);
-
-extern bool lxc_container_clone(struct lxc_container *, const char *, int, const char *);
-extern int lxc_container_console_getfd(struct lxc_container *, int);
-extern bool lxc_container_console(struct lxc_container *, int, int, int, int, int);
 
 //FIXME: Missing API functionality
 //    char** (*get_ips)(struct lxc_container *c, char* interface, char* family, int scope);

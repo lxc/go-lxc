@@ -41,10 +41,8 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	if c.Defined() {
-		fmt.Printf("Destroying container...\n")
-		c.Destroy()
-	} else {
-		fmt.Printf("No such container...\n")
+	fmt.Printf("Destroying container...\n")
+	if err := c.Destroy(); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }
