@@ -55,3 +55,8 @@ extern void lxc_container_want_daemonize(struct lxc_container *);
 //    int (*attach)(struct lxc_container *c, lxc_attach_exec_t exec_function, void *exec_payload, lxc_attach_options_t *options, pid_t *attached_process);
 //    int (*attach_run_wait)(struct lxc_container *c, lxc_attach_options_t *options, const char *program, const char * const argv[]);
 //
+//    snapshot
+//    int (*snapshot)(struct lxc_container *c, char *commentfile);
+//    int (*snapshot_list)(struct lxc_container *, struct lxc_snapshot **);
+//    bool (*snapshot_restore)(struct lxc_container *c, char *snapname, char *newname);
+//
