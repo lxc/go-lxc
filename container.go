@@ -111,22 +111,22 @@ func (lxc *Container) SetVerbosity(verbosity Verbosity) {
 // Freeze freezes the running container
 func (lxc *Container) Freeze() error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return fmt.Errorf("container %q is not running", lxc.Name())
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	if lxc.State() == FROZEN {
-		return fmt.Errorf("container %q is already frozen", lxc.Name())
+		return fmt.Errorf("container %q is already frozen", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	if !bool(C.lxc_container_freeze(lxc.container)) {
-		return fmt.Errorf("freezing the container %q failed", lxc.Name())
+		return fmt.Errorf("freezing the container %q failed", C.GoString(lxc.container.name))
 	}
 
 	return nil
@@ -135,22 +135,22 @@ func (lxc *Container) Freeze() error {
 // Unfreeze unfreezes the frozen container
 func (lxc *Container) Unfreeze() error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return fmt.Errorf("container %q is not running", lxc.Name())
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	if lxc.State() != FROZEN {
-		return fmt.Errorf("container %q is not frozen", lxc.Name())
+		return fmt.Errorf("container %q is not frozen", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	if !bool(C.lxc_container_unfreeze(lxc.container)) {
-		return fmt.Errorf("unfreezing the container %q failed", lxc.Name())
+		return fmt.Errorf("unfreezing the container %q failed", C.GoString(lxc.container.name))
 	}
 
 	return nil
@@ -159,7 +159,7 @@ func (lxc *Container) Unfreeze() error {
 // Create creates the container using given template and arguments
 func (lxc *Container) Create(template string, args ...string) error {
 	if lxc.Defined() {
-		return fmt.Errorf("container %q is already defined", lxc.Name())
+		return fmt.Errorf("container %q is already defined", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
@@ -179,7 +179,7 @@ func (lxc *Container) Create(template string, args ...string) error {
 	}
 
 	if !ret {
-		return fmt.Errorf("creating the container %q failed", lxc.Name())
+		return fmt.Errorf("creating the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
@@ -187,11 +187,11 @@ func (lxc *Container) Create(template string, args ...string) error {
 // Start starts the container
 func (lxc *Container) Start(useinit bool, args ...string) error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if lxc.Running() {
-		return fmt.Errorf("container %q is already running", lxc.Name())
+		return fmt.Errorf("container %q is already running", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
@@ -214,7 +214,7 @@ func (lxc *Container) Start(useinit bool, args ...string) error {
 	}
 
 	if !ret {
-		return fmt.Errorf("starting the container %q failed", lxc.Name())
+		return fmt.Errorf("starting the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
@@ -222,18 +222,18 @@ func (lxc *Container) Start(useinit bool, args ...string) error {
 // Stop stops the container
 func (lxc *Container) Stop() error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return fmt.Errorf("container %q is already stoped", lxc.Name())
+		return fmt.Errorf("container %q is already stoped", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	if !bool(C.lxc_container_stop(lxc.container)) {
-		return fmt.Errorf("stoping the container %q failed", lxc.Name())
+		return fmt.Errorf("stoping the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
@@ -241,18 +241,18 @@ func (lxc *Container) Stop() error {
 // Reboot reboots the container
 func (lxc *Container) Reboot() error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return fmt.Errorf("container %q is not running", lxc.Name())
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	if !bool(C.lxc_container_reboot(lxc.container)) {
-		return fmt.Errorf("rebooting the container %q failed", lxc.Name())
+		return fmt.Errorf("rebooting the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
@@ -260,18 +260,18 @@ func (lxc *Container) Reboot() error {
 // Shutdown shutdowns the container
 func (lxc *Container) Shutdown(timeout int) error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return fmt.Errorf("container %q is not running", lxc.Name())
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	if !bool(C.lxc_container_shutdown(lxc.container, C.int(timeout))) {
-		return fmt.Errorf("shutting down the container %q failed", lxc.Name())
+		return fmt.Errorf("shutting down the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
@@ -279,18 +279,18 @@ func (lxc *Container) Shutdown(timeout int) error {
 // Destroy destroys the container
 func (lxc *Container) Destroy() error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if lxc.Running() {
-		return fmt.Errorf("container %q is running", lxc.Name())
+		return fmt.Errorf("container %q is running", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	if !bool(C.lxc_container_destroy(lxc.container)) {
-		return fmt.Errorf("destroying the container %q failed", lxc.Name())
+		return fmt.Errorf("destroying the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
@@ -298,11 +298,11 @@ func (lxc *Container) Destroy() error {
 // Clone clones the container
 func (lxc *Container) Clone(name string, flags int, backend BackendStore) error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if lxc.Running() {
-		return fmt.Errorf("container %q is running", lxc.Name())
+		return fmt.Errorf("container %q is running", C.GoString(lxc.container.name))
 	}
 
 	lxc.Lock()
@@ -312,7 +312,7 @@ func (lxc *Container) Clone(name string, flags int, backend BackendStore) error 
 	defer C.free(unsafe.Pointer(cname))
 
 	if !bool(C.lxc_container_clone(lxc.container, cname, C.int(flags), C.CString(backend.String()))) {
-		return fmt.Errorf("cloning the container %q failed", lxc.Name())
+		return fmt.Errorf("cloning the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
@@ -370,7 +370,7 @@ func (lxc *Container) SetConfigItem(key string, value string) error {
 	defer C.free(unsafe.Pointer(cvalue))
 
 	if !bool(C.lxc_container_set_config_item(lxc.container, ckey, cvalue)) {
-		return fmt.Errorf("setting config item for the container %q failed (key: %s, value: %s)", lxc.Name(), key, value)
+		return fmt.Errorf("setting config item for the container %q failed (key: %s, value: %s)", C.GoString(lxc.container.name), key, value)
 	}
 	return nil
 }
@@ -399,7 +399,7 @@ func (lxc *Container) SetCgroupItem(key string, value string) error {
 	defer C.free(unsafe.Pointer(cvalue))
 
 	if !bool(C.lxc_container_set_cgroup_item(lxc.container, ckey, cvalue)) {
-		return fmt.Errorf("setting cgroup item for the container %q failed (key: %s, value: %s)", lxc.Name(), key, value)
+		return fmt.Errorf("setting cgroup item for the container %q failed (key: %s, value: %s)", C.GoString(lxc.container.name), key, value)
 	}
 	return nil
 }
@@ -413,7 +413,7 @@ func (lxc *Container) ClearConfigItem(key string) error {
 	defer C.free(unsafe.Pointer(ckey))
 
 	if !bool(C.lxc_container_clear_config_item(lxc.container, ckey)) {
-		return fmt.Errorf("clearing cgroup item for the container %q failed (key: %s)", lxc.Name(), key)
+		return fmt.Errorf("clearing cgroup item for the container %q failed (key: %s)", C.GoString(lxc.container.name), key)
 	}
 	return nil
 }
@@ -439,7 +439,7 @@ func (lxc *Container) LoadConfigFile(path string) error {
 	defer C.free(unsafe.Pointer(cpath))
 
 	if !bool(C.lxc_container_load_config(lxc.container, cpath)) {
-		return fmt.Errorf("loading config file for the container %q failed (path: %s)", lxc.Name(), path)
+		return fmt.Errorf("loading config file for the container %q failed (path: %s)", C.GoString(lxc.container.name), path)
 	}
 	return nil
 }
@@ -453,7 +453,7 @@ func (lxc *Container) SaveConfigFile(path string) error {
 	defer C.free(unsafe.Pointer(cpath))
 
 	if !bool(C.lxc_container_save_config(lxc.container, cpath)) {
-		return fmt.Errorf("saving config file for the container %q failed (path: %s)", lxc.Name(), path)
+		return fmt.Errorf("saving config file for the container %q failed (path: %s)", C.GoString(lxc.container.name), path)
 	}
 	return nil
 }
@@ -475,7 +475,7 @@ func (lxc *Container) SetConfigPath(path string) error {
 	defer C.free(unsafe.Pointer(cpath))
 
 	if !bool(C.lxc_container_set_config_path(lxc.container, cpath)) {
-		return fmt.Errorf("setting config file for the container %q failed (path: %s)", lxc.Name(), path)
+		return fmt.Errorf("setting config file for the container %q failed (path: %s)", C.GoString(lxc.container.name), path)
 	}
 	return nil
 }
@@ -494,11 +494,11 @@ func (lxc *Container) NumberOfNetworkInterfaces() int {
 // MemoryUsageInBytes returns memory usage in bytes
 func (lxc *Container) MemoryUsageInBytes() (ByteSize, error) {
 	if !lxc.Defined() {
-		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+		return -1, fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+		return -1, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
@@ -514,11 +514,11 @@ func (lxc *Container) MemoryUsageInBytes() (ByteSize, error) {
 // SwapUsageInBytes returns swap usage in bytes
 func (lxc *Container) SwapUsageInBytes() (ByteSize, error) {
 	if !lxc.Defined() {
-		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+		return -1, fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+		return -1, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
@@ -534,11 +534,11 @@ func (lxc *Container) SwapUsageInBytes() (ByteSize, error) {
 // MemoryLimitInBytes returns memory limit in bytes
 func (lxc *Container) MemoryLimitInBytes() (ByteSize, error) {
 	if !lxc.Defined() {
-		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+		return -1, fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+		return -1, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
@@ -554,11 +554,11 @@ func (lxc *Container) MemoryLimitInBytes() (ByteSize, error) {
 // SwapLimitInBytes returns the swap limit in bytes
 func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
 	if !lxc.Defined() {
-		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+		return -1, fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+		return -1, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
@@ -574,11 +574,11 @@ func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
 // CPUTime returns the total CPU time (in nanoseconds) consumed by all tasks in this cgroup (including tasks lower in the hierarchy).
 func (lxc *Container) CPUTime() (time.Duration, error) {
 	if !lxc.Defined() {
-		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+		return -1, fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+		return -1, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
@@ -594,11 +594,11 @@ func (lxc *Container) CPUTime() (time.Duration, error) {
 // CPUTimePerCPU returns the CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup (including tasks lower in the hierarchy).
 func (lxc *Container) CPUTimePerCPU() ([]time.Duration, error) {
 	if !lxc.Defined() {
-		return nil, fmt.Errorf("there is no container named %q", lxc.Name())
+		return nil, fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return nil, fmt.Errorf("container %q is not running", lxc.Name())
+		return nil, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
@@ -619,11 +619,11 @@ func (lxc *Container) CPUTimePerCPU() ([]time.Duration, error) {
 // CPUStats returns the number of CPU cycles (in the units defined by USER_HZ on the system) consumed by tasks in this cgroup and its children in both user mode and system (kernel) mode.
 func (lxc *Container) CPUStats() ([]int64, error) {
 	if !lxc.Defined() {
-		return nil, fmt.Errorf("there is no container named %q", lxc.Name())
+		return nil, fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return nil, fmt.Errorf("container %q is not running", lxc.Name())
+		return nil, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
@@ -644,11 +644,11 @@ func (lxc *Container) CPUStats() ([]int64, error) {
 // ConsoleGetFD allocates a console tty from container
 func (lxc *Container) ConsoleGetFD(ttynum int) (int, error) {
 	if !lxc.Defined() {
-		return -1, fmt.Errorf("there is no container named %q", lxc.Name())
+		return -1, fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return -1, fmt.Errorf("container %q is not running", lxc.Name())
+		return -1, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
@@ -656,7 +656,7 @@ func (lxc *Container) ConsoleGetFD(ttynum int) (int, error) {
 
 	ret := int(C.lxc_container_console_getfd(lxc.container, C.int(ttynum)))
 	if ret < 0 {
-		return -1, fmt.Errorf("allocating a console tty container %q failed", lxc.Name())
+		return -1, fmt.Errorf("allocating a console tty container %q failed", C.GoString(lxc.container.name))
 	}
 	return ret, nil
 }
@@ -664,18 +664,18 @@ func (lxc *Container) ConsoleGetFD(ttynum int) (int, error) {
 // Console allocates and runs a console tty from container
 func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) error {
 	if !lxc.Defined() {
-		return fmt.Errorf("there is no container named %q", lxc.Name())
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
 	}
 
 	if !lxc.Running() {
-		return fmt.Errorf("container %q is not running", lxc.Name())
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
 	lxc.RLock()
 	defer lxc.RUnlock()
 
 	if !bool(C.lxc_container_console(lxc.container, C.int(ttynum), C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), C.int(escape))) {
-		return fmt.Errorf("allocating a console for the container %q failed", lxc.Name())
+		return fmt.Errorf("allocating a console for the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
