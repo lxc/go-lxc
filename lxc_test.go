@@ -369,12 +369,16 @@ func TestKeys(t *testing.T) {
 	}
 }
 
-func TestNumberOfNetworkInterfaces(t *testing.T) {
+func TestInterfaces(t *testing.T) {
 	z := NewContainer(ContainerName)
 	defer PutContainer(z)
 
-	if z.NumberOfNetworkInterfaces() != 1 {
-		t.Errorf("NumberOfNetworkInterfaces failed...")
+	if err, interfaces := z.Interfaces(); err != nil {
+		t.Errorf(err.Error())
+	} else {
+		for i, v := range interfaces {
+			fmt.Printf("%d) %s\n", i, v)
+		}
 	}
 }
 

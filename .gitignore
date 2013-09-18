@@ -9,6 +9,8 @@ examples/console
 examples/create
 examples/destroy
 examples/freeze
+examples/interfaces
+examples/ipaddress
 examples/list
 examples/shutdown
 examples/start

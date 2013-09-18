@@ -23,24 +23,60 @@
 
 package lxc
 
-// #include <stdlib.h>
+/*
+#include <stdlib.h>
+
+static char** makeCharArray(int size) {
+    return calloc(sizeof(char*), size);
+}
+
+static void setArrayString(char **array, char *string, int n) {
+    array[n] = string;
+}
+
+static void freeCharArray(char **array, int size) {
+    int i;
+    for (i = 0; i < size; i++)
+        free(array[i]);
+    free(array);
+}
+*/
 import "C"
 
 import (
 	"unsafe"
 )
 
-func makeArgs(args []string) []*C.char {
-	ret := make([]*C.char, len(args)+1)
-	for i, s := range args {
-		ret[i] = C.CString(s)
-	}
-	ret[len(ret)-1] = nil
-	return ret
+func sptr(p uintptr) *C.char {
+	return *(**C.char)(unsafe.Pointer(p))
 }
 
-func freeArgs(cArgs []*C.char) {
-	for _, s := range cArgs {
-		C.free(unsafe.Pointer(s))
+func makeArgs(args []string) **C.char {
+	cparams := C.makeCharArray(C.int(len(args)))
+	for i, s := range args {
+		C.setArrayString(cparams, C.CString(s), C.int(i))
 	}
+	return cparams
+}
+
+func freeArgs(cArgs **C.char, length int) {
+	C.freeCharArray(cArgs, C.int(length))
+}
+
+func convertArgs(cArgs **C.char) []string {
+	if cArgs == nil {
+		return nil
+	}
+
+	var s []string
+
+	// duplicate
+	for p := uintptr(unsafe.Pointer(cArgs)); sptr(p) != nil; p += unsafe.Sizeof(uintptr(0)) {
+		s = append(s, C.GoString(sptr(p)))
+	}
+
+	// free the original
+	C.freeCharArray(cArgs, C.int(len(s)))
+
+	return s
 }

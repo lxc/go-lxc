@@ -171,9 +171,9 @@ func (lxc *Container) Create(template string, args ...string) error {
 	ret := false
 	if args != nil {
 		cargs := makeArgs(args)
-		defer freeArgs(cargs)
+		defer freeArgs(cargs, len(args))
 
-		ret = bool(C.lxc_container_create(lxc.container, ctemplate, C.int(lxc.verbosity), &cargs[0]))
+		ret = bool(C.lxc_container_create(lxc.container, ctemplate, C.int(lxc.verbosity), cargs))
 	} else {
 		ret = bool(C.lxc_container_create(lxc.container, ctemplate, C.int(lxc.verbosity), nil))
 	}
@@ -206,9 +206,9 @@ func (lxc *Container) Start(useinit bool, args ...string) error {
 
 	if args != nil {
 		cargs := makeArgs(args)
-		defer freeArgs(cargs)
+		defer freeArgs(cargs, len(args))
 
-		ret = bool(C.lxc_container_start(lxc.container, C.int(cuseinit), &cargs[0]))
+		ret = bool(C.lxc_container_start(lxc.container, C.int(cuseinit), cargs))
 	} else {
 		ret = bool(C.lxc_container_start(lxc.container, C.int(cuseinit), nil))
 	}
@@ -343,7 +343,11 @@ func (lxc *Container) ConfigFileName() string {
 	lxc.RLock()
 	defer lxc.RUnlock()
 
-	return C.GoString(C.lxc_container_config_file_name(lxc.container))
+	// allocated in lxc.c
+	configFileName := C.lxc_container_config_file_name(lxc.container)
+	defer C.free(unsafe.Pointer(configFileName))
+
+	return C.GoString(configFileName)
 }
 
 // ConfigItem returns the value of the given key
@@ -354,7 +358,11 @@ func (lxc *Container) ConfigItem(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
-	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_config_item(lxc.container, ckey)))
+	// allocated in lxc.c
+	configItem := C.lxc_container_get_config_item(lxc.container, ckey)
+	defer C.free(unsafe.Pointer(configItem))
+
+	ret := strings.TrimSpace(C.GoString(configItem))
 	return strings.Split(ret, "\n")
 }
 
@@ -383,7 +391,11 @@ func (lxc *Container) CgroupItem(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
-	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_cgroup_item(lxc.container, ckey)))
+	// allocated in lxc.c
+	cgroupItem := C.lxc_container_get_cgroup_item(lxc.container, ckey)
+	defer C.free(unsafe.Pointer(cgroupItem))
+
+	ret := strings.TrimSpace(C.GoString(cgroupItem))
 	return strings.Split(ret, "\n")
 }
 
@@ -426,7 +438,11 @@ func (lxc *Container) Keys(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
-	ret := strings.TrimSpace(C.GoString(C.lxc_container_get_keys(lxc.container, ckey)))
+	// allocated in lxc.c
+	keys := C.lxc_container_get_keys(lxc.container, ckey)
+	defer C.free(unsafe.Pointer(keys))
+
+	ret := strings.TrimSpace(C.GoString(keys))
 	return strings.Split(ret, "\n")
 }
 
@@ -478,17 +494,6 @@ func (lxc *Container) SetConfigPath(path string) error {
 		return fmt.Errorf("setting config file for the container %q failed (path: %s)", C.GoString(lxc.container.name), path)
 	}
 	return nil
-}
-
-// NumberOfNetworkInterfaces returns the number of network interfaces
-func (lxc *Container) NumberOfNetworkInterfaces() int {
-	lxc.RLock()
-	defer lxc.RUnlock()
-
-	if lxc.Running() {
-		return len(lxc.ConfigItem("lxc.network"))
-	}
-	return -1
 }
 
 // MemoryUsageInBytes returns memory usage in bytes
@@ -678,4 +683,113 @@ func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) e
 		return fmt.Errorf("allocating a console for the container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
+}
+
+/*
+// Interfaces returns the name of the interfaces from the container
+func (lxc *Container) Interfaces() (error, []string) {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name)), nil
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
+	}
+
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	result := C.lxc_container_get_interfaces(lxc.container)
+	if result == nil {
+		return fmt.Errorf("getting interface names for the container %q failed", C.GoString(lxc.container.name)), nil
+	}
+	return nil, convertArgs(result)
+}
+*/
+
+// IPAddress returns the IP address of the given interface
+func (lxc *Container) IPAddress(interfaceName string) (error, []string) {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name)), nil
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	cinterface := C.CString(interfaceName)
+	defer C.free(unsafe.Pointer(cinterface))
+
+	result := C.lxc_container_get_ips(lxc.container, cinterface, nil, 0)
+	if result == nil {
+		return fmt.Errorf("getting IP address of the interface %s for the container %q failed", interfaceName, C.GoString(lxc.container.name)), nil
+	}
+	return nil, convertArgs(result)
+}
+
+// IPAddresses returns all IP addresses from the container
+func (lxc *Container) IPAddresses() (error, []string) {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name)), nil
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
+	}
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	result := C.lxc_container_get_ips(lxc.container, nil, nil, 0)
+	if result == nil {
+		return fmt.Errorf("getting IP addresses for the container %q failed", C.GoString(lxc.container.name)), nil
+	}
+	return nil, convertArgs(result)
+
+}
+
+// IPv4Addresses returns all IPv4 addresses from the container
+func (lxc *Container) IPv4Addresses() (error, []string) {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name)), nil
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
+	}
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	cfamily := C.CString("inet")
+	defer C.free(unsafe.Pointer(cfamily))
+
+	result := C.lxc_container_get_ips(lxc.container, nil, cfamily, 0)
+	if result == nil {
+		return fmt.Errorf("getting IPv4 addresses for the container %q failed", C.GoString(lxc.container.name)), nil
+	}
+	return nil, convertArgs(result)
+}
+
+// IPv6Addresses returns all IPv6 addresses from the container
+func (lxc *Container) IPv6Addresses() (error, []string) {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name)), nil
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
+	}
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	cfamily := C.CString("inet6")
+	defer C.free(unsafe.Pointer(cfamily))
+
+	result := C.lxc_container_get_ips(lxc.container, nil, cfamily, 0)
+	if result == nil {
+		return fmt.Errorf("getting IPv6 addresses for the container %q failed", C.GoString(lxc.container.name)), nil
+	}
+	return nil, convertArgs(result)
 }

@@ -21,7 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <stdio.h>
 #include <stdbool.h>
 
 #include <lxc/lxc.h>
@@ -173,4 +172,12 @@ extern bool lxc_container_console(struct lxc_container *c, int ttynum, int stdin
         return true;
     }
     return false;
+}
+
+extern char** lxc_container_get_interfaces(struct lxc_container *c) {
+    return c->get_interfaces(c);
+}
+
+extern char** lxc_container_get_ips(struct lxc_container *c, char *interface, char *family, int scope) {
+    return c->get_ips(c, interface, family, scope);
 }
