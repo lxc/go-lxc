@@ -1,5 +1,5 @@
 /*
- * interfaces.go
+ * attach.go
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -41,14 +41,13 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	fmt.Printf("Interfaces\n")
-	/*
-		if err, interfaces := c.Interfaces(); err != nil {
-			fmt.Printf("ERROR: %s\n", err.Error())
-		} else {
-			for i, v := range interfaces {
-				fmt.Printf("%d) %s\n", i, v)
-			}
-		}
-	*/
+	fmt.Printf("AttachRunShell\n")
+	if err := c.AttachRunShell(); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+
+	fmt.Printf("AttachRunCommand\n")
+	if err := c.AttachRunCommand("uname", "-a"); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
 }

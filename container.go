@@ -656,8 +656,8 @@ func (lxc *Container) ConsoleGetFD(ttynum int) (int, error) {
 		return -1, fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
-	lxc.RLock()
-	defer lxc.RUnlock()
+	lxc.Lock()
+	defer lxc.Unlock()
 
 	ret := int(C.lxc_container_console_getfd(lxc.container, C.int(ttynum)))
 	if ret < 0 {
@@ -676,11 +676,58 @@ func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) e
 		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
 	}
 
-	lxc.RLock()
-	defer lxc.RUnlock()
+	lxc.Lock()
+	defer lxc.Unlock()
 
 	if !bool(C.lxc_container_console(lxc.container, C.int(ttynum), C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), C.int(escape))) {
 		return fmt.Errorf("allocating a console for the container %q failed", C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
+// AttachRunShell runs a shell inside the container
+func (lxc *Container) AttachRunShell() error {
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	ret := int(C.lxc_container_attach(lxc.container))
+	if ret < 0 {
+		return fmt.Errorf("allocating a console tty container %q failed", C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
+// AttachRunCommand runs user specified command inside the container and waits it
+func (lxc *Container) AttachRunCommand(args ...string) error {
+	if args == nil {
+		return fmt.Errorf("not enough arguments")
+	}
+
+	if !lxc.Defined() {
+		return fmt.Errorf("there is no container named %q", C.GoString(lxc.container.name))
+	}
+
+	if !lxc.Running() {
+		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name))
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	cargs := makeArgs(args)
+	defer freeArgs(cargs, len(args))
+
+	ret := int(C.lxc_container_attach_run_wait(lxc.container, cargs))
+	if ret < 0 {
+		return fmt.Errorf("allocating a console tty container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }
@@ -717,8 +764,8 @@ func (lxc *Container) IPAddress(interfaceName string) (error, []string) {
 		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
 	}
 
-	lxc.Lock()
-	defer lxc.Unlock()
+	lxc.RLock()
+	defer lxc.RUnlock()
 
 	cinterface := C.CString(interfaceName)
 	defer C.free(unsafe.Pointer(cinterface))
@@ -739,8 +786,8 @@ func (lxc *Container) IPAddresses() (error, []string) {
 	if !lxc.Running() {
 		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
 	}
-	lxc.Lock()
-	defer lxc.Unlock()
+	lxc.RLock()
+	defer lxc.RUnlock()
 
 	result := C.lxc_container_get_ips(lxc.container, nil, nil, 0)
 	if result == nil {
@@ -759,8 +806,8 @@ func (lxc *Container) IPv4Addresses() (error, []string) {
 	if !lxc.Running() {
 		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
 	}
-	lxc.Lock()
-	defer lxc.Unlock()
+	lxc.RLock()
+	defer lxc.RUnlock()
 
 	cfamily := C.CString("inet")
 	defer C.free(unsafe.Pointer(cfamily))
@@ -781,8 +828,8 @@ func (lxc *Container) IPv6Addresses() (error, []string) {
 	if !lxc.Running() {
 		return fmt.Errorf("container %q is not running", C.GoString(lxc.container.name)), nil
 	}
-	lxc.Lock()
-	defer lxc.Unlock()
+	lxc.RLock()
+	defer lxc.RUnlock()
 
 	cfamily := C.CString("inet6")
 	defer C.free(unsafe.Pointer(cfamily))
