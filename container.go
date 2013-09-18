@@ -732,7 +732,6 @@ func (lxc *Container) AttachRunCommand(args ...string) error {
 	return nil
 }
 
-/*
 // Interfaces returns the name of the interfaces from the container
 func (lxc *Container) Interfaces() (error, []string) {
 	if !lxc.Defined() {
@@ -752,7 +751,6 @@ func (lxc *Container) Interfaces() (error, []string) {
 	}
 	return nil, convertArgs(result)
 }
-*/
 
 // IPAddress returns the IP address of the given interface
 func (lxc *Container) IPAddress(interfaceName string) (error, []string) {

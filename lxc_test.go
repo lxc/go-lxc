@@ -377,7 +377,7 @@ func TestInterfaces(t *testing.T) {
 		t.Errorf(err.Error())
 	} else {
 		for i, v := range interfaces {
-			fmt.Printf("%d) %s\n", i, v)
+			t.Logf("%d) %s\n", i, v)
 		}
 	}
 }
