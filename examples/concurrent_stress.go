@@ -39,16 +39,18 @@ func init() {
 func main() {
 	var wg sync.WaitGroup
 
+	nOfContainers := 10
+
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		go func(i int) {
-			name := strconv.Itoa(rand.Intn(10))
+			name := strconv.Itoa(rand.Intn(nOfContainers))
 
 			c := lxc.NewContainer(name)
 			defer lxc.PutContainer(c)
 
 			// sleep for a while to simulate some dummy work
-			time.Sleep(time.Millisecond * time.Duration(rand.Intn(500)))
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(1000)))
 
 			if c.Defined() {
 				if !c.Running() {
@@ -64,6 +66,7 @@ func main() {
 					}
 				}
 			} else {
+				fmt.Printf("Creating the container (%s)...\n", name)
 				if err := c.Create("ubuntu", "amd64", "quantal"); err != nil {
 					fmt.Printf("ERROR: %s\n", err.Error())
 				}
@@ -72,4 +75,18 @@ func main() {
 		}(i)
 	}
 	wg.Wait()
+
+	for i := 0; i < nOfContainers; i++ {
+		name := strconv.Itoa(i)
+
+		c := lxc.NewContainer(name)
+		defer lxc.PutContainer(c)
+
+		c.Stop()
+
+		fmt.Printf("Destroying the container (%s)...\n", name)
+		if err := c.Destroy(); err != nil {
+			fmt.Printf("ERROR: %s\n", err.Error())
+		}
+	}
 }

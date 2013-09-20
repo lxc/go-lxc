@@ -158,7 +158,7 @@ bool lxc_container_clone(struct lxc_container *c, const char *newname, int flags
     return c->clone(c, newname, NULL, flags, bdevtype, NULL, 0, NULL) != NULL;
 }
 
-extern int lxc_container_console_getfd(struct lxc_container *c, int ttynum) {
+int lxc_container_console_getfd(struct lxc_container *c, int ttynum) {
     int masterfd;
 
     if (c->console_getfd(c, &ttynum, &masterfd) < 0) {
@@ -167,7 +167,7 @@ extern int lxc_container_console_getfd(struct lxc_container *c, int ttynum) {
     return masterfd;
 }
 
-extern bool lxc_container_console(struct lxc_container *c, int ttynum, int stdinfd, int stdoutfd, int stderrfd, int escape) {
+bool lxc_container_console(struct lxc_container *c, int ttynum, int stdinfd, int stdoutfd, int stderrfd, int escape) {
 
     if (c->console(c, ttynum, stdinfd, stdoutfd, stderrfd, escape) == 0) {
         return true;
@@ -175,15 +175,15 @@ extern bool lxc_container_console(struct lxc_container *c, int ttynum, int stdin
     return false;
 }
 
-extern char** lxc_container_get_interfaces(struct lxc_container *c) {
+char** lxc_container_get_interfaces(struct lxc_container *c) {
     return c->get_interfaces(c);
 }
 
-extern char** lxc_container_get_ips(struct lxc_container *c, char *interface, char *family, int scope) {
+char** lxc_container_get_ips(struct lxc_container *c, char *interface, char *family, int scope) {
     return c->get_ips(c, interface, family, scope);
 }
 
-extern int lxc_container_attach(struct lxc_container *c) {
+int lxc_container_attach(struct lxc_container *c) {
     int ret;
     pid_t pid;
     lxc_attach_options_t default_options = LXC_ATTACH_OPTIONS_DEFAULT;
@@ -226,7 +226,7 @@ extern int lxc_container_attach(struct lxc_container *c) {
     return -1;
 }
 
-extern int lxc_container_attach_run_wait(struct lxc_container *c, char **argv) {
+int lxc_container_attach_run_wait(struct lxc_container *c, char **argv) {
     int ret;
     lxc_attach_options_t default_options = LXC_ATTACH_OPTIONS_DEFAULT;
 
