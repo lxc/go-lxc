@@ -100,6 +100,17 @@ func (lxc *Container) SetDaemonize() {
 	C.lxc_container_want_daemonize(lxc.container)
 }
 
+// SetCloseAllFds sets the close_all_fds flag for the container
+func (lxc *Container) SetCloseAllFds() error {
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	if !bool(C.lxc_container_want_close_all_fds(lxc.container)) {
+		return fmt.Errorf("setting CloseAllFDs for container %q failed", C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
 // SetVerbosity sets the verbosity level of some API calls
 func (lxc *Container) SetVerbosity(verbosity Verbosity) {
 	lxc.Lock()

@@ -24,7 +24,7 @@
 // Package lxc provides Go (golang) Bindings for LXC (Linux Containers) C API.
 package lxc
 
-// #cgo linux LDFLAGS: -llxc -lutil
+// #cgo pkg-config: lxc
 // #include <lxc/lxc.h>
 // #include <lxc/lxccontainer.h>
 // #include "lxc.h"

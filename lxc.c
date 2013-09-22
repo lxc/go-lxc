@@ -28,31 +28,35 @@
 #include <lxc/attach_options.h>
 
 bool lxc_container_defined(struct lxc_container *c) {
-	return c->is_defined(c);
+    return c->is_defined(c);
 }
 
 const char* lxc_container_state(struct lxc_container *c) {
-	return c->state(c);
+    return c->state(c);
 }
 
 bool lxc_container_running(struct lxc_container *c) {
-	return c->is_running(c);
+    return c->is_running(c);
 }
 
 bool lxc_container_freeze(struct lxc_container *c) {
-	return c->freeze(c);
+    return c->freeze(c);
 }
 
 bool lxc_container_unfreeze(struct lxc_container *c) {
-	return c->unfreeze(c);
+    return c->unfreeze(c);
 }
 
 pid_t lxc_container_init_pid(struct lxc_container *c) {
-	return c->init_pid(c);
+    return c->init_pid(c);
 }
 
 void lxc_container_want_daemonize(struct lxc_container *c) {
-	c->want_daemonize(c);
+    c->want_daemonize(c);
+}
+
+bool lxc_container_want_close_all_fds(struct lxc_container *c) {
+    return c->want_close_all_fds(c);
 }
 
 bool lxc_container_create(struct lxc_container *c, char *t, int flags, char **argv) {
@@ -60,98 +64,98 @@ bool lxc_container_create(struct lxc_container *c, char *t, int flags, char **ar
 }
 
 bool lxc_container_start(struct lxc_container *c, int useinit, char **argv) {
-	return c->start(c, useinit, argv);
+    return c->start(c, useinit, argv);
 }
 
 bool lxc_container_stop(struct lxc_container *c) {
-	return c->stop(c);
+    return c->stop(c);
 }
 
 bool lxc_container_reboot(struct lxc_container *c) {
-	return c->reboot(c);
+    return c->reboot(c);
 }
 
 bool lxc_container_shutdown(struct lxc_container *c, int timeout) {
-	return c->shutdown(c, timeout);
+    return c->shutdown(c, timeout);
 }
 
 char* lxc_container_config_file_name(struct lxc_container *c) {
-	return c->config_file_name(c);
+    return c->config_file_name(c);
 }
 
 bool lxc_container_destroy(struct lxc_container *c) {
-	return c->destroy(c);
+    return c->destroy(c);
 }
 
 bool lxc_container_wait(struct lxc_container *c, char *state, int timeout) {
-	return c->wait(c, state, timeout);
+    return c->wait(c, state, timeout);
 }
 
 char* lxc_container_get_config_item(struct lxc_container *c, char *key) {
-	int len = c->get_config_item(c, key, NULL, 0);
-	if (len <= 0) {
-		return NULL;
-	}
+    int len = c->get_config_item(c, key, NULL, 0);
+    if (len <= 0) {
+        return NULL;
+    }
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
-	if (c->get_config_item(c, key, value, len + 1) != len) {
-		return NULL;
-	}
-	return value;
+    char* value = (char*)malloc(sizeof(char)*len + 1);
+    if (c->get_config_item(c, key, value, len + 1) != len) {
+        return NULL;
+    }
+    return value;
 }
 
 bool lxc_container_set_config_item(struct lxc_container *c, char *key, char *value) {
-	return c->set_config_item(c, key, value);
+    return c->set_config_item(c, key, value);
 }
 
 bool lxc_container_clear_config_item(struct lxc_container *c, char *key) {
-	return c->clear_config_item(c, key);
+    return c->clear_config_item(c, key);
 }
 
 char* lxc_container_get_keys(struct lxc_container *c, char *key) {
-	int len = c->get_keys(c, key, NULL, 0);
-	if (len <= 0) {
-		return NULL;
-	}
+    int len = c->get_keys(c, key, NULL, 0);
+    if (len <= 0) {
+        return NULL;
+    }
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
-	if (c->get_keys(c, key, value, len + 1) != len) {
-		return NULL;
-	}
-	return value;
+    char* value = (char*)malloc(sizeof(char)*len + 1);
+    if (c->get_keys(c, key, value, len + 1) != len) {
+        return NULL;
+    }
+    return value;
 }
 
 char* lxc_container_get_cgroup_item(struct lxc_container *c, char *key) {
-	int len = c->get_cgroup_item(c, key, NULL, 0);
-	if (len <= 0) {
-		return NULL;
-	}
+    int len = c->get_cgroup_item(c, key, NULL, 0);
+    if (len <= 0) {
+        return NULL;
+    }
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
-	if (c->get_cgroup_item(c, key, value, len + 1) != len) {
-		return NULL;
-	}
-	return value;
+    char* value = (char*)malloc(sizeof(char)*len + 1);
+    if (c->get_cgroup_item(c, key, value, len + 1) != len) {
+        return NULL;
+    }
+    return value;
 }
 
 bool lxc_container_set_cgroup_item(struct lxc_container *c, char *key, char *value) {
-	return c->set_cgroup_item(c, key, value);
+    return c->set_cgroup_item(c, key, value);
 }
 
 const char* lxc_container_get_config_path(struct lxc_container *c) {
-	return c->get_config_path(c);
+    return c->get_config_path(c);
 }
 
 bool lxc_container_set_config_path(struct lxc_container *c, char *path) {
-	return c->set_config_path(c, path);
+    return c->set_config_path(c, path);
 }
 
 bool lxc_container_load_config(struct lxc_container *c, char *alt_file) {
-	return c->load_config(c, alt_file);
+    return c->load_config(c, alt_file);
 }
 
 bool lxc_container_save_config(struct lxc_container *c, char *alt_file) {
-	return c->save_config(c, alt_file);
+    return c->save_config(c, alt_file);
 }
 
 bool lxc_container_clone(struct lxc_container *c, const char *newname, int flags, const char *bdevtype) {
@@ -188,29 +192,29 @@ int lxc_container_attach(struct lxc_container *c) {
     pid_t pid;
     lxc_attach_options_t default_options = LXC_ATTACH_OPTIONS_DEFAULT;
 
-/*
-    remount_sys_proc
-    When using -s and the mount namespace is not included, this flag will cause lxc-attach to remount /proc and /sys to reflect the current other namespace contexts.
-    default_options.attach_flags |= LXC_ATTACH_REMOUNT_PROC_SYS;
+    /*
+       remount_sys_proc
+       When using -s and the mount namespace is not included, this flag will cause lxc-attach to remount /proc and /sys to reflect the current other namespace contexts.
+       default_options.attach_flags |= LXC_ATTACH_REMOUNT_PROC_SYS;
 
-    elevated_privileges
-    Do  not  drop privileges when running command inside the container. If this option is specified, the new process will not be added to the container's cgroup(s) and it will not drop its capabilities before executing.
-    default_options.attach_flags &= ~(LXC_ATTACH_MOVE_TO_CGROUP | LXC_ATTACH_DROP_CAPABILITIES | LXC_ATTACH_APPARMOR);
+       elevated_privileges
+       Do  not  drop privileges when running command inside the container. If this option is specified, the new process will not be added to the container's cgroup(s) and it will not drop its capabilities before executing.
+       default_options.attach_flags &= ~(LXC_ATTACH_MOVE_TO_CGROUP | LXC_ATTACH_DROP_CAPABILITIES | LXC_ATTACH_APPARMOR);
 
-    Specify the namespaces to attach to, as a pipe-separated list, e.g. NETWORK|IPC. Allowed values are MOUNT, PID, UTSNAME, IPC, USER and NETWORK.
-    default_options.namespaces = namespace_flags; // lxc_fill_namespace_flags(arg, &namespace_flags);
+       Specify the namespaces to attach to, as a pipe-separated list, e.g. NETWORK|IPC. Allowed values are MOUNT, PID, UTSNAME, IPC, USER and NETWORK.
+       default_options.namespaces = namespace_flags; // lxc_fill_namespace_flags(arg, &namespace_flags);
 
-    Specify the architecture which the kernel should appear to be running as to the command executed.
-    default_options.personality = new_personality; // lxc_config_parse_arch(arg);
+       Specify the architecture which the kernel should appear to be running as to the command executed.
+       default_options.personality = new_personality; // lxc_config_parse_arch(arg);
 
-    Keep the current environment for attached programs.
-    Clear the environment before attaching, so no undesired environment variables leak into the container.
+       Keep the current environment for attached programs.
+       Clear the environment before attaching, so no undesired environment variables leak into the container.
 
-    default_options.env_policy = env_policy; // LXC_ATTACH_KEEP_ENV or LXC_ATTACH_CLEAR_ENV
+       default_options.env_policy = env_policy; // LXC_ATTACH_KEEP_ENV or LXC_ATTACH_CLEAR_ENV
 
-    default_options.extra_env_vars = extra_env;
-    default_options.extra_keep_env = extra_keep;
-*/
+       default_options.extra_env_vars = extra_env;
+       default_options.extra_keep_env = extra_keep;
+    */
 
     ret = c->attach(c, lxc_attach_run_shell, NULL, &default_options, &pid);
     if (ret < 0)

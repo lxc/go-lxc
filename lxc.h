@@ -53,6 +53,7 @@ extern int lxc_container_attach(struct lxc_container *);
 extern int lxc_container_console_getfd(struct lxc_container *, int);
 extern pid_t lxc_container_init_pid(struct lxc_container *);
 extern void lxc_container_want_daemonize(struct lxc_container *);
+extern bool lxc_container_want_close_all_fds(struct lxc_container *);
 
 //FIXME: Missing API functionality
 //    snapshot
