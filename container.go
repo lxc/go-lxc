@@ -93,11 +93,15 @@ func (lxc *Container) Daemonize() bool {
 }
 
 // SetDaemonize sets the daemonize flag
-func (lxc *Container) SetDaemonize() {
+func (lxc *Container) SetDaemonize() error {
 	lxc.Lock()
 	defer lxc.Unlock()
 
 	C.lxc_container_want_daemonize(lxc.container)
+	if bool(lxc.container.daemonize == 0) {
+		return fmt.Errorf("setting daemonize flag for container %q failed", C.GoString(lxc.container.name))
+	}
+	return nil
 }
 
 // SetCloseAllFds sets the close_all_fds flag for the container
@@ -106,7 +110,7 @@ func (lxc *Container) SetCloseAllFds() error {
 	defer lxc.Unlock()
 
 	if !bool(C.lxc_container_want_close_all_fds(lxc.container)) {
-		return fmt.Errorf("setting CloseAllFDs for container %q failed", C.GoString(lxc.container.name))
+		return fmt.Errorf("setting closeAllFDs flag for container %q failed", C.GoString(lxc.container.name))
 	}
 	return nil
 }

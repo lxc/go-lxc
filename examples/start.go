@@ -42,7 +42,9 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	fmt.Printf("Starting the container...\n")
-	c.SetDaemonize()
+	if err := c.SetDaemonize(); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
 
 	if err := c.SetCloseAllFds(); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
