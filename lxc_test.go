@@ -373,7 +373,7 @@ func TestInterfaces(t *testing.T) {
 	z := NewContainer(ContainerName)
 	defer PutContainer(z)
 
-	if err, interfaces := z.Interfaces(); err != nil {
+	if interfaces, err := z.Interfaces(); err != nil {
 		t.Errorf(err.Error())
 	} else {
 		for i, v := range interfaces {

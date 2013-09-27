@@ -36,24 +36,6 @@ import (
 	"unsafe"
 )
 
-const (
-	// WaitForever timeout
-	WaitForever int = iota - 1
-	// DontWait timeout
-	DontWait
-)
-
-const (
-	// CloneKeepName means don't edit the rootfs to change the hostname.
-	CloneKeepName int = 1 << iota
-	// CloneCopyHooks means copy all hooks into the container directory.
-	CloneCopyHooks
-	// CloneKeepMACAddr means don't change the mac address on network interfaces.
-	CloneKeepMACAddr
-	// CloneSnapshot means snapshot the original filesystem(s).
-	CloneSnapshot
-)
-
 func init() {
 	if os.Geteuid() != 0 {
 		panic("Running as non-root.")

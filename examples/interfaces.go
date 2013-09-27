@@ -42,7 +42,7 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	fmt.Printf("Interfaces\n")
-	if err, interfaces := c.Interfaces(); err != nil {
+	if interfaces, err := c.Interfaces(); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range interfaces {

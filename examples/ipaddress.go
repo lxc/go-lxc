@@ -42,7 +42,7 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	fmt.Printf("IPAddress(\"lo\")\n")
-	if err, addresses := c.IPAddress("lo"); err != nil {
+	if addresses, err := c.IPAddress("lo"); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range addresses {
@@ -51,7 +51,7 @@ func main() {
 	}
 
 	fmt.Printf("IPAddresses()\n")
-	if err, addresses := c.IPAddresses(); err != nil {
+	if addresses, err := c.IPAddresses(); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range addresses {
@@ -59,7 +59,7 @@ func main() {
 		}
 	}
 	fmt.Printf("IPv4Addresses()\n")
-	if err, addresses := c.IPv4Addresses(); err != nil {
+	if addresses, err := c.IPv4Addresses(); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range addresses {
@@ -67,7 +67,7 @@ func main() {
 		}
 	}
 	fmt.Printf("IPv6Addresses()\n")
-	if err, addresses := c.IPv6Addresses(); err != nil {
+	if addresses, err := c.IPv6Addresses(); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range addresses {
