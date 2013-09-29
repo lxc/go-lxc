@@ -41,19 +41,19 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	memLimit, err := c.MemoryLimitInBytes()
+	memLimit, err := c.MemoryLimit()
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	}
-	swapLimit, err := c.SwapLimitInBytes()
+	swapLimit, err := c.SwapLimit()
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 
-	if err := c.SetMemoryLimitInBytes(memLimit / 4); err != nil {
+	if err := c.SetMemoryLimit(memLimit / 4); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	}
-	if err := c.SetSwapLimitInBytes(swapLimit / 4); err != nil {
+	if err := c.SetSwapLimit(swapLimit / 4); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }

@@ -180,8 +180,3 @@ func (b ByteSize) String() string {
 	}
 	return fmt.Sprintf("%.2fB", b)
 }
-
-// ConvertToString converts float64 value to string
-func (b ByteSize) ConvertToString() string {
-	return fmt.Sprintf("%.f", b)
-}

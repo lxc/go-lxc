@@ -501,8 +501,8 @@ func (lxc *Container) SetConfigPath(path string) error {
 	return nil
 }
 
-// MemoryUsageInBytes returns memory usage in bytes
-func (lxc *Container) MemoryUsageInBytes() (ByteSize, error) {
+// MemoryUsage returns memory usage in bytes
+func (lxc *Container) MemoryUsage() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
 	}
@@ -517,8 +517,8 @@ func (lxc *Container) MemoryUsageInBytes() (ByteSize, error) {
 	return ByteSize(memUsed), err
 }
 
-// SwapUsageInBytes returns swap usage in bytes
-func (lxc *Container) SwapUsageInBytes() (ByteSize, error) {
+// SwapUsage returns swap usage in bytes
+func (lxc *Container) SwapUsage() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
 	}
@@ -533,8 +533,8 @@ func (lxc *Container) SwapUsageInBytes() (ByteSize, error) {
 	return ByteSize(swapUsed), err
 }
 
-// MemoryLimitInBytes returns memory limit in bytes
-func (lxc *Container) MemoryLimitInBytes() (ByteSize, error) {
+// MemoryLimit returns memory limit in bytes
+func (lxc *Container) MemoryLimit() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
 	}
@@ -549,20 +549,20 @@ func (lxc *Container) MemoryLimitInBytes() (ByteSize, error) {
 	return ByteSize(memLimit), err
 }
 
-// SetMemoryLimitInBytes sets memory limit in bytes
-func (lxc *Container) SetMemoryLimitInBytes(limit ByteSize) error {
+// SetMemoryLimit sets memory limit in bytes
+func (lxc *Container) SetMemoryLimit(limit ByteSize) error {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
 	}
 
-	if err := lxc.SetCgroupItem("memory.limit_in_bytes", limit.ConvertToString()); err != nil {
+	if err := lxc.SetCgroupItem("memory.limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
 		return fmt.Errorf(errSettingMemoryLimitFailed, C.GoString(lxc.container.name))
 	}
 	return nil
 }
 
-// SwapLimitInBytes returns the swap limit in bytes
-func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
+// SwapLimit returns the swap limit in bytes
+func (lxc *Container) SwapLimit() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
 	}
@@ -577,13 +577,13 @@ func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
 	return ByteSize(swapLimit), err
 }
 
-// SetSwapLimitInBytes sets memory limit in bytes
-func (lxc *Container) SetSwapLimitInBytes(limit ByteSize) error {
+// SetSwapLimit sets memory limit in bytes
+func (lxc *Container) SetSwapLimit(limit ByteSize) error {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
 	}
 
-	if err := lxc.SetCgroupItem("memory.memsw.limit_in_bytes", limit.ConvertToString()); err != nil {
+	if err := lxc.SetCgroupItem("memory.memsw.limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
 		return fmt.Errorf(errSettingSwapLimitFailed, C.GoString(lxc.container.name))
 	}
 	return nil

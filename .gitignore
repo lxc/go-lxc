@@ -14,6 +14,7 @@ examples/interfaces
 examples/ipaddress
 examples/limit
 examples/list
+examples/reboot
 examples/shutdown
 examples/start
 examples/stats

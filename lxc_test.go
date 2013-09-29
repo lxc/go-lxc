@@ -383,14 +383,14 @@ func TestInterfaces(t *testing.T) {
 	}
 }
 
-func TestMemoryUsageInBytes(t *testing.T) {
+func TestMemoryUsage(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	memUsed, _ := z.MemoryUsageInBytes()
-	swapUsed, _ := z.SwapUsageInBytes()
-	memLimit, _ := z.MemoryLimitInBytes()
-	swapLimit, _ := z.SwapLimitInBytes()
+	memUsed, _ := z.MemoryUsage()
+	swapUsed, _ := z.SwapUsage()
+	memLimit, _ := z.MemoryLimit()
+	swapLimit, _ := z.SwapLimit()
 
 	t.Logf("Mem usage: %0.0f\n", memUsed)
 	t.Logf("Mem usage: %s\n", memUsed)

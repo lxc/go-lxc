@@ -41,21 +41,47 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	if c.Running() {
-		// mem
-		memUsed, _ := c.MemoryUsageInBytes()
-		fmt.Printf("mem_used: %s\n", memUsed)
-
-		memLimit, _ := c.MemoryLimitInBytes()
-		fmt.Printf("mem_limit: %s\n", memLimit)
-
-		// swap
-		swapUsed, _ := c.SwapUsageInBytes()
-		fmt.Printf("memsw_used: %s\n", swapUsed)
-
-		swapLimit, _ := c.SwapLimitInBytes()
-		fmt.Printf("memsw_used: %s\n", swapLimit)
-	} else {
-		fmt.Printf("Container is not running...\n")
+	// mem
+	memUsed, err := c.MemoryUsage()
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
+	fmt.Printf("memerrused: %s\n", memUsed)
+
+	memLimit, err := c.MemoryLimit()
+	fmt.Printf("memerrlimit: %s\n", memLimit)
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+
+	// swap
+	swapUsed, err := c.SwapUsage()
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+	fmt.Printf("memswerrused: %s\n", swapUsed)
+
+	swapLimit, err := c.SwapLimit()
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+	fmt.Printf("memswerrused: %s\n", swapLimit)
+
+	cpuTime, err := c.CPUTime()
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+	fmt.Printf("cpuacct.usage: %s\n", cpuTime)
+
+	cpuTimePerCPU, err := c.CPUTimePerCPU()
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+	fmt.Printf("cpuacct.usageerrpercpu: %s\n", cpuTimePerCPU)
+
+	cpuStats, err := c.CPUStats()
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+	fmt.Printf("cpuacct.stat: %v\n", cpuStats)
 }
