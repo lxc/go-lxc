@@ -549,6 +549,18 @@ func (lxc *Container) MemoryLimitInBytes() (ByteSize, error) {
 	return ByteSize(memLimit), err
 }
 
+// SetMemoryLimitInBytes sets memory limit in bytes
+func (lxc *Container) SetMemoryLimitInBytes(limit ByteSize) error {
+	if err := lxc.ensureDefinedAndRunning(); err != nil {
+		return err
+	}
+
+	if err := lxc.SetCgroupItem("memory.limit_in_bytes", limit.ConvertToString()); err != nil {
+		return fmt.Errorf(errSettingMemoryLimitFailed, C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
 // SwapLimitInBytes returns the swap limit in bytes
 func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
@@ -563,6 +575,18 @@ func (lxc *Container) SwapLimitInBytes() (ByteSize, error) {
 		return -1, err
 	}
 	return ByteSize(swapLimit), err
+}
+
+// SetSwapLimitInBytes sets memory limit in bytes
+func (lxc *Container) SetSwapLimitInBytes(limit ByteSize) error {
+	if err := lxc.ensureDefinedAndRunning(); err != nil {
+		return err
+	}
+
+	if err := lxc.SetCgroupItem("memory.memsw.limit_in_bytes", limit.ConvertToString()); err != nil {
+		return fmt.Errorf(errSettingSwapLimitFailed, C.GoString(lxc.container.name))
+	}
+	return nil
 }
 
 // CPUTime returns the total CPU time (in nanoseconds) consumed by all tasks in this cgroup (including tasks lower in the hierarchy).

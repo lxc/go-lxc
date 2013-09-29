@@ -12,6 +12,7 @@ examples/destroy
 examples/freeze
 examples/interfaces
 examples/ipaddress
+examples/limit
 examples/list
 examples/shutdown
 examples/start

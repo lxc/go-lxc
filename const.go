@@ -68,6 +68,8 @@ const (
 	errSettingCgroupItemFailed       = "setting cgroup item for the container %q failed (key: %s, value: %s)"
 	errSettingConfigItemFailed       = "setting config item for the container %q failed (key: %s, value: %s)"
 	errSettingConfigPathFailed       = "setting config file for the container %q failed (path: %s)"
+	errSettingMemoryLimitFailed      = "setting memory limit for the container %q failed"
+	errSettingSwapLimitFailed        = "setting swap limit for the container %q failed"
 	errShutdownFailed                = "shutting down the container %q failed"
 	errStartFailed                   = "starting the container %q failed"
 	errStopFailed                    = "stopping the container %q failed"
