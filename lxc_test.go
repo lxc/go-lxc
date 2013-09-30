@@ -232,11 +232,25 @@ func TestStart(t *testing.T) {
 	z.Start(false)
 
 	z.Wait(lxc.RUNNING, 30)
-	if !z.Running() {
-		t.Errorf("Starting the container failed...")
+}
+
+func TestMayControl(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	if !z.MayControl() {
+		t.Errorf("Controling the container failed...")
 	}
 }
 
+func TestRunning(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	if !z.Running() {
+		t.Errorf("Checking the container failed...")
+	}
+}
 func TestSetDaemonize(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)

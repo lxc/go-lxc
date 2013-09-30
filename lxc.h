@@ -54,10 +54,10 @@ extern int lxc_container_console_getfd(struct lxc_container *, int);
 extern pid_t lxc_container_init_pid(struct lxc_container *);
 extern void lxc_container_want_daemonize(struct lxc_container *);
 extern bool lxc_container_want_close_all_fds(struct lxc_container *);
+extern bool lxc_container_may_control(struct lxc_container *);
 
 //FIXME: Missing API functionality
 //    snapshot
 //    int (*snapshot)(struct lxc_container *c, char *commentfile);
 //    int (*snapshot_list)(struct lxc_container *, struct lxc_snapshot **);
 //    bool (*snapshot_restore)(struct lxc_container *c, char *snapname, char *newname);
-//

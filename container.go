@@ -90,6 +90,14 @@ func (lxc *Container) Running() bool {
 	return bool(C.lxc_container_running(lxc.container))
 }
 
+// MayControl returns whether the container is already running or not
+func (lxc *Container) MayControl() bool {
+	lxc.RLock()
+	defer lxc.RUnlock()
+
+	return bool(C.lxc_container_may_control(lxc.container))
+}
+
 // State returns the container's state
 func (lxc *Container) State() State {
 	lxc.RLock()

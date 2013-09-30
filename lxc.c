@@ -239,3 +239,7 @@ int lxc_container_attach_run_wait(struct lxc_container *c, char **argv) {
         return -1;
     return ret;
 }
+
+bool lxc_container_may_control(struct lxc_container *c) {
+    return c->may_control(c);
+}
