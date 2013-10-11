@@ -56,8 +56,8 @@ extern void lxc_container_want_daemonize(struct lxc_container *);
 extern bool lxc_container_want_close_all_fds(struct lxc_container *);
 extern bool lxc_container_may_control(struct lxc_container *);
 
-//FIXME: Missing API functionality
-//    snapshot
-//    int (*snapshot)(struct lxc_container *c, char *commentfile);
-//    int (*snapshot_list)(struct lxc_container *, struct lxc_snapshot **);
-//    bool (*snapshot_restore)(struct lxc_container *c, char *snapname, char *newname);
+extern int lxc_container_snapshot(struct lxc_container *);
+extern bool lxc_container_snapshot_restore(struct lxc_container *, char *, char *);
+
+extern struct lxc_snapshot* lxc_container_snapshot_list(struct lxc_container *);
+extern int lxc_container_snapshot_list_size(struct lxc_container *);

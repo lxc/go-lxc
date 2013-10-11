@@ -44,6 +44,14 @@ type Container struct {
 	sync.RWMutex
 }
 
+// Snapshot struct
+type Snapshot struct {
+	Name        string
+	CommentPath string
+	Timestamp   string
+	Path        string
+}
+
 func (lxc *Container) ensureDefinedAndRunning() error {
 	if !lxc.Defined() {
 		return fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
@@ -96,6 +104,69 @@ func (lxc *Container) MayControl() bool {
 	defer lxc.RUnlock()
 
 	return bool(C.lxc_container_may_control(lxc.container))
+}
+
+// Snapshot creates a new snapshot
+func (lxc *Container) Snapshot() error {
+	if err := lxc.ensureDefinedButNotRunning(); err != nil {
+		return err
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	if int(C.lxc_container_snapshot(lxc.container)) < 0 {
+		return fmt.Errorf(errSnapshotFailed, C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
+// Restore creates a new snapshot
+func (lxc *Container) Restore(snapshot Snapshot, name string) error {
+	if !lxc.Defined() {
+		return fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+
+	csnapname := C.CString(snapshot.Name)
+	defer C.free(unsafe.Pointer(csnapname))
+
+	if !bool(C.lxc_container_snapshot_restore(lxc.container, csnapname, cname)) {
+		return fmt.Errorf(errRestoreFailed, C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
+// ListSnapshots lists the snapshot of given container
+func (lxc *Container) ListSnapshots() ([]Snapshot, error) {
+	if !lxc.Defined() {
+		return nil, fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+	var snapshots []Snapshot
+
+	size := int(C.lxc_container_snapshot_list_size(lxc.container))
+	if size < 1 {
+		return nil, fmt.Errorf("%s has no snapshots", C.GoString(lxc.container.name))
+	}
+	snapshot := C.lxc_container_snapshot_list(lxc.container)
+	defer freeSnapshots(snapshot, size)
+
+	p := uintptr(unsafe.Pointer(snapshot))
+	for i := 0; i < size; i++ {
+		z := (*C.struct_lxc_snapshot)(unsafe.Pointer(p))
+		s := &Snapshot{Name: C.GoString(z.name), Timestamp: C.GoString(z.timestamp), CommentPath: C.GoString(z.comment_pathname), Path: C.GoString(z.lxcpath)}
+		snapshots = append(snapshots, *s)
+		p += unsafe.Sizeof(*snapshot)
+	}
+	return snapshots, nil
 }
 
 // State returns the container's state

@@ -14,8 +14,11 @@ examples/interfaces
 examples/ipaddress
 examples/limit
 examples/list
+examples/list_snapshots
 examples/reboot
+examples/restore
 examples/shutdown
+examples/snapshot
 examples/start
 examples/stats
 examples/stop

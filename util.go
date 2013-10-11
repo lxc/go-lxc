@@ -25,6 +25,7 @@ package lxc
 
 /*
 #include <stdlib.h>
+#include <lxc/lxccontainer.h>
 
 static char** makeCharArray(int size) {
     return calloc(sizeof(char*), size);
@@ -39,6 +40,14 @@ static void freeCharArray(char **array, int size) {
     for (i = 0; i < size; i++)
         free(array[i]);
     free(array);
+}
+
+static void freeSnapshotArray(struct lxc_snapshot *s, int size) {
+    int i;
+    for (i = 0; i < size; i++) {
+        s[i].free(&s[i]);
+    }
+    free(s);
 }
 */
 import "C"
@@ -79,4 +88,8 @@ func convertArgs(cArgs **C.char) []string {
 	C.freeCharArray(cArgs, C.int(len(s)))
 
 	return s
+}
+
+func freeSnapshots(snapshots *C.struct_lxc_snapshot, size int) {
+	C.freeSnapshotArray(snapshots, C.int(size))
 }

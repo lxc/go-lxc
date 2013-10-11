@@ -74,4 +74,6 @@ const (
 	errStartFailed                   = "starting the container %q failed"
 	errStopFailed                    = "stopping the container %q failed"
 	errUnfreezeFailed                = "unfreezing the container %q failed"
+	errSnapshotFailed                = "snapshotting the container %q failed"
+	errRestoreFailed                 = "restoring the container %q failed"
 )

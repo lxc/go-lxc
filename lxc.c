@@ -243,3 +243,35 @@ int lxc_container_attach_run_wait(struct lxc_container *c, char **argv) {
 bool lxc_container_may_control(struct lxc_container *c) {
     return c->may_control(c);
 }
+
+int lxc_container_snapshot(struct lxc_container *c) {
+    return c->snapshot(c, NULL);
+}
+
+bool lxc_container_snapshot_restore(struct lxc_container *c, char *snapname, char *newname) {
+    return c->snapshot_restore(c, snapname, newname);
+}
+
+int lxc_container_snapshot_list_size(struct lxc_container *c) {
+    int i;
+    struct lxc_snapshot *s;
+
+    int n = c->snapshot_list(c, &s);
+    if (n < 1)
+        return 0;
+
+    for (i = 0; i < n; i++) {
+        s[i].free(&s[i]);
+    }
+    free(s);
+    return n;
+}
+
+struct lxc_snapshot* lxc_container_snapshot_list(struct lxc_container *c) {
+    struct lxc_snapshot *s;
+
+    int n = c->snapshot_list(c, &s);
+    if (n < 1)
+        return NULL;
+    return s;
+}
