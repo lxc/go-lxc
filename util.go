@@ -90,6 +90,26 @@ func convertArgs(cArgs **C.char) []string {
 	return s
 }
 
+func convertNArgs(cArgs **C.char, size int) []string {
+	if cArgs == nil || size <= 0 {
+		return nil
+	}
+
+	var s []string
+
+	// duplicate
+	p := uintptr(unsafe.Pointer(cArgs))
+	for i := 0; i < size; i++ {
+		s = append(s, C.GoString(sptr(p)))
+		p += unsafe.Sizeof(uintptr(0))
+	}
+
+	// free the original
+	C.freeCharArray(cArgs, C.int(size))
+
+	return s
+}
+
 func freeSnapshots(snapshots *C.struct_lxc_snapshot, size int) {
 	C.freeSnapshotArray(snapshots, C.int(size))
 }

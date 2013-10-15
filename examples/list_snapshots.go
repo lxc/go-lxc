@@ -40,7 +40,7 @@ func main() {
 			fmt.Printf("Comment path: %s\n", s.CommentPath)
 			fmt.Printf("Timestamp: %s\n", s.Timestamp)
 			fmt.Printf("LXC path: %s\n", s.Path)
-            fmt.Println()
+			fmt.Println()
 		}
 	}
 }

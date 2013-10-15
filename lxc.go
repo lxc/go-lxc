@@ -32,7 +32,6 @@ import "C"
 
 import (
 	"os"
-	"path/filepath"
 	"unsafe"
 )
 
@@ -83,15 +82,13 @@ func DefaultZfsRoot() string {
 // ContainerNames returns the names of containers on the system.
 func ContainerNames(paths ...string) []string {
 	if paths == nil {
-		matches, err := filepath.Glob(filepath.Join(DefaultConfigPath(), "/*/config"))
-		if err != nil {
+		var cnames **C.char
+
+		size := int(C.lxc_container_list_defined_containers(nil, &cnames))
+		if size < 1 {
 			return nil
 		}
-
-		for i, v := range matches {
-			matches[i] = filepath.Base(filepath.Dir(v))
-		}
-		return matches
+		return convertNArgs(cnames, size)
 	}
 	// FIXME: Support custom config paths
 	return nil
@@ -102,6 +99,31 @@ func Containers() []Container {
 	var containers []Container
 
 	for _, v := range ContainerNames() {
+		containers = append(containers, *NewContainer(v))
+	}
+	return containers
+}
+
+// ActiveContainerNames returns the names of the active containers on the system.
+func ActiveContainerNames(paths ...string) []string {
+	if paths == nil {
+		var cnames **C.char
+
+		size := int(C.lxc_container_list_active_containers(nil, &cnames))
+		if size < 1 {
+			return nil
+		}
+		return convertNArgs(cnames, size)
+	}
+	// FIXME: Support custom config paths
+	return nil
+}
+
+// ActiveContainers returns the active containers on the system.
+func ActiveContainers() []Container {
+	var containers []Container
+
+	for _, v := range ActiveContainerNames() {
 		containers = append(containers, *NewContainer(v))
 	}
 	return containers

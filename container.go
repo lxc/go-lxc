@@ -150,21 +150,23 @@ func (lxc *Container) ListSnapshots() ([]Snapshot, error) {
 
 	lxc.Lock()
 	defer lxc.Unlock()
+
+	var csnapshots *C.struct_lxc_snapshot
 	var snapshots []Snapshot
 
-	size := int(C.lxc_container_snapshot_list_size(lxc.container))
+	size := int(C.lxc_container_snapshot_list(lxc.container, &csnapshots))
+	defer freeSnapshots(csnapshots, size)
+
 	if size < 1 {
 		return nil, fmt.Errorf("%s has no snapshots", C.GoString(lxc.container.name))
 	}
-	snapshot := C.lxc_container_snapshot_list(lxc.container)
-	defer freeSnapshots(snapshot, size)
 
-	p := uintptr(unsafe.Pointer(snapshot))
+	p := uintptr(unsafe.Pointer(csnapshots))
 	for i := 0; i < size; i++ {
 		z := (*C.struct_lxc_snapshot)(unsafe.Pointer(p))
 		s := &Snapshot{Name: C.GoString(z.name), Timestamp: C.GoString(z.timestamp), CommentPath: C.GoString(z.comment_pathname), Path: C.GoString(z.lxcpath)}
 		snapshots = append(snapshots, *s)
-		p += unsafe.Sizeof(*snapshot)
+		p += unsafe.Sizeof(*csnapshots)
 	}
 	return snapshots, nil
 }

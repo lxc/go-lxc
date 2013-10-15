@@ -147,8 +147,18 @@ func TestContainerNames(t *testing.T) {
 	t.Logf("Containers: %+v\n", lxc.ContainerNames())
 }
 
+func TestActiveContainerNames(t *testing.T) {
+	t.Logf("Active Containers: %+v\n", lxc.ActiveContainerNames())
+}
+
 func TestContainers(t *testing.T) {
 	for _, v := range lxc.Containers() {
+		t.Logf("%s: %s", v.Name(), v.State())
+	}
+}
+
+func TestActiveContainers(t *testing.T) {
+	for _, v := range lxc.ActiveContainers() {
 		t.Logf("%s: %s", v.Name(), v.State())
 	}
 }

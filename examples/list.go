@@ -28,7 +28,15 @@ import (
 )
 
 func main() {
+	fmt.Printf("Defined containers:\n")
 	for _, v := range lxc.Containers() {
+		fmt.Printf("%s (%s)\n", v.Name(), v.State())
+	}
+
+	fmt.Println()
+
+	fmt.Printf("Active containers:\n")
+	for _, v := range lxc.ActiveContainers() {
 		fmt.Printf("%s (%s)\n", v.Name(), v.State())
 	}
 }

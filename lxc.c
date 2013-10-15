@@ -248,30 +248,18 @@ int lxc_container_snapshot(struct lxc_container *c) {
     return c->snapshot(c, NULL);
 }
 
+int lxc_container_snapshot_list(struct lxc_container *c, struct lxc_snapshot **ret) {
+    return c->snapshot_list(c, ret);
+}
+
 bool lxc_container_snapshot_restore(struct lxc_container *c, char *snapname, char *newname) {
     return c->snapshot_restore(c, snapname, newname);
 }
 
-int lxc_container_snapshot_list_size(struct lxc_container *c) {
-    int i;
-    struct lxc_snapshot *s;
-
-    int n = c->snapshot_list(c, &s);
-    if (n < 1)
-        return 0;
-
-    for (i = 0; i < n; i++) {
-        s[i].free(&s[i]);
-    }
-    free(s);
-    return n;
+int lxc_container_list_defined_containers(const char *lxcpath, char ***names) {
+    return list_defined_containers(lxcpath, names, NULL);
 }
 
-struct lxc_snapshot* lxc_container_snapshot_list(struct lxc_container *c) {
-    struct lxc_snapshot *s;
-
-    int n = c->snapshot_list(c, &s);
-    if (n < 1)
-        return NULL;
-    return s;
+int lxc_container_list_active_containers(const char *lxcpath, char ***names) {
+    return list_active_containers(lxcpath, names, NULL);
 }

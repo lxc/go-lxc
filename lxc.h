@@ -29,6 +29,7 @@ extern bool lxc_container_defined(struct lxc_container *);
 extern bool lxc_container_destroy(struct lxc_container *);
 extern bool lxc_container_freeze(struct lxc_container *);
 extern bool lxc_container_load_config(struct lxc_container *, char *);
+extern bool lxc_container_may_control(struct lxc_container *);
 extern bool lxc_container_reboot(struct lxc_container *);
 extern bool lxc_container_running(struct lxc_container *);
 extern bool lxc_container_save_config(struct lxc_container *, char *);
@@ -36,10 +37,12 @@ extern bool lxc_container_set_cgroup_item(struct lxc_container *, char *key, cha
 extern bool lxc_container_set_config_item(struct lxc_container *, char *, char *);
 extern bool lxc_container_set_config_path(struct lxc_container *, char *);
 extern bool lxc_container_shutdown(struct lxc_container *, int);
+extern bool lxc_container_snapshot_restore(struct lxc_container *, char *, char *);
 extern bool lxc_container_start(struct lxc_container *, int, char **);
 extern bool lxc_container_stop(struct lxc_container *);
 extern bool lxc_container_unfreeze(struct lxc_container *);
 extern bool lxc_container_wait(struct lxc_container *, char *, int);
+extern bool lxc_container_want_close_all_fds(struct lxc_container *);
 extern char* lxc_container_config_file_name(struct lxc_container *);
 extern char* lxc_container_get_cgroup_item(struct lxc_container *, char *);
 extern char* lxc_container_get_config_item(struct lxc_container *, char *);
@@ -51,13 +54,9 @@ extern const char* lxc_container_state(struct lxc_container *);
 extern int lxc_container_attach_run_wait(struct lxc_container *, char **);
 extern int lxc_container_attach(struct lxc_container *);
 extern int lxc_container_console_getfd(struct lxc_container *, int);
+extern int lxc_container_list_active_containers(const char *, char ***);
+extern int lxc_container_list_defined_containers(const char *, char ***);
+extern int lxc_container_snapshot_list(struct lxc_container *, struct lxc_snapshot **);
+extern int lxc_container_snapshot(struct lxc_container *);
 extern pid_t lxc_container_init_pid(struct lxc_container *);
 extern void lxc_container_want_daemonize(struct lxc_container *);
-extern bool lxc_container_want_close_all_fds(struct lxc_container *);
-extern bool lxc_container_may_control(struct lxc_container *);
-
-extern int lxc_container_snapshot(struct lxc_container *);
-extern bool lxc_container_snapshot_restore(struct lxc_container *, char *, char *);
-
-extern struct lxc_snapshot* lxc_container_snapshot_list(struct lxc_container *);
-extern int lxc_container_snapshot_list_size(struct lxc_container *);

@@ -42,7 +42,7 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	fmt.Printf("Restoring the container...\n")
-    snapshot := lxc.Snapshot{Name: "snap0"}
+	snapshot := lxc.Snapshot{Name: "snap0"}
 
 	if err := c.Restore(snapshot, "rubik-restore"); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
