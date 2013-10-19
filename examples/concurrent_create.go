@@ -44,7 +44,7 @@ func main() {
 			defer lxc.PutContainer(c)
 
 			fmt.Printf("Creating the container (%d)...\n", i)
-			if err := c.Create("ubuntu", "amd64", "quantal"); err != nil {
+			if err := c.Create("ubuntu", "amd64"); err != nil {
 				fmt.Printf("ERROR: %s\n", err.Error())
 			}
 			wg.Done()

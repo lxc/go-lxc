@@ -200,25 +200,25 @@ func TestConcurrentStart(t *testing.T) {
 }
 
 func TestContainerNames(t *testing.T) {
-	if lxc.ContainerNames() != nil {
+	if lxc.ContainerNames() == nil {
 		t.Errorf("ContainerNames failed...")
 	}
 }
 
 func TestActiveContainerNames(t *testing.T) {
-	if lxc.ActiveContainerNames() != nil {
+	if lxc.ActiveContainerNames() == nil {
 		t.Errorf("ContainerNames failed...")
 	}
 }
 
 func TestContainers(t *testing.T) {
-	if lxc.Containers() != nil {
+	if lxc.Containers() == nil {
 		t.Errorf("Containers failed...")
 	}
 }
 
 func TestActiveContainers(t *testing.T) {
-	if lxc.ActiveContainers() != nil {
+	if lxc.ActiveContainers() == nil {
 		t.Errorf("ActiveContainers failed...")
 	}
 }
@@ -537,7 +537,7 @@ func TestConcurrentShutdown(t *testing.T) {
 			z := lxc.NewContainer(strconv.Itoa(i))
 			defer lxc.PutContainer(z)
 
-			if err := z.Shutdown(30); err != nil {
+			if err := z.Shutdown(3); err != nil {
 				t.Errorf(err.Error())
 			}
 			if z.Running() {
@@ -554,7 +554,7 @@ func TestShutdown(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	if err := z.Shutdown(30); err != nil {
+	if err := z.Shutdown(3); err != nil {
 		t.Errorf(err.Error())
 	}
 

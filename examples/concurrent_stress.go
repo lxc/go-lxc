@@ -67,7 +67,7 @@ func main() {
 				}
 			} else {
 				fmt.Printf("Creating the container (%s)...\n", name)
-				if err := c.Create("ubuntu", "amd64", "quantal"); err != nil {
+				if err := c.Create("ubuntu", "amd64"); err != nil {
 					fmt.Printf("ERROR: %s\n", err.Error())
 				}
 			}
