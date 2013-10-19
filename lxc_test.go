@@ -34,6 +34,7 @@ import (
 )
 
 const (
+	ContainerType             = "busybox"
 	ContainerName             = "rubik"
 	SnapshotName              = "snap0"
 	ContainerRestoreName      = "rubik-restore"
@@ -106,7 +107,7 @@ func TestCreate(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	if err := z.Create("ubuntu", "amd64", "quantal"); err != nil {
+	if err := z.Create(ContainerType); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -124,7 +125,7 @@ func TestClone(t *testing.T) {
 	}
 }
 
-func TestSnapshot(t *testing.T) {
+func TestCreateSnapshot(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
@@ -133,7 +134,7 @@ func TestSnapshot(t *testing.T) {
 	}
 }
 
-func TestSnapshotRestore(t *testing.T) {
+func TestRestoreSnapshot(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
@@ -155,7 +156,7 @@ func TestConcurrentCreate(t *testing.T) {
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
-			if err := z.Create("ubuntu", "amd64", "quantal"); err != nil {
+			if err := z.Create(ContainerType); err != nil {
 				t.Errorf(err.Error())
 			}
 			wg.Done()
@@ -164,36 +165,12 @@ func TestConcurrentCreate(t *testing.T) {
 	wg.Wait()
 }
 
-func TestContainerNames(t *testing.T) {
-	t.Logf("Containers: %+v\n", lxc.ContainerNames())
-}
-
-func TestActiveContainerNames(t *testing.T) {
-	t.Logf("Active Containers: %+v\n", lxc.ActiveContainerNames())
-}
-
-func TestContainers(t *testing.T) {
-	for _, v := range lxc.Containers() {
-		t.Logf("%s: %s", v.Name(), v.State())
-	}
-}
-
-func TestActiveContainers(t *testing.T) {
-	for _, v := range lxc.ActiveContainers() {
-		t.Logf("%s: %s", v.Name(), v.State())
-	}
-}
-
 func TestSnapshots(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	l, _ := z.Snapshots()
-	for _, s := range l {
-		t.Logf("Name: %s\n", s.Name)
-		t.Logf("Comment path: %s\n", s.CommentPath)
-		t.Logf("Timestamp: %s\n", s.Timestamp)
-		t.Logf("LXC path: %s\n", s.Path)
+	if _, err := z.Snapshots(); err != nil {
+		t.Errorf(err.Error())
 	}
 }
 
@@ -210,6 +187,7 @@ func TestConcurrentStart(t *testing.T) {
 			if err := z.Start(false); err != nil {
 				t.Errorf(err.Error())
 			}
+
 			z.Wait(lxc.RUNNING, 30)
 			if !z.Running() {
 				t.Errorf("Starting the container failed...")
@@ -221,9 +199,34 @@ func TestConcurrentStart(t *testing.T) {
 	wg.Wait()
 }
 
+func TestContainerNames(t *testing.T) {
+	if lxc.ContainerNames() != nil {
+		t.Errorf("ContainerNames failed...")
+	}
+}
+
+func TestActiveContainerNames(t *testing.T) {
+	if lxc.ActiveContainerNames() != nil {
+		t.Errorf("ContainerNames failed...")
+	}
+}
+
+func TestContainers(t *testing.T) {
+	if lxc.Containers() != nil {
+		t.Errorf("Containers failed...")
+	}
+}
+
+func TestActiveContainers(t *testing.T) {
+	if lxc.ActiveContainers() != nil {
+		t.Errorf("ActiveContainers failed...")
+	}
+}
+
 func TestConfigFileName(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
+
 	if z.ConfigFileName() != ConfigFileName {
 		t.Errorf("ConfigFileName failed...")
 	}
@@ -273,9 +276,14 @@ func TestStart(t *testing.T) {
 	defer lxc.PutContainer(z)
 
 	z.SetDaemonize()
-	z.Start(false)
+	if err := z.Start(false); err != nil {
+		t.Errorf(err.Error())
+	}
 
 	z.Wait(lxc.RUNNING, 30)
+	if z.State() != lxc.RUNNING {
+		t.Errorf("Starting the container failed...")
+	}
 }
 
 func TestMayControl(t *testing.T) {
@@ -385,6 +393,7 @@ func TestSetConfigItem(t *testing.T) {
 	if err := z.SetConfigItem("lxc.utsname", ContainerName); err != nil {
 		t.Errorf(err.Error())
 	}
+
 	if z.ConfigItem("lxc.utsname")[0] != ContainerName {
 		t.Errorf("ConfigItem failed...")
 	}
@@ -432,12 +441,8 @@ func TestInterfaces(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	if interfaces, err := z.Interfaces(); err != nil {
+	if _, err := z.Interfaces(); err != nil {
 		t.Errorf(err.Error())
-	} else {
-		for i, v := range interfaces {
-			t.Logf("%d) %s\n", i, v)
-		}
 	}
 }
 
@@ -445,46 +450,51 @@ func TestMemoryUsage(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	memUsed, _ := z.MemoryUsage()
-	t.Logf("Mem usage: %0.0f\n", memUsed)
-	t.Logf("Mem usage: %s\n", memUsed)
+	if _, err := z.MemoryUsage(); err != nil {
+		t.Errorf(err.Error())
+	}
 }
 
 func TestSwapUsage(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	swapUsed, _ := z.SwapUsage()
-	t.Logf("Swap usage: %0.0f\n", swapUsed)
-	t.Logf("Swap usage: %s\n", swapUsed)
+	if _, err := z.SwapUsage(); err != nil {
+		t.Errorf(err.Error())
+	}
 }
 
 func TestMemoryLimit(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	memLimit, _ := z.MemoryLimit()
-	t.Logf("Mem limit: %0.0f\n", memLimit)
-	t.Logf("Mem limit: %s\n", memLimit)
+	if _, err := z.MemoryLimit(); err != nil {
+		t.Errorf(err.Error())
+	}
 }
 
 func TestSwapLimit(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	swapLimit, _ := z.SwapLimit()
-	t.Logf("Swap limit: %0.0f\n", swapLimit)
-	t.Logf("Swap limit: %s\n", swapLimit)
+	if _, err := z.SwapLimit(); err != nil {
+		t.Errorf(err.Error())
+	}
 }
 
 func TestSetMemoryLimit(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	memLimit, _ := z.MemoryLimit()
+	oldMemLimit, _ := z.MemoryLimit()
 
-	if err := z.SetMemoryLimit(memLimit / 4); err != nil {
+	if err := z.SetMemoryLimit(oldMemLimit * 4); err != nil {
 		t.Errorf(err.Error())
+	}
+
+	newMemLimit, _ := z.MemoryLimit()
+	if newMemLimit != 4*oldMemLimit {
+		t.Errorf("SetMemoryLimit failed")
 	}
 }
 
@@ -492,10 +502,15 @@ func TestSetSwapLimit(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
 
-	swapLimit, _ := z.SwapLimit()
+	oldSwapLimit, _ := z.SwapLimit()
 
-	if err := z.SetSwapLimit(swapLimit / 4); err != nil {
+	if err := z.SetSwapLimit(oldSwapLimit / 4); err != nil {
 		t.Errorf(err.Error())
+	}
+
+	newSwapLimit, _ := z.SwapLimit()
+	if newSwapLimit != oldSwapLimit/4 {
+		t.Errorf("SetSwapLimit failed")
 	}
 }
 
