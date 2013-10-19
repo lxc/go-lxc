@@ -1,5 +1,5 @@
 /*
- * list_snapshots.go
+ * snapshot.go
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -23,24 +23,26 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/caglar10ur/lxc"
 )
 
-func main() {
-	for _, v := range lxc.Containers() {
-		fmt.Printf("%s\n", v.Name())
-		l, err := v.Snapshots()
-		if err != nil {
-			fmt.Printf("ERROR: %s\n", err.Error())
-		}
+var (
+	name string
+)
 
-		for _, s := range l {
-			fmt.Printf("Name: %s\n", s.Name)
-			fmt.Printf("Comment path: %s\n", s.CommentPath)
-			fmt.Printf("Timestamp: %s\n", s.Timestamp)
-			fmt.Printf("LXC path: %s\n", s.Path)
-			fmt.Println()
-		}
+func init() {
+	flag.StringVar(&name, "name", "rubik", "Name of the container")
+	flag.Parse()
+}
+
+func main() {
+	c := lxc.NewContainer(name)
+	defer lxc.PutContainer(c)
+
+	fmt.Printf("Snapshoting the container...\n")
+	if err := c.CreateSnapshot(); err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }

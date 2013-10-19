@@ -106,8 +106,8 @@ func (lxc *Container) MayControl() bool {
 	return bool(C.lxc_container_may_control(lxc.container))
 }
 
-// Snapshot creates a new snapshot
-func (lxc *Container) Snapshot() error {
+// CreateSnapshot creates a new snapshot
+func (lxc *Container) CreateSnapshot() error {
 	if err := lxc.ensureDefinedButNotRunning(); err != nil {
 		return err
 	}
@@ -116,13 +116,13 @@ func (lxc *Container) Snapshot() error {
 	defer lxc.Unlock()
 
 	if int(C.lxc_container_snapshot(lxc.container)) < 0 {
-		return fmt.Errorf(errSnapshotFailed, C.GoString(lxc.container.name))
+		return fmt.Errorf(errCreateSnapshotFailed, C.GoString(lxc.container.name))
 	}
 	return nil
 }
 
-// Restore creates a new snapshot
-func (lxc *Container) Restore(snapshot Snapshot, name string) error {
+// RestoreSnapshot creates a new snapshot
+func (lxc *Container) RestoreSnapshot(snapshot Snapshot, name string) error {
 	if !lxc.Defined() {
 		return fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
 	}
@@ -137,13 +137,31 @@ func (lxc *Container) Restore(snapshot Snapshot, name string) error {
 	defer C.free(unsafe.Pointer(csnapname))
 
 	if !bool(C.lxc_container_snapshot_restore(lxc.container, csnapname, cname)) {
-		return fmt.Errorf(errRestoreFailed, C.GoString(lxc.container.name))
+		return fmt.Errorf(errRestoreSnapshotFailed, C.GoString(lxc.container.name))
 	}
 	return nil
 }
 
-// ListSnapshots lists the snapshot of given container
-func (lxc *Container) ListSnapshots() ([]Snapshot, error) {
+// DestroySnapshot destroys the snapshot
+func (lxc *Container) DestroySnapshot(snapshot Snapshot) error {
+	if !lxc.Defined() {
+		return fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	csnapname := C.CString(snapshot.Name)
+	defer C.free(unsafe.Pointer(csnapname))
+
+	if !bool(C.lxc_container_snapshot_destroy(lxc.container, csnapname)) {
+		return fmt.Errorf(errDestroySnapshotFailed, C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
+// Snapshots lists the snapshot of given container
+func (lxc *Container) Snapshots() ([]Snapshot, error) {
 	if !lxc.Defined() {
 		return nil, fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
 	}

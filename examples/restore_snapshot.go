@@ -1,5 +1,5 @@
 /*
- * snapshot.go
+ * snapshot_restore.go
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -41,8 +41,10 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
-	fmt.Printf("Snapshoting the container...\n")
-	if err := c.Snapshot(); err != nil {
+	fmt.Printf("Restoring the container...\n")
+	snapshot := lxc.Snapshot{Name: "snap0"}
+
+	if err := c.RestoreSnapshot(snapshot, "rubik-restore"); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }

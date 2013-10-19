@@ -1,5 +1,5 @@
 /*
- * snapshot.go
+ * destroy_snapshots.go
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -23,28 +23,23 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/caglar10ur/lxc"
 )
 
-var (
-	name string
-)
-
-func init() {
-	flag.StringVar(&name, "name", "rubik", "Name of the container")
-	flag.Parse()
-}
-
 func main() {
-	c := lxc.NewContainer(name)
-	defer lxc.PutContainer(c)
+	for _, v := range lxc.Containers() {
+		fmt.Printf("%s\n", v.Name())
+		l, err := v.Snapshots()
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err.Error())
+		}
 
-	fmt.Printf("Restoring the container...\n")
-	snapshot := lxc.Snapshot{Name: "snap0"}
-
-	if err := c.Restore(snapshot, "rubik-restore"); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		for _, s := range l {
+			fmt.Printf("Destroying Snaphot: %s\n", s.Name)
+			if err := v.DestroySnapshot(s); err != nil {
+				fmt.Printf("ERROR: %s\n", err.Error())
+			}
+		}
 	}
 }

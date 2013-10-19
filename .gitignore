@@ -8,7 +8,9 @@ examples/concurrent_stop
 examples/concurrent_stress
 examples/console
 examples/create
+examples/create_snapshot
 examples/destroy
+examples/destroy_snapshots
 examples/freeze
 examples/interfaces
 examples/ipaddress
@@ -16,9 +18,8 @@ examples/limit
 examples/list
 examples/list_snapshots
 examples/reboot
-examples/restore
+examples/restore_snapshot
 examples/shutdown
-examples/snapshot
 examples/start
 examples/stats
 examples/stop

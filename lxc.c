@@ -256,6 +256,10 @@ bool lxc_container_snapshot_restore(struct lxc_container *c, char *snapname, cha
     return c->snapshot_restore(c, snapname, newname);
 }
 
+bool lxc_container_snapshot_destroy(struct lxc_container *c, char *snapname) {
+    return c->snapshot_destroy(c, snapname);
+}
+
 int lxc_container_list_defined_containers(const char *lxcpath, char ***names) {
     return list_defined_containers(lxcpath, names, NULL);
 }

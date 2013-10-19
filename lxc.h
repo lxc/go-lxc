@@ -38,6 +38,7 @@ extern bool lxc_container_set_config_item(struct lxc_container *, char *, char *
 extern bool lxc_container_set_config_path(struct lxc_container *, char *);
 extern bool lxc_container_shutdown(struct lxc_container *, int);
 extern bool lxc_container_snapshot_restore(struct lxc_container *, char *, char *);
+extern bool lxc_container_snapshot_destroy(struct lxc_container *, char *);
 extern bool lxc_container_start(struct lxc_container *, int, char **);
 extern bool lxc_container_stop(struct lxc_container *);
 extern bool lxc_container_unfreeze(struct lxc_container *);

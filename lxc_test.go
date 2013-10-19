@@ -35,6 +35,8 @@ import (
 
 const (
 	ContainerName             = "rubik"
+	SnapshotName              = "snap0"
+	ContainerRestoreName      = "rubik-restore"
 	CloneContainerName        = "O"
 	CloneOverlayContainerName = "O_o"
 	ConfigFilePath            = "/var/lib/lxc"
@@ -122,6 +124,25 @@ func TestClone(t *testing.T) {
 	}
 }
 
+func TestSnapshot(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	if err := z.CreateSnapshot(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestSnapshotRestore(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	snapshot := lxc.Snapshot{Name: SnapshotName}
+	if err := z.RestoreSnapshot(snapshot, ContainerRestoreName); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestConcurrentCreate(t *testing.T) {
 	var wg sync.WaitGroup
 
@@ -160,6 +181,19 @@ func TestContainers(t *testing.T) {
 func TestActiveContainers(t *testing.T) {
 	for _, v := range lxc.ActiveContainers() {
 		t.Logf("%s: %s", v.Name(), v.State())
+	}
+}
+
+func TestSnapshots(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	l, _ := z.Snapshots()
+	for _, s := range l {
+		t.Logf("Name: %s\n", s.Name)
+		t.Logf("Comment path: %s\n", s.CommentPath)
+		t.Logf("Timestamp: %s\n", s.Timestamp)
+		t.Logf("LXC path: %s\n", s.Path)
 	}
 }
 
@@ -412,19 +446,57 @@ func TestMemoryUsage(t *testing.T) {
 	defer lxc.PutContainer(z)
 
 	memUsed, _ := z.MemoryUsage()
-	swapUsed, _ := z.SwapUsage()
-	memLimit, _ := z.MemoryLimit()
-	swapLimit, _ := z.SwapLimit()
-
 	t.Logf("Mem usage: %0.0f\n", memUsed)
 	t.Logf("Mem usage: %s\n", memUsed)
+}
+
+func TestSwapUsage(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	swapUsed, _ := z.SwapUsage()
 	t.Logf("Swap usage: %0.0f\n", swapUsed)
 	t.Logf("Swap usage: %s\n", swapUsed)
+}
+
+func TestMemoryLimit(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	memLimit, _ := z.MemoryLimit()
 	t.Logf("Mem limit: %0.0f\n", memLimit)
 	t.Logf("Mem limit: %s\n", memLimit)
+}
+
+func TestSwapLimit(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	swapLimit, _ := z.SwapLimit()
 	t.Logf("Swap limit: %0.0f\n", swapLimit)
 	t.Logf("Swap limit: %s\n", swapLimit)
+}
 
+func TestSetMemoryLimit(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	memLimit, _ := z.MemoryLimit()
+
+	if err := z.SetMemoryLimit(memLimit / 4); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestSetSwapLimit(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	swapLimit, _ := z.SwapLimit()
+
+	if err := z.SetSwapLimit(swapLimit / 4); err != nil {
+		t.Errorf(err.Error())
+	}
 }
 
 /*
@@ -494,6 +566,16 @@ func TestStop(t *testing.T) {
 	}
 }
 
+func TestDestroySnapshot(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	snapshot := lxc.Snapshot{Name: SnapshotName}
+	if err := z.DestroySnapshot(snapshot); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestDestroy(t *testing.T) {
 	z := lxc.NewContainer(CloneOverlayContainerName)
 	defer lxc.PutContainer(z)
@@ -503,6 +585,13 @@ func TestDestroy(t *testing.T) {
 	}
 
 	z = lxc.NewContainer(CloneContainerName)
+	defer lxc.PutContainer(z)
+
+	if err := z.Destroy(); err != nil {
+		t.Errorf(err.Error())
+	}
+
+	z = lxc.NewContainer(ContainerRestoreName)
 	defer lxc.PutContainer(z)
 
 	if err := z.Destroy(); err != nil {
