@@ -286,6 +286,7 @@ func (lxc *Container) Unfreeze() error {
 
 // Create creates the container using given template and arguments
 func (lxc *Container) Create(template string, args ...string) error {
+	// FIXME: Support bdevtype, bdev_specs and flags
 	if lxc.Defined() {
 		return fmt.Errorf(errAlreadyDefined, C.GoString(lxc.container.name))
 	}
@@ -405,6 +406,7 @@ func (lxc *Container) Destroy() error {
 
 // Clone clones the container
 func (lxc *Container) Clone(name string, flags int, backend BackendStore) error {
+	// FIXME: support lxcpath, bdevtype, bdevdata, newsize and hookargs
 	if err := lxc.ensureDefinedButNotRunning(); err != nil {
 		return err
 	}
@@ -424,6 +426,11 @@ func (lxc *Container) Clone(name string, flags int, backend BackendStore) error 
 // CloneToDirectory clones the container using Directory backendstore
 func (lxc *Container) CloneToDirectory(name string) error {
 	return lxc.Clone(name, 0, Directory)
+}
+
+// CloneToBtrFS clones the container using BtrFS backendstore
+func (lxc *Container) CloneToBtrFS(name string) error {
+	return lxc.Clone(name, 0, BtrFS)
 }
 
 // CloneToOverlayFS clones the container using OverlayFS backendstore
@@ -611,7 +618,7 @@ func (lxc *Container) MemoryUsage() (ByteSize, error) {
 
 	memUsed, err := strconv.ParseFloat(lxc.CgroupItem("memory.usage_in_bytes")[0], 64)
 	if err != nil {
-		return -1, err
+		return -1, fmt.Errorf(errMemLimit)
 	}
 	return ByteSize(memUsed), err
 }
@@ -627,7 +634,7 @@ func (lxc *Container) SwapUsage() (ByteSize, error) {
 
 	swapUsed, err := strconv.ParseFloat(lxc.CgroupItem("memory.memsw.usage_in_bytes")[0], 64)
 	if err != nil {
-		return -1, err
+		return -1, fmt.Errorf(errSwapLimit)
 	}
 	return ByteSize(swapUsed), err
 }
@@ -643,7 +650,7 @@ func (lxc *Container) MemoryLimit() (ByteSize, error) {
 
 	memLimit, err := strconv.ParseFloat(lxc.CgroupItem("memory.limit_in_bytes")[0], 64)
 	if err != nil {
-		return -1, err
+		return -1, fmt.Errorf(errMemLimit)
 	}
 	return ByteSize(memLimit), err
 }
@@ -671,7 +678,7 @@ func (lxc *Container) SwapLimit() (ByteSize, error) {
 
 	swapLimit, err := strconv.ParseFloat(lxc.CgroupItem("memory.memsw.limit_in_bytes")[0], 64)
 	if err != nil {
-		return -1, err
+		return -1, fmt.Errorf(errSwapLimit)
 	}
 	return ByteSize(swapLimit), err
 }

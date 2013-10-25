@@ -32,7 +32,6 @@ import "C"
 
 import (
 	"os"
-	"sort"
 	"unsafe"
 )
 
@@ -89,9 +88,7 @@ func ContainerNames(paths ...string) []string {
 		if size < 1 {
 			return nil
 		}
-		names := sort.StringSlice(convertNArgs(cnames, size))
-		names.Sort()
-		return names
+		return convertNArgs(cnames, size)
 	}
 	// FIXME: Support custom config paths
 	return nil
@@ -116,9 +113,7 @@ func ActiveContainerNames(paths ...string) []string {
 		if size < 1 {
 			return nil
 		}
-		names := sort.StringSlice(convertNArgs(cnames, size))
-		names.Sort()
-		return names
+		return convertNArgs(cnames, size)
 	}
 	// FIXME: Support custom config paths
 	return nil

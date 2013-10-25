@@ -45,27 +45,31 @@ func main() {
 	memUsed, err := c.MemoryUsage()
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
+	} else {
+		fmt.Printf("MemoryUsage: %s\n", memUsed)
 	}
-	fmt.Printf("memerrused: %s\n", memUsed)
 
 	memLimit, err := c.MemoryLimit()
-	fmt.Printf("memerrlimit: %s\n", memLimit)
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
+	} else {
+		fmt.Printf("MemoryLimit: %s\n", memLimit)
 	}
 
 	// swap
 	swapUsed, err := c.SwapUsage()
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
+	} else {
+		fmt.Printf("SwapUsage: %s\n", swapUsed)
 	}
-	fmt.Printf("memswerrused: %s\n", swapUsed)
 
 	swapLimit, err := c.SwapLimit()
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
+	} else {
+		fmt.Printf("SwapLimit: %s\n", swapLimit)
 	}
-	fmt.Printf("memswerrused: %s\n", swapLimit)
 
 	cpuTime, err := c.CPUTime()
 	if err != nil {

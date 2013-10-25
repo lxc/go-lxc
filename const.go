@@ -77,4 +77,6 @@ const (
 	errCreateSnapshotFailed          = "snapshotting the container %q failed"
 	errRestoreSnapshotFailed         = "restoring the container %q failed"
 	errDestroySnapshotFailed         = "destroying the snapshot %q failed"
+	errMemLimit                      = "your kernel does not support cgroup memory controller"
+	errSwapLimit                     = "your kernel does not support cgroup swap controller"
 )
