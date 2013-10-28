@@ -1,3 +1,5 @@
+// +build linux
+
 /*
  * util.go: Go bindings for lxc
  *

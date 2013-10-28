@@ -1,3 +1,5 @@
+// +build linux
+
 /*
  * container.go: Go bindings for lxc
  *

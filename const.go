@@ -1,3 +1,5 @@
+// +build linux
+
 /*
  * const.go: Go bindings for lxc
  *

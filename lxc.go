@@ -1,3 +1,5 @@
+// +build linux
+
 /*
  * lxc.go: Go bindings for lxc
  *
