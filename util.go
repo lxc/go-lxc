@@ -54,8 +54,21 @@ func makeArgs(args []string) **C.char {
 	return cparams
 }
 
+func makeNullTerminatedArgs(args []string) **C.char {
+	cparams := C.makeCharArray(C.int(len(args) + 1))
+	for i, s := range args {
+		C.setArrayString(cparams, C.CString(s), C.int(i))
+	}
+	C.setArrayString(cparams, nil, C.int(len(args)))
+	return cparams
+}
+
 func freeArgs(cArgs **C.char, length int) {
 	C.freeCharArray(cArgs, C.int(length))
+}
+
+func freeNullTerminatedArgs(cArgs **C.char, length int) {
+	C.freeCharArray(cArgs, C.int(length + 1))
 }
 
 func convertArgs(cArgs **C.char) []string {

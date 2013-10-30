@@ -799,8 +799,8 @@ func (lxc *Container) AttachRunCommand(args ...string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
 
-	cargs := makeArgs(args)
-	defer freeArgs(cargs, len(args))
+	cargs := makeNullTerminatedArgs(args)
+	defer freeNullTerminatedArgs(cargs, len(args))
 
 	ret := int(C.lxc_container_attach_run_wait(lxc.container, cargs))
 	if ret < 0 {
