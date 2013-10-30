@@ -68,7 +68,7 @@ func freeArgs(cArgs **C.char, length int) {
 }
 
 func freeNullTerminatedArgs(cArgs **C.char, length int) {
-	C.freeCharArray(cArgs, C.int(length + 1))
+	C.freeCharArray(cArgs, C.int(length+1))
 }
 
 func convertArgs(cArgs **C.char) []string {
