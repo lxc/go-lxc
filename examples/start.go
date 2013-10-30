@@ -46,10 +46,6 @@ func main() {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 
-	if err := c.SetCloseAllFds(); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
-	}
-
 	if err := c.Start(false); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 	}
