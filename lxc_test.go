@@ -501,7 +501,53 @@ func TestSetSwapLimit(t *testing.T) {
 	}
 }
 
+func TestAttachRunCommand(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
+	if err := z.AttachRunCommand(argsThree...); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestConsoleGetFD(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	if _, err := z.ConsoleGetFD(0); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestIPAddress(t *testing.T) {
+	z := lxc.NewContainer(ContainerName)
+	defer lxc.PutContainer(z)
+
+	if _, err := z.IPAddress("lo"); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 /*
+func TestIPv4Addresses(t *testing.T) {
+    z := lxc.NewContainer(ContainerName)
+    defer lxc.PutContainer(z)
+
+    if _, err := z.IPv4Addresses(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestIPv6Addresses(t *testing.T) {
+    z := lxc.NewContainer(ContainerName)
+    defer lxc.PutContainer(z)
+
+    if _, err := z.IPv6Addresses(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestReboot(t *testing.T) {
 	z := lxc.NewContainer(ContainerName)
 	defer lxc.PutContainer(z)
