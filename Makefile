@@ -9,3 +9,5 @@ vet:
 	`which go` vet .
 lint:
 	`which golint` .
+ctags:
+	@ctags -R --languages=c,go
