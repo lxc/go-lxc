@@ -22,6 +22,9 @@ See the [examples](https://github.com/caglar10ur/lxc/tree/master/examples) direc
 
 Note that as we don’t have full user namespaces support at the moment, any code using the LXC API needs to run as root.
 
+Also please be aware that LXC C API is not considered stable until LXC 1.0 release. Development branch (see below) is currently under heavy development with incompatible changes and will be merged to master once LXC 1.0 released.
+
+
 ## Development branch
 
 If you are interested with upcoming LXC version (staging tree) then please use the devel branch.
