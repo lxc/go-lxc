@@ -41,6 +41,9 @@ func main() {
 	c := lxc.NewContainer(name)
 	defer lxc.PutContainer(c)
 
+	c.SetLogFile("/tmp/" + name + ".log")
+	c.SetLogLevel(lxc.TRACE)
+
 	fmt.Printf("Starting the container...\n")
 	if err := c.SetDaemonize(); err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())

@@ -10,6 +10,7 @@
 package lxc
 
 // #include <lxc/lxc.h>
+// #include <lxc/log.h>
 // #include <lxc/lxccontainer.h>
 import "C"
 
@@ -165,4 +166,64 @@ func (b ByteSize) String() string {
 		return fmt.Sprintf("%.2fKB", b/KB)
 	}
 	return fmt.Sprintf("%.2fB", b)
+}
+
+// LogLevel type
+type LogLevel int
+
+const (
+	// TRACE priority
+	TRACE LogLevel = C.LXC_LOG_PRIORITY_TRACE
+	// DEBUG priority
+	DEBUG LogLevel = C.LXC_LOG_PRIORITY_DEBUG
+	// INFO priority
+	INFO LogLevel = C.LXC_LOG_PRIORITY_INFO
+	// NOTICE priority
+	NOTICE LogLevel = C.LXC_LOG_PRIORITY_NOTICE
+	// WARN priority
+	WARN LogLevel = C.LXC_LOG_PRIORITY_WARN
+	// ERROR priority
+	ERROR LogLevel = C.LXC_LOG_PRIORITY_ERROR
+	// CRIT priority
+	CRIT LogLevel = C.LXC_LOG_PRIORITY_CRIT
+	// ALERT priority
+	ALERT LogLevel = C.LXC_LOG_PRIORITY_ALERT
+	// FATAL priority
+	FATAL LogLevel = C.LXC_LOG_PRIORITY_FATAL
+)
+
+var logLevelMap = map[string]LogLevel{
+	"TRACE":  TRACE,
+	"DEBUG":  DEBUG,
+	"INFO":   INFO,
+	"NOTICE": NOTICE,
+	"WARN":   WARN,
+	"ERROR":  ERROR,
+	"CRIT":   CRIT,
+	"ALERT":  ALERT,
+	"FATAL":  FATAL,
+}
+
+func (l LogLevel) String() string {
+	switch l {
+	case TRACE:
+		return "TRACE"
+	case DEBUG:
+		return "DEBUG"
+	case INFO:
+		return "INFO"
+	case NOTICE:
+		return "NOTICE"
+	case WARN:
+		return "WARN"
+	case ERROR:
+		return "ERROR"
+	case CRIT:
+		return "CRIT"
+	case ALERT:
+		return "ALERT"
+	case FATAL:
+		return "FATAL"
+	}
+	return "NOTSET"
 }

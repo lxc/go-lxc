@@ -898,3 +898,29 @@ func (lxc *Container) IPv6Addresses() ([]string, error) {
 	}
 	return convertArgs(result), nil
 }
+
+// LogFile returns the name of the logfile
+func (lxc *Container) LogFile() string {
+	return lxc.ConfigItem("lxc.logfile")[0]
+}
+
+// SetLogFile sets the logfile to given filename
+func (lxc *Container) SetLogFile(filename string) error {
+	if err := lxc.SetConfigItem("lxc.logfile", filename); err != nil {
+		return err
+	}
+	return nil
+}
+
+// LogLevel returns the name of the logfile
+func (lxc *Container) LogLevel() LogLevel {
+	return logLevelMap[lxc.ConfigItem("lxc.loglevel")[0]]
+}
+
+// SetLogLevel sets the logfile to given filename
+func (lxc *Container) SetLogLevel(level LogLevel) error {
+	if err := lxc.SetConfigItem("lxc.loglevel", level.String()); err != nil {
+		return err
+	}
+	return nil
+}
