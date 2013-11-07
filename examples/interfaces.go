@@ -24,8 +24,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 var (
@@ -38,15 +38,18 @@ func init() {
 }
 
 func main() {
-	c := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
 	defer lxc.PutContainer(c)
 
-	fmt.Printf("Interfaces\n")
+	log.Printf("Interfaces\n")
 	if interfaces, err := c.Interfaces(); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range interfaces {
-			fmt.Printf("%d) %s\n", i, v)
+			log.Printf("%d) %s\n", i, v)
 		}
 	}
 }

@@ -24,8 +24,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 var (
@@ -38,11 +38,14 @@ func init() {
 }
 
 func main() {
-	c := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name)
+	if err != nil {
+		log.Fatal("ERROR: %s\n", err.Error())
+	}
 	defer lxc.PutContainer(c)
 
-	fmt.Printf("Destroying container...\n")
+	log.Printf("Destroying container...\n")
 	if err := c.Destroy(); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

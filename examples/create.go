@@ -24,8 +24,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 var (
@@ -38,12 +38,15 @@ func init() {
 }
 
 func main() {
-	c := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
 	defer lxc.PutContainer(c)
 
-	fmt.Printf("Creating container...\n")
+	log.Printf("Creating container...\n")
 	c.SetVerbosity(lxc.Verbose)
 	if err := c.Create("ubuntu", "amd64"); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Printf("ERROR: %s\n", err.Error())
 	}
 }

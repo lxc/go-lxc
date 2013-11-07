@@ -24,8 +24,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 var (
@@ -38,25 +38,28 @@ func init() {
 }
 
 func main() {
-	c := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
 	defer lxc.PutContainer(c)
 
 	directoryClone := name + "Directory"
 	overlayClone := name + "OverlayFS"
 	btrfsClone := name + "BtrFS"
 
-	fmt.Printf("Cloning the container using Directory backend...\n")
+	log.Printf("Cloning the container using Directory backend...\n")
 	if err := c.CloneToDirectory(directoryClone); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
-	fmt.Printf("Cloning the container using OverlayFS backend...\n")
+	log.Printf("Cloning the container using OverlayFS backend...\n")
 	if err := c.CloneToOverlayFS(overlayClone); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
-	fmt.Printf("Cloning the container using BtrFS backend...\n")
+	log.Printf("Cloning the container using BtrFS backend...\n")
 	if err := c.CloneToBtrFS(btrfsClone); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

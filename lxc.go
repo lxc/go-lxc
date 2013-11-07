@@ -17,6 +17,7 @@ package lxc
 import "C"
 
 import (
+	"fmt"
 	"os"
 	"unsafe"
 )
@@ -28,11 +29,15 @@ func init() {
 }
 
 // NewContainer returns a new container struct
-func NewContainer(name string) *Container {
+func NewContainer(name string) (*Container, error) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	return &Container{container: C.lxc_container_new(cname, nil), verbosity: Quiet}
+	container := C.lxc_container_new(cname, nil)
+	if container == nil {
+		return nil, fmt.Errorf(errNewFailed, name)
+	}
+	return &Container{container: container, verbosity: Quiet}, nil
 }
 
 // GetContainer increments reference counter of the container object
@@ -85,7 +90,11 @@ func Containers() []Container {
 	var containers []Container
 
 	for _, v := range ContainerNames() {
-		containers = append(containers, *NewContainer(v))
+		container, err := NewContainer(v)
+		if err != nil {
+			return nil
+		}
+		containers = append(containers, *container)
 	}
 	return containers
 }
@@ -110,7 +119,11 @@ func ActiveContainers() []Container {
 	var containers []Container
 
 	for _, v := range ActiveContainerNames() {
-		containers = append(containers, *NewContainer(v))
+		container, err := NewContainer(v)
+		if err != nil {
+			return nil
+		}
+		containers = append(containers, *container)
 	}
 	return containers
 }

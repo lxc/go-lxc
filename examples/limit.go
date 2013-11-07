@@ -24,8 +24,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 var (
@@ -38,22 +38,25 @@ func init() {
 }
 
 func main() {
-	c := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
 	defer lxc.PutContainer(c)
 
 	memLimit, err := c.MemoryLimit()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 	swapLimit, err := c.SwapLimit()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
 	if err := c.SetMemoryLimit(memLimit / 4); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 	if err := c.SetSwapLimit(swapLimit / 4); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

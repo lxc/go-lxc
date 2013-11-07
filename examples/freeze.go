@@ -24,8 +24,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 var (
@@ -38,12 +38,15 @@ func init() {
 }
 
 func main() {
-	c := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
 	defer lxc.PutContainer(c)
 
-	fmt.Printf("Freezing the container...\n")
+	log.Printf("Freezing the container...\n")
 	if err := c.Freeze(); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 	c.Wait(lxc.FROZEN, 10)
 }

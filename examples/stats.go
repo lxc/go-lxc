@@ -24,8 +24,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 var (
@@ -38,54 +38,57 @@ func init() {
 }
 
 func main() {
-	c := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
 	defer lxc.PutContainer(c)
 
 	// mem
 	memUsed, err := c.MemoryUsage()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
-		fmt.Printf("MemoryUsage: %s\n", memUsed)
+		log.Printf("MemoryUsage: %s\n", memUsed)
 	}
 
 	memLimit, err := c.MemoryLimit()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
-		fmt.Printf("MemoryLimit: %s\n", memLimit)
+		log.Printf("MemoryLimit: %s\n", memLimit)
 	}
 
 	// swap
 	swapUsed, err := c.SwapUsage()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
-		fmt.Printf("SwapUsage: %s\n", swapUsed)
+		log.Printf("SwapUsage: %s\n", swapUsed)
 	}
 
 	swapLimit, err := c.SwapLimit()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
-		fmt.Printf("SwapLimit: %s\n", swapLimit)
+		log.Printf("SwapLimit: %s\n", swapLimit)
 	}
 
 	cpuTime, err := c.CPUTime()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	fmt.Printf("cpuacct.usage: %s\n", cpuTime)
+	log.Printf("cpuacct.usage: %s\n", cpuTime)
 
 	cpuTimePerCPU, err := c.CPUTimePerCPU()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	fmt.Printf("cpuacct.usageerrpercpu: %s\n", cpuTimePerCPU)
+	log.Printf("cpuacct.usageerrpercpu: %s\n", cpuTimePerCPU)
 
 	cpuStats, err := c.CPUStats()
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	fmt.Printf("cpuacct.stat: %v\n", cpuStats)
+	log.Printf("cpuacct.stat: %v\n", cpuStats)
 }

@@ -24,8 +24,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 var (
@@ -38,40 +38,43 @@ func init() {
 }
 
 func main() {
-	c := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
 	defer lxc.PutContainer(c)
 
-	fmt.Printf("IPAddress(\"lo\")\n")
+	log.Printf("IPAddress(\"lo\")\n")
 	if addresses, err := c.IPAddress("lo"); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range addresses {
-			fmt.Printf("%d) %s\n", i, v)
+			log.Printf("%d) %s\n", i, v)
 		}
 	}
 
-	fmt.Printf("IPAddresses()\n")
+	log.Printf("IPAddresses()\n")
 	if addresses, err := c.IPAddresses(); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range addresses {
-			fmt.Printf("%d) %s\n", i, v)
+			log.Printf("%d) %s\n", i, v)
 		}
 	}
-	fmt.Printf("IPv4Addresses()\n")
+	log.Printf("IPv4Addresses()\n")
 	if addresses, err := c.IPv4Addresses(); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range addresses {
-			fmt.Printf("%d) %s\n", i, v)
+			log.Printf("%d) %s\n", i, v)
 		}
 	}
-	fmt.Printf("IPv6Addresses()\n")
+	log.Printf("IPv6Addresses()\n")
 	if addresses, err := c.IPv6Addresses(); err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
 		for i, v := range addresses {
-			fmt.Printf("%d) %s\n", i, v)
+			log.Printf("%d) %s\n", i, v)
 		}
 	}
 }

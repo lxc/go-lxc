@@ -23,8 +23,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 	"math/rand"
 	"runtime"
 	"strconv"
@@ -46,7 +46,10 @@ func main() {
 		go func(i int) {
 			name := strconv.Itoa(rand.Intn(nOfContainers))
 
-			c := lxc.NewContainer(name)
+			c, err := lxc.NewContainer(name)
+			if err != nil {
+				log.Fatalf("ERROR: %s\n", err.Error())
+			}
 			defer lxc.PutContainer(c)
 
 			// sleep for a while to simulate some dummy work
@@ -55,20 +58,20 @@ func main() {
 			if c.Defined() {
 				if !c.Running() {
 					c.SetDaemonize()
-					fmt.Printf("Starting the container (%s)...\n", name)
+					log.Printf("Starting the container (%s)...\n", name)
 					if err := c.Start(false); err != nil {
-						fmt.Printf("ERROR: %s\n", err.Error())
+						log.Fatalf("ERROR: %s\n", err.Error())
 					}
 				} else {
-					fmt.Printf("Stopping the container (%s)...\n", name)
+					log.Printf("Stopping the container (%s)...\n", name)
 					if err := c.Stop(); err != nil {
-						fmt.Printf("ERROR: %s\n", err.Error())
+						log.Fatalf("ERROR: %s\n", err.Error())
 					}
 				}
 			} else {
-				fmt.Printf("Creating the container (%s)...\n", name)
+				log.Printf("Creating the container (%s)...\n", name)
 				if err := c.Create("ubuntu", "amd64"); err != nil {
-					fmt.Printf("ERROR: %s\n", err.Error())
+					log.Fatalf("ERROR: %s\n", err.Error())
 				}
 			}
 			wg.Done()
@@ -79,14 +82,17 @@ func main() {
 	for i := 0; i < nOfContainers; i++ {
 		name := strconv.Itoa(i)
 
-		c := lxc.NewContainer(name)
+		c, err := lxc.NewContainer(name)
+		if err != nil {
+			log.Fatalf("ERROR: %s\n", err.Error())
+		}
 		defer lxc.PutContainer(c)
 
 		c.Stop()
 
-		fmt.Printf("Destroying the container (%s)...\n", name)
+		log.Printf("Destroying the container (%s)...\n", name)
 		if err := c.Destroy(); err != nil {
-			fmt.Printf("ERROR: %s\n", err.Error())
+			log.Fatalf("ERROR: %s\n", err.Error())
 		}
 	}
 }

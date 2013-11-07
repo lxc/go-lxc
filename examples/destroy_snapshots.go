@@ -23,22 +23,22 @@
 package main
 
 import (
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 func main() {
 	for _, v := range lxc.Containers() {
-		fmt.Printf("%s\n", v.Name())
+		log.Printf("%s\n", v.Name())
 		l, err := v.Snapshots()
 		if err != nil {
-			fmt.Printf("ERROR: %s\n", err.Error())
+			log.Fatalf("ERROR: %s\n", err.Error())
 		}
 
 		for _, s := range l {
-			fmt.Printf("Destroying Snaphot: %s\n", s.Name)
+			log.Printf("Destroying Snaphot: %s\n", s.Name)
 			if err := v.DestroySnapshot(s); err != nil {
-				fmt.Printf("ERROR: %s\n", err.Error())
+				log.Fatalf("ERROR: %s\n", err.Error())
 			}
 		}
 	}

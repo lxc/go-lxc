@@ -23,20 +23,20 @@
 package main
 
 import (
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 func main() {
-	fmt.Printf("Defined containers:\n")
+	log.Printf("Defined containers:\n")
 	for _, v := range lxc.Containers() {
-		fmt.Printf("%s (%s)\n", v.Name(), v.State())
+		log.Printf("%s (%s)\n", v.Name(), v.State())
 	}
 
-	fmt.Println()
+	log.Println()
 
-	fmt.Printf("Active containers:\n")
+	log.Printf("Active containers:\n")
 	for _, v := range lxc.ActiveContainers() {
-		fmt.Printf("%s (%s)\n", v.Name(), v.State())
+		log.Printf("%s (%s)\n", v.Name(), v.State())
 	}
 }

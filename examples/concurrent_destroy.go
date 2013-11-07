@@ -23,8 +23,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 	"runtime"
 	"strconv"
 	"sync"
@@ -40,12 +40,15 @@ func main() {
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
-			z := lxc.NewContainer(strconv.Itoa(i))
-			defer lxc.PutContainer(z)
+			c, err := lxc.NewContainer(strconv.Itoa(i))
+			if err != nil {
+				log.Fatalf("ERROR: %s\n", err.Error())
+			}
+			defer lxc.PutContainer(c)
 
-			fmt.Printf("Destroying the container (%d)...\n", i)
-			if err := z.Destroy(); err != nil {
-				fmt.Printf("ERROR: %s\n", err.Error())
+			log.Printf("Destroying the container (%d)...\n", i)
+			if err := c.Destroy(); err != nil {
+				log.Fatalf("ERROR: %s\n", err.Error())
 			}
 			wg.Done()
 		}(i)

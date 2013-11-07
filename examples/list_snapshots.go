@@ -23,24 +23,24 @@
 package main
 
 import (
-	"fmt"
 	"github.com/caglar10ur/lxc"
+	"log"
 )
 
 func main() {
 	for _, v := range lxc.Containers() {
-		fmt.Printf("%s\n", v.Name())
+		log.Printf("%s\n", v.Name())
 		l, err := v.Snapshots()
 		if err != nil {
-			fmt.Printf("ERROR: %s\n", err.Error())
+			log.Fatalf("ERROR: %s\n", err.Error())
 		}
 
 		for _, s := range l {
-			fmt.Printf("Name: %s\n", s.Name)
-			fmt.Printf("Comment path: %s\n", s.CommentPath)
-			fmt.Printf("Timestamp: %s\n", s.Timestamp)
-			fmt.Printf("LXC path: %s\n", s.Path)
-			fmt.Println()
+			log.Printf("Name: %s\n", s.Name)
+			log.Printf("Comment path: %s\n", s.CommentPath)
+			log.Printf("Timestamp: %s\n", s.Timestamp)
+			log.Printf("LXC path: %s\n", s.Path)
+			log.Println()
 		}
 	}
 }
