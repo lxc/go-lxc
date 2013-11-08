@@ -32,10 +32,12 @@ import (
 )
 
 var (
-	iteration int
-	count     int
-	template  string
-	debug     bool
+	iteration     int
+	count         int
+	template      string
+	debug         bool
+	startstop     bool
+	createdestroy bool
 )
 
 func init() {
@@ -45,6 +47,8 @@ func init() {
 	flag.IntVar(&count, "count", 10, "Number of operations to run concurrently")
 	flag.IntVar(&iteration, "iteration", 1, "Number times to run the test")
 	flag.BoolVar(&debug, "debug", false, "Flag to control debug output")
+	flag.BoolVar(&startstop, "startstop", false, "Flag to execute Start and Stop")
+	flag.BoolVar(&createdestroy, "createdestroy", false, "Flag to execute Create and Destroy")
 	flag.Parse()
 }
 
@@ -71,23 +75,23 @@ func main() {
 					}
 					defer lxc.PutContainer(c)
 
-					if mode == "CREATE" {
+					if mode == "CREATE" && startstop == false {
 						log.Debugf("\t\tCreating the container (%d)...\n", i)
 						if err := c.Create(template); err != nil {
 							log.Errorf("\t\t\tERROR: %s\n", err.Error())
 						}
-					} else if mode == "START" {
+					} else if mode == "START" && createdestroy == false {
 						c.SetDaemonize()
 						log.Debugf("\t\tStarting the container (%d)...\n", i)
 						if err := c.Start(false); err != nil {
 							log.Errorf("\t\t\tERROR: %s\n", err.Error())
 						}
-					} else if mode == "STOP" {
+					} else if mode == "STOP" && createdestroy == false {
 						log.Debugf("\t\tStoping the container (%d)...\n", i)
 						if err := c.Stop(); err != nil {
 							log.Errorf("\t\t\tERROR: %s\n", err.Error())
 						}
-					} else if mode == "DESTROY" {
+					} else if mode == "DESTROY" && startstop == false {
 						log.Debugf("\t\tDestroying the container (%d)...\n", i)
 						if err := c.Destroy(); err != nil {
 							log.Errorf("\t\t\tERROR: %s\n", err.Error())
