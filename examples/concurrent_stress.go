@@ -23,76 +23,80 @@
 package main
 
 import (
+	"flag"
+	"github.com/caglar10ur/gologger"
 	"github.com/caglar10ur/lxc"
-	"log"
-	"math/rand"
 	"runtime"
 	"strconv"
 	"sync"
-	"time"
+)
+
+var (
+	iteration int
+	count     int
+	template  string
+	debug     bool
 )
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	flag.StringVar(&template, "template", "busybox", "Template to use")
+	flag.IntVar(&count, "count", 10, "Number of operations to run concurrently")
+	flag.IntVar(&iteration, "iteration", 1, "Number times to run the test")
+	flag.BoolVar(&debug, "debug", false, "Flag to control debug output")
+	flag.Parse()
 }
 
 func main() {
+	log := logger.New(nil)
+	if debug {
+		log.SetLogLevel(logger.Debug)
+	}
+
+	log.Debugf("Using %d GOMAXPROCS", runtime.NumCPU())
+
 	var wg sync.WaitGroup
 
-	nOfContainers := 10
-
-	for i := 0; i < 100; i++ {
-		wg.Add(1)
-		go func(i int) {
-			name := strconv.Itoa(rand.Intn(nOfContainers))
-
-			c, err := lxc.NewContainer(name)
-			if err != nil {
-				log.Fatalf("ERROR: %s\n", err.Error())
-			}
-			defer lxc.PutContainer(c)
-
-			// sleep for a while to simulate some dummy work
-			time.Sleep(time.Millisecond * time.Duration(rand.Intn(1000)))
-
-			if c.Defined() {
-				if !c.Running() {
-					c.SetDaemonize()
-					log.Printf("Starting the container (%s)...\n", name)
-					if err := c.Start(false); err != nil {
+	for i := 0; i < iteration; i++ {
+		log.Debugf("-- ITERATION %d --", i+1)
+		for _, mode := range []string{"CREATE", "START", "STOP", "DESTROY"} {
+			log.Debugf("\t-- %s --", mode)
+			for j := 0; j < count; j++ {
+				wg.Add(1)
+				go func(i int, mode string) {
+					c, err := lxc.NewContainer(strconv.Itoa(i))
+					if err != nil {
 						log.Fatalf("ERROR: %s\n", err.Error())
 					}
-				} else {
-					log.Printf("Stopping the container (%s)...\n", name)
-					if err := c.Stop(); err != nil {
-						log.Fatalf("ERROR: %s\n", err.Error())
+					defer lxc.PutContainer(c)
+
+					if mode == "CREATE" {
+						log.Debugf("\t\tCreating the container (%d)...\n", i)
+						if err := c.Create(template); err != nil {
+							log.Errorf("\t\t\tERROR: %s\n", err.Error())
+						}
+					} else if mode == "START" {
+						c.SetDaemonize()
+						log.Debugf("\t\tStarting the container (%d)...\n", i)
+						if err := c.Start(false); err != nil {
+							log.Errorf("\t\t\tERROR: %s\n", err.Error())
+						}
+					} else if mode == "STOP" {
+						log.Debugf("\t\tStoping the container (%d)...\n", i)
+						if err := c.Stop(); err != nil {
+							log.Errorf("\t\t\tERROR: %s\n", err.Error())
+						}
+					} else if mode == "DESTROY" {
+						log.Debugf("\t\tDestroying the container (%d)...\n", i)
+						if err := c.Destroy(); err != nil {
+							log.Errorf("\t\t\tERROR: %s\n", err.Error())
+						}
 					}
-				}
-			} else {
-				log.Printf("Creating the container (%s)...\n", name)
-				if err := c.Create("ubuntu", "amd64"); err != nil {
-					log.Fatalf("ERROR: %s\n", err.Error())
-				}
+					wg.Done()
+				}(j, mode)
 			}
-			wg.Done()
-		}(i)
-	}
-	wg.Wait()
-
-	for i := 0; i < nOfContainers; i++ {
-		name := strconv.Itoa(i)
-
-		c, err := lxc.NewContainer(name)
-		if err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-		defer lxc.PutContainer(c)
-
-		c.Stop()
-
-		log.Printf("Destroying the container (%s)...\n", name)
-		if err := c.Destroy(); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
+			wg.Wait()
 		}
 	}
 }
