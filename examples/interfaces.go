@@ -40,7 +40,7 @@ func init() {
 }
 
 func main() {
-	c, err := lxc.NewContainer(lxcpath)
+	c, err := lxc.NewContainer(name, lxcpath)
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
