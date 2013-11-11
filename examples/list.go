@@ -23,20 +23,37 @@
 package main
 
 import (
+	"flag"
 	"github.com/caglar10ur/lxc"
 	"log"
 )
 
+var (
+	lxcpath string
+)
+
+func init() {
+	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
+	flag.Parse()
+}
+
 func main() {
 	log.Printf("Defined containers:\n")
-	for _, v := range lxc.Containers() {
+	for _, v := range lxc.DefinedContainers(lxcpath) {
 		log.Printf("%s (%s)\n", v.Name(), v.State())
 	}
 
 	log.Println()
 
 	log.Printf("Active containers:\n")
-	for _, v := range lxc.ActiveContainers() {
+	for _, v := range lxc.ActiveContainers(lxcpath) {
+		log.Printf("%s (%s)\n", v.Name(), v.State())
+	}
+
+	log.Println()
+
+	log.Printf("Active and Defined containers:\n")
+	for _, v := range lxc.ActiveContainers(lxcpath) {
 		log.Printf("%s (%s)\n", v.Name(), v.State())
 	}
 }

@@ -29,18 +29,20 @@ import (
 )
 
 var (
-	name string
+	lxcpath string
+	name    string
 )
 
 func init() {
+	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
 	flag.StringVar(&name, "name", "rubik", "Name of the container")
 	flag.Parse()
 }
 
 func main() {
-	c, err := lxc.NewContainer(name)
+	c, err := lxc.NewContainer(name, lxcpath)
 	if err != nil {
-		log.Fatal("ERROR: %s\n", err.Error())
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 	defer lxc.PutContainer(c)
 

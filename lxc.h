@@ -39,8 +39,6 @@ extern const char* lxc_container_state(struct lxc_container *);
 extern int lxc_container_attach_run_wait(struct lxc_container *, char **);
 extern int lxc_container_attach(struct lxc_container *);
 extern int lxc_container_console_getfd(struct lxc_container *, int);
-extern int lxc_container_list_active_containers(const char *, char ***);
-extern int lxc_container_list_defined_containers(const char *, char ***);
 extern int lxc_container_snapshot_list(struct lxc_container *, struct lxc_snapshot **);
 extern int lxc_container_snapshot(struct lxc_container *);
 extern pid_t lxc_container_init_pid(struct lxc_container *);

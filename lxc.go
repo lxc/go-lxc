@@ -29,11 +29,21 @@ func init() {
 }
 
 // NewContainer returns a new container struct
-func NewContainer(name string) (*Container, error) {
+func NewContainer(name string, lxcpath ...string) (*Container, error) {
+	var container *C.struct_lxc_container
+
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	container := C.lxc_container_new(cname, nil)
+	if lxcpath != nil && len(lxcpath) == 1 {
+		clxcpath := C.CString(lxcpath[0])
+		defer C.free(unsafe.Pointer(clxcpath))
+
+		container = C.lxc_container_new(cname, clxcpath)
+	} else {
+		container = C.lxc_container_new(cname, nil)
+	}
+
 	if container == nil {
 		return nil, fmt.Errorf(errNewFailed, name)
 	}
@@ -70,27 +80,68 @@ func DefaultZfsRoot() string {
 	return C.GoString(C.lxc_get_default_zfs_root())
 }
 
-// ContainerNames returns the names of containers on the system.
-func ContainerNames(paths ...string) []string {
-	if paths == nil {
-		var cnames **C.char
+// ContainerNames returns the names of defined and active containers on the system.
+func ContainerNames(lxcpath ...string) []string {
+	var size int
+	var cnames **C.char
 
-		size := int(C.lxc_container_list_defined_containers(nil, &cnames))
-		if size < 1 {
-			return nil
-		}
-		return convertNArgs(cnames, size)
+	if lxcpath != nil && len(lxcpath) == 1 {
+		clxcpath := C.CString(lxcpath[0])
+		defer C.free(unsafe.Pointer(clxcpath))
+
+		size = int(C.list_all_containers(clxcpath, &cnames, nil))
+	} else {
+
+		size = int(C.list_all_containers(nil, &cnames, nil))
 	}
-	// FIXME: Support custom config paths
-	return nil
+
+	if size < 1 {
+		return nil
+	}
+	return convertNArgs(cnames, size)
 }
 
-// Containers returns the containers on the system.
-func Containers() []Container {
+// Containers returns the defined and active containers on the system.
+func Containers(lxcpath ...string) []Container {
 	var containers []Container
 
-	for _, v := range ContainerNames() {
-		container, err := NewContainer(v)
+	for _, v := range ContainerNames(lxcpath...) {
+		container, err := NewContainer(v, lxcpath...)
+		if err != nil {
+			return nil
+		}
+		containers = append(containers, *container)
+	}
+	return containers
+}
+
+// DefinedContainerNames returns the names of the defined containers on the system.
+func DefinedContainerNames(lxcpath ...string) []string {
+	var size int
+	var cnames **C.char
+
+	if lxcpath != nil && len(lxcpath) == 1 {
+		clxcpath := C.CString(lxcpath[0])
+		defer C.free(unsafe.Pointer(clxcpath))
+
+		size = int(C.list_defined_containers(clxcpath, &cnames, nil))
+	} else {
+
+		size = int(C.list_defined_containers(nil, &cnames, nil))
+	}
+
+	if size < 1 {
+		return nil
+	}
+	return convertNArgs(cnames, size)
+}
+
+// DefinedContainers returns the defined containers on the system.
+func DefinedContainers(lxcpath ...string) []Container {
+	var containers []Container
+
+	for _, v := range DefinedContainerNames(lxcpath...) {
+		container, err := NewContainer(v, lxcpath...)
 		if err != nil {
 			return nil
 		}
@@ -100,26 +151,32 @@ func Containers() []Container {
 }
 
 // ActiveContainerNames returns the names of the active containers on the system.
-func ActiveContainerNames(paths ...string) []string {
-	if paths == nil {
-		var cnames **C.char
+func ActiveContainerNames(lxcpath ...string) []string {
+	var size int
+	var cnames **C.char
 
-		size := int(C.lxc_container_list_active_containers(nil, &cnames))
-		if size < 1 {
-			return nil
-		}
-		return convertNArgs(cnames, size)
+	if lxcpath != nil && len(lxcpath) == 1 {
+		clxcpath := C.CString(lxcpath[0])
+		defer C.free(unsafe.Pointer(clxcpath))
+
+		size = int(C.list_active_containers(clxcpath, &cnames, nil))
+	} else {
+
+		size = int(C.list_active_containers(nil, &cnames, nil))
 	}
-	// FIXME: Support custom config paths
-	return nil
+
+	if size < 1 {
+		return nil
+	}
+	return convertNArgs(cnames, size)
 }
 
 // ActiveContainers returns the active containers on the system.
-func ActiveContainers() []Container {
+func ActiveContainers(lxcpath ...string) []Container {
 	var containers []Container
 
-	for _, v := range ActiveContainerNames() {
-		container, err := NewContainer(v)
+	for _, v := range ActiveContainerNames(lxcpath...) {
+		container, err := NewContainer(v, lxcpath...)
 		if err != nil {
 			return nil
 		}
