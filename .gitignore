@@ -16,6 +16,7 @@ examples/interfaces
 examples/ipaddress
 examples/limit
 examples/list
+examples/list_keys
 examples/list_snapshots
 examples/reboot
 examples/restore_snapshot

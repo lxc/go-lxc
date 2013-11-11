@@ -101,6 +101,7 @@ func (lxc *Container) CreateSnapshot() error {
 	lxc.Lock()
 	defer lxc.Unlock()
 
+	// FIXME: LXC C API returns the number of snapshots, should we return it as well?
 	if int(C.lxc_container_snapshot(lxc.container)) < 0 {
 		return fmt.Errorf(errCreateSnapshotFailed, C.GoString(lxc.container.name))
 	}
@@ -272,7 +273,17 @@ func (lxc *Container) Unfreeze() error {
 
 // Create creates the container using given template and arguments
 func (lxc *Container) Create(template string, args ...string) error {
-	// FIXME: Support bdevtype, bdev_specs and flags
+	// FIXME: Support bdevtype and bdev_specs
+	// bdevtypes:
+	// "btrfs", "zfs", "lvm", "dir"
+	//
+	// best tries to find the best backing store type, according to our opinionated preferences we are using it for now
+	//
+	// bdev_specs:
+	// zfs requires zfsroot
+	// lvm requires lvname/vgname/thinpool as well as fstype and fssize
+	// btrfs requires nothing
+	// dir requires nothing
 	if lxc.Defined() {
 		return fmt.Errorf(errAlreadyDefined, C.GoString(lxc.container.name))
 	}
@@ -283,14 +294,17 @@ func (lxc *Container) Create(template string, args ...string) error {
 	ctemplate := C.CString(template)
 	defer C.free(unsafe.Pointer(ctemplate))
 
+	cbdevtype := C.CString("best")
+	defer C.free(unsafe.Pointer(cbdevtype))
+
 	ret := false
 	if args != nil {
 		cargs := makeArgs(args)
 		defer freeArgs(cargs, len(args))
 
-		ret = bool(C.lxc_container_create(lxc.container, ctemplate, C.int(lxc.verbosity), cargs))
+		ret = bool(C.lxc_container_create(lxc.container, ctemplate, cbdevtype, C.int(lxc.verbosity), cargs))
 	} else {
-		ret = bool(C.lxc_container_create(lxc.container, ctemplate, C.int(lxc.verbosity), nil))
+		ret = bool(C.lxc_container_create(lxc.container, ctemplate, cbdevtype, C.int(lxc.verbosity), nil))
 	}
 
 	if !ret {
@@ -393,6 +407,21 @@ func (lxc *Container) Destroy() error {
 // Clone clones the container
 func (lxc *Container) Clone(name string, flags int, backend BackendStore) error {
 	// FIXME: support lxcpath, bdevtype, bdevdata, newsize and hookargs
+	//
+	// bdevtypes:
+	// "btrfs", "zfs", "lvm", "dir" "overlayfs"
+	//
+	// bdevdata:
+	// zfs requires zfsroot
+	// lvm requires lvname/vgname/thinpool as well as fstype and fssize
+	// btrfs requires nothing
+	// dir requires nothing
+	//
+	// flags: LXC_CLONE_SNAPSHOT || LXC_CLONE_KEEPNAME || LXC_CLONE_KEEPMACADDR || LXC_CLONE_COPYHOOKS
+	//
+	// newsize: for blockdev-backed backingstores
+	//
+	// hookargs: additional arguments to pass to the clone hook script
 	if err := lxc.ensureDefinedButNotRunning(); err != nil {
 		return err
 	}
@@ -527,18 +556,25 @@ func (lxc *Container) ClearConfigItem(key string) error {
 	return nil
 }
 
-// Keys returns the keys
-func (lxc *Container) Keys(key string) []string {
+// ConfigKeys returns the name of the config keys
+func (lxc *Container) ConfigKeys(key ...string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
 
-	ckey := C.CString(key)
-	defer C.free(unsafe.Pointer(ckey))
+	var keys *_Ctype_char
 
-	// allocated in lxc.c
-	keys := C.lxc_container_get_keys(lxc.container, ckey)
-	defer C.free(unsafe.Pointer(keys))
+	if key != nil && len(key) == 1 {
+		ckey := C.CString(key[0])
+		defer C.free(unsafe.Pointer(ckey))
 
+		// allocated in lxc.c
+		keys = C.lxc_container_get_keys(lxc.container, ckey)
+		defer C.free(unsafe.Pointer(keys))
+	} else {
+		// allocated in lxc.c
+		keys = C.lxc_container_get_keys(lxc.container, nil)
+		defer C.free(unsafe.Pointer(keys))
+	}
 	ret := strings.TrimSpace(C.GoString(keys))
 	return strings.Split(ret, "\n")
 }
@@ -740,7 +776,14 @@ func (lxc *Container) CPUStats() ([]int64, error) {
 }
 
 // ConsoleGetFD allocates a console tty from container
+// ttynum: tty number to attempt to allocate or -1 to allocate the first available tty
+//
+// Returns "ttyfd" on success, -1 on failure. The returned "ttyfd" is
+// used to keep the tty allocated. The caller should close "ttyfd" to
+// indicate that it is done with the allocated console so that it can
+// be allocated by another caller.
 func (lxc *Container) ConsoleGetFD(ttynum int) (int, error) {
+	// FIXME: Make idiomatic
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
 	}
@@ -756,7 +799,15 @@ func (lxc *Container) ConsoleGetFD(ttynum int) (int, error) {
 }
 
 // Console allocates and runs a console tty from container
+// ttynum: tty number to attempt to allocate, -1 to allocate the first available tty, or 0 to allocate the console
+// stdinfd: fd to read input from
+// stdoutfd: fd to write output to
+// stderrfd: fd to write error output to
+// escape: he escape character (1 == 'a', 2 == 'b', ...)
+//
+// This function will not return until the console has been exited by the user.
 func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) error {
+	// FIXME: Make idiomatic
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
 	}
@@ -772,6 +823,7 @@ func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) e
 
 // AttachRunShell runs a shell inside the container
 func (lxc *Container) AttachRunShell() error {
+	// FIXME: support lxc_attach_options_t, currently we use LXC_ATTACH_OPTIONS_DEFAULT
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
 	}
@@ -786,8 +838,9 @@ func (lxc *Container) AttachRunShell() error {
 	return nil
 }
 
-// AttachRunCommand runs user specified command inside the container and waits it
+// AttachRunCommand runs user specified command inside the container and waits it to exit
 func (lxc *Container) AttachRunCommand(args ...string) error {
+	// FIXME: support lxc_attach_options_t, currently we use LXC_ATTACH_OPTIONS_DEFAULT
 	if args == nil {
 		return fmt.Errorf(errInsufficientNumberOfArguments)
 	}

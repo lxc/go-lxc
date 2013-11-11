@@ -498,14 +498,14 @@ func TestClearConfigItem(t *testing.T) {
 	}
 }
 
-func TestKeys(t *testing.T) {
+func TestConfigKeys(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(z)
 
-	keys := strings.Join(z.Keys("lxc.network.0"), " ")
+	keys := strings.Join(z.ConfigKeys("lxc.network.0"), " ")
 	if !strings.Contains(keys, "mtu") {
 		t.Errorf("Keys failed...")
 	}

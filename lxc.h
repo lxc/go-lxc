@@ -8,7 +8,7 @@
 extern bool lxc_container_clear_config_item(struct lxc_container *, char *);
 extern bool lxc_container_clone(struct lxc_container *, const char *, int, const char *);
 extern bool lxc_container_console(struct lxc_container *, int, int, int, int, int);
-extern bool lxc_container_create(struct lxc_container *, char *, int, char **);
+extern bool lxc_container_create(struct lxc_container *, char *, char *, int, char **);
 extern bool lxc_container_defined(struct lxc_container *);
 extern bool lxc_container_destroy(struct lxc_container *);
 extern bool lxc_container_freeze(struct lxc_container *);

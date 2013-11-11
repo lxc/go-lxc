@@ -45,8 +45,8 @@ bool lxc_container_want_close_all_fds(struct lxc_container *c) {
 	return c->want_close_all_fds(c);
 }
 
-bool lxc_container_create(struct lxc_container *c, char *t, int flags, char **argv) {
-	return c->create(c, t, NULL, NULL, !!(flags & LXC_CREATE_QUIET), argv);
+bool lxc_container_create(struct lxc_container *c, char *t, char *bdevtype, int flags, char **argv) {
+	return c->create(c, t, bdevtype, NULL, !!(flags & LXC_CREATE_QUIET), argv);
 }
 
 bool lxc_container_start(struct lxc_container *c, int useinit, char **argv) {
