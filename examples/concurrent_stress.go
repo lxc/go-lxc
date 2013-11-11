@@ -32,6 +32,7 @@ import (
 )
 
 var (
+	lxcpath       string
 	iteration     int
 	count         int
 	template      string
@@ -43,6 +44,7 @@ var (
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
+	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
 	flag.StringVar(&template, "template", "busybox", "Template to use")
 	flag.IntVar(&count, "count", 10, "Number of operations to run concurrently")
 	flag.IntVar(&iteration, "iteration", 1, "Number times to run the test")
@@ -69,7 +71,7 @@ func main() {
 			for j := 0; j < count; j++ {
 				wg.Add(1)
 				go func(i int, mode string) {
-					c, err := lxc.NewContainer(strconv.Itoa(i))
+					c, err := lxc.NewContainer(strconv.Itoa(i), lxcpath)
 					if err != nil {
 						log.Fatalf("ERROR: %s\n", err.Error())
 					}

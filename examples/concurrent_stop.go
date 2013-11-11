@@ -23,6 +23,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/caglar10ur/lxc"
 	"log"
 	"runtime"
@@ -30,8 +31,14 @@ import (
 	"sync"
 )
 
+var (
+	lxcpath string
+)
+
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
+	flag.Parse()
 }
 
 func main() {
@@ -40,7 +47,7 @@ func main() {
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
-			c, err := lxc.NewContainer(strconv.Itoa(i))
+			c, err := lxc.NewContainer(strconv.Itoa(i), lxcpath)
 			if err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
