@@ -43,3 +43,5 @@ extern int lxc_container_snapshot_list(struct lxc_container *, struct lxc_snapsh
 extern int lxc_container_snapshot(struct lxc_container *);
 extern pid_t lxc_container_init_pid(struct lxc_container *);
 extern void lxc_container_want_daemonize(struct lxc_container *);
+extern bool lxc_container_add_device_node(struct lxc_container *, char *, char *);
+extern bool lxc_container_remove_device_node(struct lxc_container *, char *, char *);

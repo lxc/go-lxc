@@ -977,3 +977,60 @@ func (lxc *Container) SetLogLevel(level LogLevel) error {
 	}
 	return nil
 }
+
+// AddDeviceNode adds the device node into given container
+func (lxc *Container) AddDeviceNode(source string, destination ...string) error {
+	if err := lxc.ensureDefinedAndRunning(); err != nil {
+		return err
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	if destination != nil && len(destination) == 1 {
+		cdestination := C.CString(destination[0])
+		defer C.free(unsafe.Pointer(cdestination))
+
+		if !bool(C.lxc_container_add_device_node(lxc.container, csource, cdestination)) {
+			return fmt.Errorf("adding device %s to container %q failed", source, C.GoString(lxc.container.name))
+		}
+		return nil
+	}
+
+	if !bool(C.lxc_container_add_device_node(lxc.container, csource, nil)) {
+		return fmt.Errorf("adding device %s to container %q failed", source, C.GoString(lxc.container.name))
+	}
+	return nil
+
+}
+
+// RemoveDeviceNode removes the device node from given container
+func (lxc *Container) RemoveDeviceNode(source string, destination ...string) error {
+	if err := lxc.ensureDefinedAndRunning(); err != nil {
+		return err
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	if destination != nil && len(destination) == 1 {
+		cdestination := C.CString(destination[0])
+		defer C.free(unsafe.Pointer(cdestination))
+
+		if !bool(C.lxc_container_remove_device_node(lxc.container, csource, cdestination)) {
+			return fmt.Errorf("adding device %s to container %q failed", source, C.GoString(lxc.container.name))
+		}
+		return nil
+	}
+
+	if !bool(C.lxc_container_remove_device_node(lxc.container, csource, nil)) {
+		return fmt.Errorf("adding device %s to container %q failed", source, C.GoString(lxc.container.name))
+	}
+	return nil
+}

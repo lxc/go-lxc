@@ -245,3 +245,11 @@ bool lxc_container_snapshot_restore(struct lxc_container *c, char *snapname, cha
 bool lxc_container_snapshot_destroy(struct lxc_container *c, char *snapname) {
 	return c->snapshot_destroy(c, snapname);
 }
+
+bool lxc_container_add_device_node(struct lxc_container *c, char *src_path, char *dest_path) {
+	return c->add_device_node(c, src_path, dest_path);
+}
+
+bool lxc_container_remove_device_node(struct lxc_container *c, char *src_path, char *dest_path) {
+	return c->remove_device_node(c, src_path, dest_path);
+}

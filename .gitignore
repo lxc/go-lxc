@@ -11,6 +11,7 @@ examples/create
 examples/create_snapshot
 examples/destroy
 examples/destroy_snapshots
+examples/device_add_remove
 examples/freeze
 examples/interfaces
 examples/ipaddress
