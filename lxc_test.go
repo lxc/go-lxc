@@ -646,6 +646,30 @@ func TestIPAddress(t *testing.T) {
 	}
 }
 
+func TestAddDeviceNode(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if err := z.AddDeviceNode("/dev/network_latency"); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestRemoveDeviceNode(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if err := z.RemoveDeviceNode("/dev/network_latency"); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 /*
 func TestIPv4Addresses(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
