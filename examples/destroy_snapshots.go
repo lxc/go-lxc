@@ -23,8 +23,8 @@
 package main
 
 import (
-	"github.com/caglar10ur/lxc"
 	"log"
+	"github.com/caglar10ur/lxc"
 )
 
 func main() {

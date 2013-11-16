@@ -7,3 +7,4 @@ clean:
 	@$(foreach file,$(ALL_FILES),rm -f $(file);)
 format:
 	@gofmt -s -w *.go
+	@goimports -w *.go

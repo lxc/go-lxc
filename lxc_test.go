@@ -10,7 +10,6 @@
 package lxc_test
 
 import (
-	"github.com/caglar10ur/lxc"
 	"math/rand"
 	"runtime"
 	"strconv"
@@ -18,6 +17,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"github.com/caglar10ur/lxc"
 )
 
 const (

@@ -1,6 +1,7 @@
 all: format vet lint
 format:
 	@gofmt -s -w *.go
+	@goimports -w *.go
 test:
 	@sudo `which go` test -v
 doc:

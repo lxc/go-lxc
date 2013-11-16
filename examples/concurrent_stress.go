@@ -24,11 +24,10 @@ package main
 
 import (
 	"flag"
-	"github.com/caglar10ur/gologger"
-	"github.com/caglar10ur/lxc"
 	"runtime"
 	"strconv"
 	"sync"
+	"github.com/caglar10ur/lxc"
 )
 
 var (

@@ -24,9 +24,9 @@ package main
 
 import (
 	"flag"
-	"github.com/caglar10ur/lxc"
 	"log"
 	"time"
+	"github.com/caglar10ur/lxc"
 )
 
 var (
