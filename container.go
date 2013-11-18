@@ -322,7 +322,7 @@ func (lxc *Container) Start() error {
 	lxc.Lock()
 	defer lxc.Unlock()
 
-	if !bool(C.lxc_container_start(lxc.container, C.int(0), nil)) {
+	if !bool(C.lxc_container_start(lxc.container, 0, nil)) {
 		return fmt.Errorf(errStartFailed, C.GoString(lxc.container.name))
 	}
 	return nil
@@ -332,22 +332,22 @@ func (lxc *Container) Start() error {
 func (lxc *Container) Execute(args ...string) error {
 	// FIXME: disable for now
 	return fmt.Errorf("NOT SUPPORTED")
-/*
-	if lxc.Defined() || lxc.Running() {
-		return fmt.Errorf(errAlreadyDefined, C.GoString(lxc.container.name))
-	}
+	/*
+		if lxc.Defined() || lxc.Running() {
+			return fmt.Errorf(errAlreadyDefined, C.GoString(lxc.container.name))
+		}
 
-	lxc.Lock()
-	defer lxc.Unlock()
+		lxc.Lock()
+		defer lxc.Unlock()
 
-	cargs := makeNullTerminatedArgs(args)
-	defer freeNullTerminatedArgs(cargs, len(args))
+		cargs := makeNullTerminatedArgs(args)
+		defer freeNullTerminatedArgs(cargs, len(args))
 
-	if !bool(C.lxc_container_start(lxc.container, C.int(1), cargs)) {
-		return fmt.Errorf(errExecuteFailed, C.GoString(lxc.container.name))
-	}
-	return nil
-*/
+		if !bool(C.lxc_container_start(lxc.container, 1, cargs)) {
+			return fmt.Errorf(errExecuteFailed, C.GoString(lxc.container.name))
+		}
+		return nil
+	*/
 }
 
 // Stop stops the container
