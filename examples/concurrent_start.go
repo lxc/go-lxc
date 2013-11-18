@@ -55,7 +55,7 @@ func main() {
 
 			c.SetDaemonize()
 			log.Printf("Starting the container (%d)...\n", i)
-			if err := c.Start(false); err != nil {
+			if err := c.Start(); err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
 			wg.Done()

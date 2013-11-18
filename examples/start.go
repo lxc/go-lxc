@@ -54,7 +54,7 @@ func main() {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
-	if err := c.Start(false); err != nil {
+	if err := c.Start(); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

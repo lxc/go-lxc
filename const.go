@@ -63,6 +63,7 @@ const (
 	errSettingSwapLimitFailed        = "setting swap limit for the container %q failed"
 	errShutdownFailed                = "shutting down the container %q failed"
 	errStartFailed                   = "starting the container %q failed"
+	errExecuteFailed                 = "executing args in temporary container %q failed"
 	errStopFailed                    = "stopping the container %q failed"
 	errSwapLimit                     = "your kernel does not support cgroup swap controller"
 	errUnfreezeFailed                = "unfreezing the container %q failed"

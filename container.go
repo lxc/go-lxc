@@ -277,7 +277,7 @@ func (lxc *Container) Create(template string, args ...string) error {
 	// bdevtypes:
 	// "btrfs", "zfs", "lvm", "dir"
 	//
-	// best tries to find the best backing store type, according to our opinionated preferences we are using it for now
+	// best tries to find the best backing store type
 	//
 	// bdev_specs:
 	// zfs requires zfsroot
@@ -294,13 +294,13 @@ func (lxc *Container) Create(template string, args ...string) error {
 	ctemplate := C.CString(template)
 	defer C.free(unsafe.Pointer(ctemplate))
 
-	cbdevtype := C.CString("best")
+	cbdevtype := C.CString("dir")
 	defer C.free(unsafe.Pointer(cbdevtype))
 
 	ret := false
 	if args != nil {
-		cargs := makeArgs(args)
-		defer freeArgs(cargs, len(args))
+		cargs := makeNullTerminatedArgs(args)
+		defer freeNullTerminatedArgs(cargs, len(args))
 
 		ret = bool(C.lxc_container_create(lxc.container, ctemplate, cbdevtype, C.int(lxc.verbosity), cargs))
 	} else {
@@ -314,7 +314,7 @@ func (lxc *Container) Create(template string, args ...string) error {
 }
 
 // Start starts the container
-func (lxc *Container) Start(useinit bool, args ...string) error {
+func (lxc *Container) Start() error {
 	if err := lxc.ensureDefinedButNotRunning(); err != nil {
 		return err
 	}
@@ -322,26 +322,32 @@ func (lxc *Container) Start(useinit bool, args ...string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
 
-	ret := false
-
-	cuseinit := 0
-	if useinit {
-		cuseinit = 1
-	}
-
-	if args != nil {
-		cargs := makeArgs(args)
-		defer freeArgs(cargs, len(args))
-
-		ret = bool(C.lxc_container_start(lxc.container, C.int(cuseinit), cargs))
-	} else {
-		ret = bool(C.lxc_container_start(lxc.container, C.int(cuseinit), nil))
-	}
-
-	if !ret {
+	if !bool(C.lxc_container_start(lxc.container, C.int(0), nil)) {
 		return fmt.Errorf(errStartFailed, C.GoString(lxc.container.name))
 	}
 	return nil
+}
+
+// Execute executes the given argument in a temporary container
+func (lxc *Container) Execute(args ...string) error {
+	// FIXME: disable for now
+	return fmt.Errorf("NOT SUPPORTED")
+/*
+	if lxc.Defined() || lxc.Running() {
+		return fmt.Errorf(errAlreadyDefined, C.GoString(lxc.container.name))
+	}
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
+	cargs := makeNullTerminatedArgs(args)
+	defer freeNullTerminatedArgs(cargs, len(args))
+
+	if !bool(C.lxc_container_start(lxc.container, C.int(1), cargs)) {
+		return fmt.Errorf(errExecuteFailed, C.GoString(lxc.container.name))
+	}
+	return nil
+*/
 }
 
 // Stop stops the container

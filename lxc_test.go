@@ -201,7 +201,7 @@ func TestConcurrentStart(t *testing.T) {
 			defer lxc.PutContainer(z)
 
 			z.SetDaemonize()
-			if err := z.Start(false); err != nil {
+			if err := z.Start(); err != nil {
 				t.Errorf(err.Error())
 			}
 
@@ -308,7 +308,7 @@ func TestStart(t *testing.T) {
 	defer lxc.PutContainer(z)
 
 	z.SetDaemonize()
-	if err := z.Start(false); err != nil {
+	if err := z.Start(); err != nil {
 		t.Errorf(err.Error())
 	}
 
@@ -760,7 +760,7 @@ func TestStop(t *testing.T) {
 	defer lxc.PutContainer(z)
 
 	z.SetDaemonize()
-	if err := z.Start(false); err != nil {
+	if err := z.Start(); err != nil {
 		t.Errorf(err.Error())
 	}
 
