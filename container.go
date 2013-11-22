@@ -16,6 +16,7 @@ import "C"
 
 import (
 	"fmt"
+	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
@@ -329,17 +330,27 @@ func (lxc *Container) Start() error {
 }
 
 // Execute executes the given argument in a temporary container
-func (lxc *Container) Execute(args ...string) error {
-	// FIXME: disable for now
-	return fmt.Errorf("NOT SUPPORTED")
+func (lxc *Container) Execute(args ...string) ([]byte, error) {
+	if lxc.Defined() {
+		return nil, fmt.Errorf(errAlreadyDefined, C.GoString(lxc.container.name))
+	}
+
+	cargs := []string{"lxc-execute", "-n", lxc.Name(), "-P", lxc.ConfigPath(), "--"}
+	cargs = append(cargs, args...)
+
+	lxc.Lock()
+	defer lxc.Unlock()
+
 	/*
-		if lxc.Defined() || lxc.Running() {
-			return fmt.Errorf(errAlreadyDefined, C.GoString(lxc.container.name))
-		}
+	 * FIXME: Go runtime and src/lxc/start.c signal_handler are not playing nice together so use lxc-execute for now
+	 */
+	output, err := exec.Command(cargs[0], cargs[1:]...).CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf(errExecuteFailed, C.GoString(lxc.container.name))
+	}
 
-		lxc.Lock()
-		defer lxc.Unlock()
-
+	return output, nil
+	/*
 		cargs := makeNullTerminatedArgs(args)
 		defer freeNullTerminatedArgs(cargs, len(args))
 
