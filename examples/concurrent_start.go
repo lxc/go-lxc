@@ -54,7 +54,7 @@ func main() {
 			}
 			defer lxc.PutContainer(c)
 
-			c.SetDaemonize()
+			c.WantDaemonize(true)
 			log.Printf("Starting the container (%d)...\n", i)
 			if err := c.Start(); err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())

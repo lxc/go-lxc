@@ -198,27 +198,26 @@ func (lxc *Container) Daemonize() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
 
-	return bool(lxc.container.daemonize != 0)
+	return bool(lxc.container.daemonize)
 }
 
-// SetDaemonize sets the daemonize flag
-func (lxc *Container) SetDaemonize() error {
+// WantDaemonize sets the daemonize flag
+func (lxc *Container) WantDaemonize(state bool) error {
 	lxc.Lock()
 	defer lxc.Unlock()
 
-	C.lxc_container_want_daemonize(lxc.container)
-	if bool(lxc.container.daemonize == 0) {
+	if !bool(C.lxc_container_want_daemonize(lxc.container, C.bool(state))) {
 		return fmt.Errorf(errDaemonizeFailed, C.GoString(lxc.container.name))
 	}
 	return nil
 }
 
-// SetCloseAllFds sets the close_all_fds flag for the container
-func (lxc *Container) SetCloseAllFds() error {
+// WantCloseAllFds sets the close_all_fds flag for the container
+func (lxc *Container) WantCloseAllFds(state bool) error {
 	lxc.Lock()
 	defer lxc.Unlock()
 
-	if !bool(C.lxc_container_want_close_all_fds(lxc.container)) {
+	if !bool(C.lxc_container_want_close_all_fds(lxc.container, C.bool(state))) {
 		return fmt.Errorf(errCloseAllFdsFailed, C.GoString(lxc.container.name))
 	}
 	return nil

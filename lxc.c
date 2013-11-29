@@ -37,12 +37,12 @@ pid_t lxc_container_init_pid(struct lxc_container *c) {
 	return c->init_pid(c);
 }
 
-void lxc_container_want_daemonize(struct lxc_container *c) {
-	c->want_daemonize(c);
+bool lxc_container_want_daemonize(struct lxc_container *c, bool state) {
+	return c->want_daemonize(c, state);
 }
 
-bool lxc_container_want_close_all_fds(struct lxc_container *c) {
-	return c->want_close_all_fds(c);
+bool lxc_container_want_close_all_fds(struct lxc_container *c, bool state) {
+	return c->want_close_all_fds(c, state);
 }
 
 bool lxc_container_create(struct lxc_container *c, char *t, char *bdevtype, int flags, char **argv) {

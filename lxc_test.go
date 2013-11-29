@@ -201,7 +201,7 @@ func TestConcurrentStart(t *testing.T) {
 			}
 			defer lxc.PutContainer(z)
 
-			z.SetDaemonize()
+			z.WantDaemonize(true)
 			if err := z.Start(); err != nil {
 				t.Errorf(err.Error())
 			}
@@ -308,7 +308,7 @@ func TestStart(t *testing.T) {
 	}
 	defer lxc.PutContainer(z)
 
-	z.SetDaemonize()
+	z.WantDaemonize(true)
 	if err := z.Start(); err != nil {
 		t.Errorf(err.Error())
 	}
@@ -342,14 +342,14 @@ func TestRunning(t *testing.T) {
 		t.Errorf("Checking the container failed...")
 	}
 }
-func TestSetDaemonize(t *testing.T) {
+func TestWantDaemonize(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(z)
 
-	z.SetDaemonize()
+	z.WantDaemonize(true)
 	if !z.Daemonize() {
 		t.Errorf("Daemonize failed...")
 	}
@@ -760,7 +760,7 @@ func TestStop(t *testing.T) {
 	}
 	defer lxc.PutContainer(z)
 
-	z.SetDaemonize()
+	z.WantDaemonize(true)
 	if err := z.Start(); err != nil {
 		t.Errorf(err.Error())
 	}
