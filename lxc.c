@@ -9,7 +9,6 @@
 
 #include <stdbool.h>
 
-#include <lxc/lxc.h>
 #include <lxc/lxccontainer.h>
 #include <lxc/attach_options.h>
 

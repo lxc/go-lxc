@@ -9,8 +9,6 @@
 
 package lxc
 
-// #include <lxc/lxc.h>
-// #include <lxc/log.h>
 // #include <lxc/lxccontainer.h>
 import "C"
 
@@ -70,21 +68,21 @@ type State int
 
 const (
 	// STOPPED means container is not running
-	STOPPED State = C.STOPPED
+	STOPPED State = iota
 	// STARTING means container is starting
-	STARTING State = C.STARTING
+	STARTING
 	// RUNNING means container is running
-	RUNNING State = C.RUNNING
+	RUNNING
 	// STOPPING means container is stopping
-	STOPPING State = C.STOPPING
+	STOPPING
 	// ABORTING means container is aborting
-	ABORTING State = C.ABORTING
+	ABORTING
 	// FREEZING means container is freezing
-	FREEZING State = C.FREEZING
+	FREEZING
 	// FROZEN means containe is frozen
-	FROZEN State = C.FROZEN
+	FROZEN
 	// THAWED means container is thawed
-	THAWED State = C.THAWED
+	THAWED
 )
 
 var stateMap = map[string]State{
@@ -173,23 +171,23 @@ type LogLevel int
 
 const (
 	// TRACE priority
-	TRACE LogLevel = C.LXC_LOG_PRIORITY_TRACE
+	TRACE LogLevel = iota
 	// DEBUG priority
-	DEBUG LogLevel = C.LXC_LOG_PRIORITY_DEBUG
+	DEBUG
 	// INFO priority
-	INFO LogLevel = C.LXC_LOG_PRIORITY_INFO
+	INFO
 	// NOTICE priority
-	NOTICE LogLevel = C.LXC_LOG_PRIORITY_NOTICE
+	NOTICE
 	// WARN priority
-	WARN LogLevel = C.LXC_LOG_PRIORITY_WARN
+	WARN
 	// ERROR priority
-	ERROR LogLevel = C.LXC_LOG_PRIORITY_ERROR
+	ERROR
 	// CRIT priority
-	CRIT LogLevel = C.LXC_LOG_PRIORITY_CRIT
+	CRIT
 	// ALERT priority
-	ALERT LogLevel = C.LXC_LOG_PRIORITY_ALERT
+	ALERT
 	// FATAL priority
-	FATAL LogLevel = C.LXC_LOG_PRIORITY_FATAL
+	FATAL
 )
 
 var logLevelMap = map[string]LogLevel{

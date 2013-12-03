@@ -11,7 +11,6 @@
 package lxc
 
 // #cgo pkg-config: lxc
-// #include <lxc/lxc.h>
 // #include <lxc/lxccontainer.h>
 // #include "lxc.h"
 import "C"
