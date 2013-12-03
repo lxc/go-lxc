@@ -60,7 +60,7 @@ func (lxc *Container) ensureDefinedButNotRunning() error {
 	return nil
 }
 
-// Name returns container's name
+// Name returns the name of the container
 func (lxc *Container) Name() string {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -68,7 +68,7 @@ func (lxc *Container) Name() string {
 	return C.GoString(lxc.container.name)
 }
 
-// Defined returns whether the container is already defined or not
+// Defined returns true if the container is already defined
 func (lxc *Container) Defined() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -76,7 +76,7 @@ func (lxc *Container) Defined() bool {
 	return bool(C.lxc_container_defined(lxc.container))
 }
 
-// Running returns whether the container is already running or not
+// Running returns true if the container is already running
 func (lxc *Container) Running() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -84,7 +84,7 @@ func (lxc *Container) Running() bool {
 	return bool(C.lxc_container_running(lxc.container))
 }
 
-// MayControl returns whether the container is already running or not
+// MayControl returns true if the caller may control the container
 func (lxc *Container) MayControl() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -108,7 +108,7 @@ func (lxc *Container) CreateSnapshot() error {
 	return nil
 }
 
-// RestoreSnapshot creates a new snapshot
+// RestoreSnapshot creates a new container based on a snapshot
 func (lxc *Container) RestoreSnapshot(snapshot Snapshot, name string) error {
 	if !lxc.Defined() {
 		return fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
@@ -129,7 +129,7 @@ func (lxc *Container) RestoreSnapshot(snapshot Snapshot, name string) error {
 	return nil
 }
 
-// DestroySnapshot destroys the snapshot
+// DestroySnapshot destroys the specified snapshot
 func (lxc *Container) DestroySnapshot(snapshot Snapshot) error {
 	if !lxc.Defined() {
 		return fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
@@ -147,7 +147,7 @@ func (lxc *Container) DestroySnapshot(snapshot Snapshot) error {
 	return nil
 }
 
-// Snapshots lists the snapshot of given container
+// Snapshots returns the list of container snapshots
 func (lxc *Container) Snapshots() ([]Snapshot, error) {
 	if !lxc.Defined() {
 		return nil, fmt.Errorf(errNotDefined, C.GoString(lxc.container.name))
@@ -176,7 +176,7 @@ func (lxc *Container) Snapshots() ([]Snapshot, error) {
 	return snapshots, nil
 }
 
-// State returns the container's state
+// State returns the state of the container
 func (lxc *Container) State() State {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -184,7 +184,7 @@ func (lxc *Container) State() State {
 	return stateMap[C.GoString(C.lxc_container_state(lxc.container))]
 }
 
-// InitPID returns the container's PID
+// InitPID returns the process ID of the container's init process seen from outside the container
 func (lxc *Container) InitPID() int {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -192,7 +192,7 @@ func (lxc *Container) InitPID() int {
 	return int(C.lxc_container_init_pid(lxc.container))
 }
 
-// Daemonize returns whether the daemonize flag is set
+// Daemonize returns whether the container wished to be daemonized
 func (lxc *Container) Daemonize() bool {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -200,7 +200,7 @@ func (lxc *Container) Daemonize() bool {
 	return bool(lxc.container.daemonize)
 }
 
-// WantDaemonize sets the daemonize flag
+// WantDaemonize sets the daemonize flag for the container
 func (lxc *Container) WantDaemonize(state bool) error {
 	lxc.Lock()
 	defer lxc.Unlock()
@@ -250,7 +250,7 @@ func (lxc *Container) Freeze() error {
 	return nil
 }
 
-// Unfreeze unfreezes the frozen container
+// Unfreeze thaws the frozen container
 func (lxc *Container) Unfreeze() error {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
@@ -327,7 +327,7 @@ func (lxc *Container) Start() error {
 	return nil
 }
 
-// Execute executes the given argument in a temporary container
+// Execute executes the given command in a temporary container
 func (lxc *Container) Execute(args ...string) ([]byte, error) {
 	if lxc.Defined() {
 		return nil, fmt.Errorf(errAlreadyDefined, C.GoString(lxc.container.name))
@@ -468,7 +468,7 @@ func (lxc *Container) CloneToOverlayFS(name string) error {
 	return lxc.Clone(name, CloneSnapshot, OverlayFS)
 }
 
-// Wait waits till the container changes its state or timeouts
+// Wait waits for container to reach a given state or timeouts
 func (lxc *Container) Wait(state State, timeout int) bool {
 	lxc.Lock()
 	defer lxc.Unlock()
@@ -491,7 +491,7 @@ func (lxc *Container) ConfigFileName() string {
 	return C.GoString(configFileName)
 }
 
-// ConfigItem returns the value of the given key
+// ConfigItem returns the value of the given config item
 func (lxc *Container) ConfigItem(key string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -507,7 +507,7 @@ func (lxc *Container) ConfigItem(key string) []string {
 	return strings.Split(ret, "\n")
 }
 
-// SetConfigItem sets the value of given key
+// SetConfigItem sets the value of the given config item
 func (lxc *Container) SetConfigItem(key string, value string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
@@ -524,7 +524,7 @@ func (lxc *Container) SetConfigItem(key string, value string) error {
 	return nil
 }
 
-// CgroupItem returns the value of the given key
+// CgroupItem returns the value of the given cgroup subsystem value
 func (lxc *Container) CgroupItem(key string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -540,7 +540,7 @@ func (lxc *Container) CgroupItem(key string) []string {
 	return strings.Split(ret, "\n")
 }
 
-// SetCgroupItem sets the value of given key
+// SetCgroupItem sets the value of given cgroup subsystem value
 func (lxc *Container) SetCgroupItem(key string, value string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
@@ -557,7 +557,7 @@ func (lxc *Container) SetCgroupItem(key string, value string) error {
 	return nil
 }
 
-// ClearConfigItem clears the value of given key
+// ClearConfigItem clears the value of given config item
 func (lxc *Container) ClearConfigItem(key string) error {
 	lxc.Lock()
 	defer lxc.Unlock()
@@ -571,7 +571,7 @@ func (lxc *Container) ClearConfigItem(key string) error {
 	return nil
 }
 
-// ConfigKeys returns the name of the config keys
+// ConfigKeys returns the names of the config items
 func (lxc *Container) ConfigKeys(key ...string) []string {
 	lxc.RLock()
 	defer lxc.RUnlock()
@@ -644,7 +644,7 @@ func (lxc *Container) SetConfigPath(path string) error {
 	return nil
 }
 
-// MemoryUsage returns memory usage in bytes
+// MemoryUsage returns memory usage of the container in bytes
 func (lxc *Container) MemoryUsage() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
@@ -660,7 +660,7 @@ func (lxc *Container) MemoryUsage() (ByteSize, error) {
 	return ByteSize(memUsed), err
 }
 
-// SwapUsage returns swap usage in bytes
+// SwapUsage returns swap usage of the container in bytes
 func (lxc *Container) SwapUsage() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
@@ -676,7 +676,7 @@ func (lxc *Container) SwapUsage() (ByteSize, error) {
 	return ByteSize(swapUsed), err
 }
 
-// MemoryLimit returns memory limit in bytes
+// MemoryLimit returns memory limit of the container in bytes
 func (lxc *Container) MemoryLimit() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
@@ -692,7 +692,7 @@ func (lxc *Container) MemoryLimit() (ByteSize, error) {
 	return ByteSize(memLimit), err
 }
 
-// SetMemoryLimit sets memory limit in bytes
+// SetMemoryLimit sets memory limit of the container in bytes
 func (lxc *Container) SetMemoryLimit(limit ByteSize) error {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
@@ -704,7 +704,7 @@ func (lxc *Container) SetMemoryLimit(limit ByteSize) error {
 	return nil
 }
 
-// SwapLimit returns the swap limit in bytes
+// SwapLimit returns the swap limit of the container in bytes
 func (lxc *Container) SwapLimit() (ByteSize, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return -1, err
@@ -720,7 +720,7 @@ func (lxc *Container) SwapLimit() (ByteSize, error) {
 	return ByteSize(swapLimit), err
 }
 
-// SetSwapLimit sets memory limit in bytes
+// SetSwapLimit sets memory limit of the container in bytes
 func (lxc *Container) SetSwapLimit(limit ByteSize) error {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
@@ -853,7 +853,7 @@ func (lxc *Container) AttachRunShell() error {
 	return nil
 }
 
-// AttachRunCommand runs user specified command inside the container and waits it to exit
+// AttachRunCommand runs the user specified command inside the container and waits it to exit
 func (lxc *Container) AttachRunCommand(args ...string) error {
 	// FIXME: support lxc_attach_options_t, currently we use LXC_ATTACH_OPTIONS_DEFAULT
 	if args == nil {
@@ -877,7 +877,7 @@ func (lxc *Container) AttachRunCommand(args ...string) error {
 	return nil
 }
 
-// Interfaces returns the name of the interfaces from the container
+// Interfaces returns the name of the network interfaces from the container
 func (lxc *Container) Interfaces() ([]string, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return nil, err
@@ -893,7 +893,7 @@ func (lxc *Container) Interfaces() ([]string, error) {
 	return convertArgs(result), nil
 }
 
-// IPAddress returns the IP address of the given interface
+// IPAddress returns the IP address of the given network interface from the container
 func (lxc *Container) IPAddress(interfaceName string) ([]string, error) {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return nil, err
@@ -993,7 +993,7 @@ func (lxc *Container) SetLogLevel(level LogLevel) error {
 	return nil
 }
 
-// AddDeviceNode adds the device node into given container
+// AddDeviceNode adds specified device to the container
 func (lxc *Container) AddDeviceNode(source string, destination ...string) error {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
@@ -1022,7 +1022,7 @@ func (lxc *Container) AddDeviceNode(source string, destination ...string) error 
 
 }
 
-// RemoveDeviceNode removes the device node from given container
+// RemoveDeviceNode removes the specified device from the container
 func (lxc *Container) RemoveDeviceNode(source string, destination ...string) error {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
