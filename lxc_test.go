@@ -64,6 +64,17 @@ func TestSetConfigPath(t *testing.T) {
 	}
 }
 
+func TestGetContainer(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	lxc.GetContainer(z)
+	lxc.PutContainer(z)
+}
+
 func TestConcurrentDefined_Negative(t *testing.T) {
 	var wg sync.WaitGroup
 
@@ -98,6 +109,28 @@ func TestDefined_Negative(t *testing.T) {
 	if z.Defined() {
 		t.Errorf("Defined_Negative failed...")
 	}
+}
+
+func TestExecute(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if _, err := z.Execute("/bin/true"); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestSetVerbosity(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	z.SetVerbosity(lxc.Quiet)
 }
 
 func TestCreate(t *testing.T) {
@@ -223,15 +256,27 @@ func TestContainerNames(t *testing.T) {
 	}
 }
 
+func TestDefinedContainerNames(t *testing.T) {
+	if lxc.DefinedContainerNames() == nil {
+		t.Errorf("DefinedContainerNames failed...")
+	}
+}
+
 func TestActiveContainerNames(t *testing.T) {
 	if lxc.ActiveContainerNames() == nil {
-		t.Errorf("ContainerNames failed...")
+		t.Errorf("ActiveContainerNames failed...")
 	}
 }
 
 func TestContainers(t *testing.T) {
 	if lxc.Containers() == nil {
 		t.Errorf("Containers failed...")
+	}
+}
+
+func TestDefinedContainers(t *testing.T) {
+	if lxc.DefinedContainers() == nil {
+		t.Errorf("DefinedContainers failed...")
 	}
 }
 
@@ -342,6 +387,7 @@ func TestRunning(t *testing.T) {
 		t.Errorf("Checking the container failed...")
 	}
 }
+
 func TestWantDaemonize(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
@@ -349,9 +395,44 @@ func TestWantDaemonize(t *testing.T) {
 	}
 	defer lxc.PutContainer(z)
 
-	z.WantDaemonize(true)
-	if !z.Daemonize() {
-		t.Errorf("Daemonize failed...")
+	if err := z.WantDaemonize(true); err != nil || !z.Daemonize() {
+		t.Errorf("WantDaemonize failed...")
+	}
+}
+
+func TestWantCloseAllFds(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if err := z.WantCloseAllFds(true); err != nil {
+		t.Errorf("WantCloseAllFds failed...")
+	}
+}
+
+func TestSetLogLevel(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if err := z.SetLogLevel(lxc.WARN); err != nil || z.LogLevel() != lxc.WARN {
+		t.Errorf("SetLogLevel( failed...")
+	}
+}
+
+func TestSetLogFile(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if err := z.SetLogFile("/tmp/" + ContainerName); err != nil || z.LogFile() != "/tmp/"+ContainerName {
+		t.Errorf("SetLogFile failed...")
 	}
 }
 
@@ -610,6 +691,42 @@ func TestSetSwapLimit(t *testing.T) {
 	}
 }
 
+func TestCPUTime(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if _, err := z.CPUTime(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestCPUTimePerCPU(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if _, err := z.CPUTimePerCPU(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestCPUStats(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if _, err := z.CPUStats(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestAttachRunCommand(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
@@ -695,6 +812,7 @@ func TestIPv6Addresses(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 }
+*/
 
 func TestReboot(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
@@ -703,14 +821,11 @@ func TestReboot(t *testing.T) {
 	}
 	defer lxc.PutContainer(z)
 
-	t.Logf("Rebooting the container...\n")
-	z.Reboot()
-
-	if z.Running() {
+	if err := z.Reboot(); err != nil {
 		t.Errorf("Rebooting the container failed...")
 	}
+	z.Wait(lxc.RUNNING, 30)
 }
-*/
 
 func TestConcurrentShutdown(t *testing.T) {
 	var wg sync.WaitGroup
@@ -727,6 +842,8 @@ func TestConcurrentShutdown(t *testing.T) {
 			if err := z.Shutdown(3); err != nil {
 				t.Errorf(err.Error())
 			}
+
+			z.Wait(lxc.STOPPED, 30)
 			if z.Running() {
 				t.Errorf("Shutting down the container failed...")
 			}
@@ -748,6 +865,7 @@ func TestShutdown(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
+	z.Wait(lxc.STOPPED, 30)
 	if z.Running() {
 		t.Errorf("Shutting down the container failed...")
 	}
@@ -769,6 +887,7 @@ func TestStop(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
+	z.Wait(lxc.STOPPED, 30)
 	if z.Running() {
 		t.Errorf("Stopping the container failed...")
 	}
