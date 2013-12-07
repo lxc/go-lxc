@@ -12,6 +12,10 @@ test:
 	@echo "$(OK_COLOR)==> Running go test $(NO_COLOR)"
 	@sudo `which go` test -v
 
+# requires https://codereview.appspot.com/34680044/
+cover:
+	@sudo `which go` test -v -covermode=count -coverprofile=coverage.out
+
 doc:
 	@`which godoc` github.com/caglar10ur/lxc | less
 

@@ -27,4 +27,5 @@ examples/start
 examples/stats
 examples/stop
 examples/unfreeze
+coverage.out
 tags
