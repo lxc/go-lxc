@@ -30,12 +30,14 @@ import (
 )
 
 var (
-	lxcpath string
-	name    string
+	lxcpath  string
+	template string
+	name     string
 )
 
 func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
+	flag.StringVar(&template, "template", "busybox", "Template to use")
 	flag.StringVar(&name, "name", "rubik", "Name of the container")
 	flag.Parse()
 }
@@ -49,7 +51,7 @@ func main() {
 
 	log.Printf("Creating container...\n")
 	c.SetVerbosity(lxc.Verbose)
-	if err := c.Create("ubuntu", "amd64"); err != nil {
+	if err := c.Create(template, "amd64"); err != nil {
 		log.Printf("ERROR: %s\n", err.Error())
 	}
 }
