@@ -44,11 +44,11 @@ bool lxc_container_want_close_all_fds(struct lxc_container *c, bool state) {
 	return c->want_close_all_fds(c, state);
 }
 
-bool lxc_container_create(struct lxc_container *c, char *t, char *bdevtype, int flags, char **argv) {
+bool lxc_container_create(struct lxc_container *c, const char *t, const char *bdevtype, int flags, char * const argv[]) {
 	return c->create(c, t, bdevtype, NULL, !!(flags & LXC_CREATE_QUIET), argv);
 }
 
-bool lxc_container_start(struct lxc_container *c, int useinit, char **argv) {
+bool lxc_container_start(struct lxc_container *c, int useinit, char * const argv[]) {
 	return c->start(c, useinit, argv);
 }
 
@@ -72,11 +72,11 @@ bool lxc_container_destroy(struct lxc_container *c) {
 	return c->destroy(c);
 }
 
-bool lxc_container_wait(struct lxc_container *c, char *state, int timeout) {
+bool lxc_container_wait(struct lxc_container *c, const char *state, int timeout) {
 	return c->wait(c, state, timeout);
 }
 
-char* lxc_container_get_config_item(struct lxc_container *c, char *key) {
+char* lxc_container_get_config_item(struct lxc_container *c, const char *key) {
 	int len = c->get_config_item(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
@@ -89,15 +89,15 @@ char* lxc_container_get_config_item(struct lxc_container *c, char *key) {
 	return value;
 }
 
-bool lxc_container_set_config_item(struct lxc_container *c, char *key, char *value) {
+bool lxc_container_set_config_item(struct lxc_container *c, const char *key, const char *value) {
 	return c->set_config_item(c, key, value);
 }
 
-bool lxc_container_clear_config_item(struct lxc_container *c, char *key) {
+bool lxc_container_clear_config_item(struct lxc_container *c, const char *key) {
 	return c->clear_config_item(c, key);
 }
 
-char* lxc_container_get_keys(struct lxc_container *c, char *key) {
+char* lxc_container_get_keys(struct lxc_container *c, const char *key) {
 	int len = c->get_keys(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
@@ -110,7 +110,7 @@ char* lxc_container_get_keys(struct lxc_container *c, char *key) {
 	return value;
 }
 
-char* lxc_container_get_cgroup_item(struct lxc_container *c, char *key) {
+char* lxc_container_get_cgroup_item(struct lxc_container *c, const char *key) {
 	int len = c->get_cgroup_item(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
@@ -123,7 +123,7 @@ char* lxc_container_get_cgroup_item(struct lxc_container *c, char *key) {
 	return value;
 }
 
-bool lxc_container_set_cgroup_item(struct lxc_container *c, char *key, char *value) {
+bool lxc_container_set_cgroup_item(struct lxc_container *c, const char *key, const char *value) {
 	return c->set_cgroup_item(c, key, value);
 }
 
@@ -131,15 +131,15 @@ const char* lxc_container_get_config_path(struct lxc_container *c) {
 	return c->get_config_path(c);
 }
 
-bool lxc_container_set_config_path(struct lxc_container *c, char *path) {
+bool lxc_container_set_config_path(struct lxc_container *c, const char *path) {
 	return c->set_config_path(c, path);
 }
 
-bool lxc_container_load_config(struct lxc_container *c, char *alt_file) {
+bool lxc_container_load_config(struct lxc_container *c, const char *alt_file) {
 	return c->load_config(c, alt_file);
 }
 
-bool lxc_container_save_config(struct lxc_container *c, char *alt_file) {
+bool lxc_container_save_config(struct lxc_container *c, const char *alt_file) {
 	return c->save_config(c, alt_file);
 }
 
@@ -168,7 +168,7 @@ char** lxc_container_get_interfaces(struct lxc_container *c) {
 	return c->get_interfaces(c);
 }
 
-char** lxc_container_get_ips(struct lxc_container *c, char *interface, char *family, int scope) {
+char** lxc_container_get_ips(struct lxc_container *c, const char *interface, const char *family, int scope) {
 	return c->get_ips(c, interface, family, scope);
 }
 
@@ -215,11 +215,11 @@ int lxc_container_attach(struct lxc_container *c) {
 	return -1;
 }
 
-int lxc_container_attach_run_wait(struct lxc_container *c, char **argv) {
+int lxc_container_attach_run_wait(struct lxc_container *c, const char * const argv[]) {
 	int ret;
 	lxc_attach_options_t default_options = LXC_ATTACH_OPTIONS_DEFAULT;
 
-	ret = c->attach_run_wait(c, &default_options, argv[0], (const char * const*)argv);
+	ret = c->attach_run_wait(c, &default_options, argv[0], argv);
 	if (WIFEXITED(ret) && WEXITSTATUS(ret) == 255)
 		return -1;
 	return ret;
@@ -237,18 +237,18 @@ int lxc_container_snapshot_list(struct lxc_container *c, struct lxc_snapshot **r
 	return c->snapshot_list(c, ret);
 }
 
-bool lxc_container_snapshot_restore(struct lxc_container *c, char *snapname, char *newname) {
+bool lxc_container_snapshot_restore(struct lxc_container *c, const char *snapname, const char *newname) {
 	return c->snapshot_restore(c, snapname, newname);
 }
 
-bool lxc_container_snapshot_destroy(struct lxc_container *c, char *snapname) {
+bool lxc_container_snapshot_destroy(struct lxc_container *c, const char *snapname) {
 	return c->snapshot_destroy(c, snapname);
 }
 
-bool lxc_container_add_device_node(struct lxc_container *c, char *src_path, char *dest_path) {
+bool lxc_container_add_device_node(struct lxc_container *c, const char *src_path, const char *dest_path) {
 	return c->add_device_node(c, src_path, dest_path);
 }
 
-bool lxc_container_remove_device_node(struct lxc_container *c, char *src_path, char *dest_path) {
+bool lxc_container_remove_device_node(struct lxc_container *c, const char *src_path, const char *dest_path) {
 	return c->remove_device_node(c, src_path, dest_path);
 }
