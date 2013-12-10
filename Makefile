@@ -1,5 +1,5 @@
 NO_COLOR=\033[0m
-OK_COLOR=\033[32;01m
+OK_COLOR=\033[0;32m
 
 all: format vet lint
 
