@@ -468,6 +468,24 @@ func (lxc *Container) CloneToOverlayFS(name string) error {
 	return lxc.Clone(name, CloneSnapshot, OverlayFS)
 }
 
+// Rename renames the container
+func (lxc *Container) Rename(name string) error {
+	if err := lxc.ensureDefinedButNotRunning(); err != nil {
+		return err
+	}
+
+	lxc.mu.Lock()
+	defer lxc.mu.Unlock()
+
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+
+	if !bool(C.lxc_container_rename(lxc.container, cname)) {
+		return fmt.Errorf(errRenameFailed, C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
 // Wait waits for container to reach a given state or timeouts
 func (lxc *Container) Wait(state State, timeout int) bool {
 	lxc.mu.Lock()
@@ -836,9 +854,8 @@ func (lxc *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) e
 	return nil
 }
 
-// AttachRunShell runs a shell inside the container
-func (lxc *Container) AttachRunShell() error {
-	// FIXME: support lxc_attach_options_t, currently we use LXC_ATTACH_OPTIONS_DEFAULT
+// AttachShell runs a shell inside the container
+func (lxc *Container) AttachShell() error {
 	if err := lxc.ensureDefinedAndRunning(); err != nil {
 		return err
 	}
@@ -846,16 +863,29 @@ func (lxc *Container) AttachRunShell() error {
 	lxc.mu.Lock()
 	defer lxc.mu.Unlock()
 
-	ret := int(C.lxc_container_attach(lxc.container))
-	if ret < 0 {
+	if int(C.lxc_container_attach(lxc.container, false)) < 0 {
 		return fmt.Errorf(errAttachFailed, C.GoString(lxc.container.name))
 	}
 	return nil
 }
 
-// AttachRunCommand runs the user specified command inside the container and waits it to exit
-func (lxc *Container) AttachRunCommand(args ...string) error {
-	// FIXME: support lxc_attach_options_t, currently we use LXC_ATTACH_OPTIONS_DEFAULT
+// AttachShellWithClearEnvironment runs a shell inside the container and clears all environment variables before attaching
+func (lxc *Container) AttachShellWithClearEnvironment() error {
+	if err := lxc.ensureDefinedAndRunning(); err != nil {
+		return err
+	}
+
+	lxc.mu.Lock()
+	defer lxc.mu.Unlock()
+
+	if int(C.lxc_container_attach(lxc.container, true)) < 0 {
+		return fmt.Errorf(errAttachFailed, C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
+// RunCommand runs the user specified command inside the container and waits it to exit
+func (lxc *Container) RunCommand(args ...string) error {
 	if args == nil {
 		return fmt.Errorf(errInsufficientNumberOfArguments)
 	}
@@ -870,8 +900,29 @@ func (lxc *Container) AttachRunCommand(args ...string) error {
 	cargs := makeNullTerminatedArgs(args)
 	defer freeNullTerminatedArgs(cargs, len(args))
 
-	ret := int(C.lxc_container_attach_run_wait(lxc.container, cargs))
-	if ret < 0 {
+	if int(C.lxc_container_attach_run_wait(lxc.container, false, cargs)) < 0 {
+		return fmt.Errorf(errAttachFailed, C.GoString(lxc.container.name))
+	}
+	return nil
+}
+
+// RunCommandWithClearEnvironment runs the user specified command inside the container and waits it to exit. It also clears all environment variables before attaching.
+func (lxc *Container) RunCommandWithClearEnvironment(args ...string) error {
+	if args == nil {
+		return fmt.Errorf(errInsufficientNumberOfArguments)
+	}
+
+	if err := lxc.ensureDefinedAndRunning(); err != nil {
+		return err
+	}
+
+	lxc.mu.Lock()
+	defer lxc.mu.Unlock()
+
+	cargs := makeNullTerminatedArgs(args)
+	defer freeNullTerminatedArgs(cargs, len(args))
+
+	if int(C.lxc_container_attach_run_wait(lxc.container, true, cargs)) < 0 {
 		return fmt.Errorf(errAttachFailed, C.GoString(lxc.container.name))
 	}
 	return nil

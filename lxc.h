@@ -17,6 +17,7 @@ extern bool lxc_container_load_config(struct lxc_container *c, const char *alt_f
 extern bool lxc_container_may_control(struct lxc_container *c);
 extern bool lxc_container_reboot(struct lxc_container *c);
 extern bool lxc_container_remove_device_node(struct lxc_container *c, const char *src_path, const char *dest_path);
+extern bool lxc_container_rename(struct lxc_container *c, const char *newname);
 extern bool lxc_container_running(struct lxc_container *c);
 extern bool lxc_container_save_config(struct lxc_container *c, const char *alt_file);
 extern bool lxc_container_set_cgroup_item(struct lxc_container *c, const char *key, const char *value);
@@ -39,8 +40,8 @@ extern char** lxc_container_get_ips(struct lxc_container *c, const char *interfa
 extern char* lxc_container_get_keys(struct lxc_container *c, const char *key);
 extern const char* lxc_container_get_config_path(struct lxc_container *c);
 extern const char* lxc_container_state(struct lxc_container *c);
-extern int lxc_container_attach_run_wait(struct lxc_container *c, const char * const argv[]);
-extern int lxc_container_attach(struct lxc_container *c);
+extern int lxc_container_attach_run_wait(struct lxc_container *c, bool clear_env, const char * const argv[]);
+extern int lxc_container_attach(struct lxc_container *c, bool clear_env);
 extern int lxc_container_console_getfd(struct lxc_container *c, int ttynum);
 extern int lxc_container_snapshot_list(struct lxc_container *c, struct lxc_snapshot **ret);
 extern int lxc_container_snapshot(struct lxc_container *c);

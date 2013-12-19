@@ -1,5 +1,5 @@
 /*
- * attach.go
+ * rename.go
  *
  * Copyright © 2013, S.Çağlar Onur
  *
@@ -31,14 +31,14 @@ import (
 
 var (
 	lxcpath string
+	newname string
 	name    string
-	clear   bool
 )
 
 func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
-	flag.StringVar(&name, "name", "rubik", "Name of the original container")
-	flag.BoolVar(&clear, "clear", false, "Attach with clear environment")
+	flag.StringVar(&newname, "newname", "kibur", "New name of the container")
+	flag.StringVar(&name, "name", "rubik", "Name of the container")
 	flag.Parse()
 }
 
@@ -49,26 +49,8 @@ func main() {
 	}
 	defer lxc.PutContainer(c)
 
-	if clear {
-		log.Printf("AttachShellWithClearEnvironment\n")
-		if err := c.AttachShellWithClearEnvironment(); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-
-		log.Printf("RunCommandWithClearEnvironment\n")
-		if err := c.RunCommandWithClearEnvironment("uname", "-a"); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-
-	} else {
-		log.Printf("AttachShell\n")
-		if err := c.AttachShell(); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-
-		log.Printf("RunCommand\n")
-		if err := c.RunCommand("uname", "-a"); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
+	log.Printf("Renaming container to %s...\n", newname)
+	if err := c.Rename(newname); err != nil {
+		log.Printf("ERROR: %s\n", err.Error())
 	}
 }

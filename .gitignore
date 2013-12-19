@@ -21,6 +21,7 @@ examples/list
 examples/list_keys
 examples/list_snapshots
 examples/reboot
+examples/rename
 examples/restore_snapshot
 examples/shutdown
 examples/start
