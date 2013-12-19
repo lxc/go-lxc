@@ -727,7 +727,7 @@ func TestCPUStats(t *testing.T) {
 	}
 }
 
-func TestAttachRunCommand(t *testing.T) {
+func TestRunCommand(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -735,7 +735,7 @@ func TestAttachRunCommand(t *testing.T) {
 	defer lxc.PutContainer(z)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	if err := z.AttachRunCommand(argsThree...); err != nil {
+	if err := z.RunCommand(argsThree...); err != nil {
 		t.Errorf(err.Error())
 	}
 }
