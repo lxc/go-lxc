@@ -19,8 +19,6 @@ const (
 const (
 	// CloneKeepName means do not edit the rootfs to change the hostname
 	CloneKeepName int = 1 << iota
-	// CloneCopyHooks means copy all hooks into the container directory
-	CloneCopyHooks
 	// CloneKeepMACAddr means do not change the mac address on network interfaces
 	CloneKeepMACAddr
 	// CloneSnapshot means snapshot the original filesystem(s)
