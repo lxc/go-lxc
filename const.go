@@ -23,6 +23,10 @@ const (
 	CloneKeepMACAddr
 	// CloneSnapshot means snapshot the original filesystem(s)
 	CloneSnapshot
+	// CloneKeepBdevType means use the same bdev type
+	CloneKeepBdevType
+	// CloneMaybeSnapshot means snapshot only if bdev supports it, else copy
+	CloneMaybeSnapshot
 )
 
 const (
