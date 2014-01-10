@@ -64,19 +64,27 @@ func Version() string {
 	return C.GoString(C.lxc_get_version())
 }
 
+// GlobalConfigItem returns the value of the given global config key
+func GlobalConfigItem(name string) string {
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+
+	return C.GoString(C.lxc_get_global_config_item(cname))
+}
+
 // DefaultConfigPath returns default config path
 func DefaultConfigPath() string {
-	return C.GoString(C.lxc_get_default_config_path())
+	return GlobalConfigItem("lxc.lxcpath")
 }
 
 // DefaultLvmVg returns default LVM volume group
 func DefaultLvmVg() string {
-	return C.GoString(C.lxc_get_default_lvm_vg())
+	return GlobalConfigItem("lxc.lvm_vg")
 }
 
 // DefaultZfsRoot returns default ZFS root
 func DefaultZfsRoot() string {
-	return C.GoString(C.lxc_get_default_zfs_root())
+	return GlobalConfigItem("lxc.zfsroot")
 }
 
 // ContainerNames returns the names of defined and active containers on the system.
