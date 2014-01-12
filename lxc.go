@@ -79,12 +79,12 @@ func DefaultConfigPath() string {
 
 // DefaultLvmVg returns default LVM volume group
 func DefaultLvmVg() string {
-	return GlobalConfigItem("lxc.lvm_vg")
+	return GlobalConfigItem("lxc.bdev.lvm.vg")
 }
 
 // DefaultZfsRoot returns default ZFS root
 func DefaultZfsRoot() string {
-	return GlobalConfigItem("lxc.zfsroot")
+	return GlobalConfigItem("lxc.bdec.zfs.root")
 }
 
 // ContainerNames returns the names of defined and active containers on the system.
