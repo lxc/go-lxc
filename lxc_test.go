@@ -740,6 +740,19 @@ func TestRunCommand(t *testing.T) {
 	}
 }
 
+func TestRunCommandWithClearEnvironment(t *testing.T) {
+	z, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
+	if err := z.RunCommandWithClearEnvironment(argsThree...); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestConsoleGetFD(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
