@@ -168,7 +168,7 @@ func TestCreateSnapshot(t *testing.T) {
 	}
 	defer lxc.PutContainer(z)
 
-	if err := z.CreateSnapshot(); err != nil {
+	if _, err := z.CreateSnapshot(); err != nil {
 		t.Errorf(err.Error())
 	}
 }

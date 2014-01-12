@@ -48,7 +48,7 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	log.Printf("Snapshoting the container...\n")
-	if err := c.CreateSnapshot(); err != nil {
+	if _, err := c.CreateSnapshot(); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

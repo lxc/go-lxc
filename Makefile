@@ -15,6 +15,7 @@ test:
 # requires https://codereview.appspot.com/34680044/
 cover:
 	@sudo `which go` test -v -covermode=count -coverprofile=coverage.out
+	@`which go` tool cover -func=coverage.out
 
 doc:
 	@`which godoc` github.com/caglar10ur/lxc | less

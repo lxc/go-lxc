@@ -93,19 +93,19 @@ func (lxc *Container) MayControl() bool {
 }
 
 // CreateSnapshot creates a new snapshot
-func (lxc *Container) CreateSnapshot() error {
+func (lxc *Container) CreateSnapshot() (*Snapshot, error) {
 	if err := lxc.ensureDefinedButNotRunning(); err != nil {
-		return err
+		return nil, err
 	}
 
 	lxc.mu.Lock()
 	defer lxc.mu.Unlock()
 
-	// FIXME: LXC C API returns the number of snapshots, should we return it as well?
-	if int(C.lxc_container_snapshot(lxc.container)) < 0 {
-		return fmt.Errorf(errCreateSnapshotFailed, C.GoString(lxc.container.name))
+	ret := int(C.lxc_container_snapshot(lxc.container))
+	if ret < 0 {
+		return nil, fmt.Errorf(errCreateSnapshotFailed, C.GoString(lxc.container.name))
 	}
-	return nil
+	return &Snapshot{Name: fmt.Sprintf("snap%d", ret)}, nil
 }
 
 // RestoreSnapshot creates a new container based on a snapshot

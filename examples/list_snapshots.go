@@ -33,7 +33,7 @@ func main() {
 		log.Printf("%s\n", v.Name())
 		l, err := v.Snapshots()
 		if err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
+			log.Printf("ERROR: %s\n", err.Error())
 		}
 
 		for _, s := range l {
