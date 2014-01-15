@@ -30,16 +30,16 @@ const (
 type BackendStore int
 
 const (
-	// BtrFS backendstore type
-	BtrFS BackendStore = iota
+	// Btrfs backendstore type
+	Btrfs BackendStore = iota
 	// Directory backendstore type
 	Directory
 	// LVM backendstore type
 	LVM
 	// ZFS backendstore type
 	ZFS
-	// OverlayFS backendstore type
-	OverlayFS
+	// Overlayfs backendstore type
+	Overlayfs
 	// Loopback backendstore type
 	Loopback
 )
@@ -51,11 +51,11 @@ func (t BackendStore) String() string {
 		return "dir"
 	case ZFS:
 		return "zfs"
-	case BtrFS:
+	case Btrfs:
 		return "btrfs"
 	case LVM:
 		return "lvm"
-	case OverlayFS:
+	case Overlayfs:
 		return "overlayfs"
 	case Loopback:
 		return "loopback"

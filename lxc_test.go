@@ -156,7 +156,7 @@ func TestClone(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if err := z.CloneToOverlayFS(CloneOverlayContainerName); err != nil {
+	if err := z.CloneToOverlayfs(CloneOverlayContainerName); err != nil {
 		t.Errorf(err.Error())
 	}
 }

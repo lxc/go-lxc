@@ -458,14 +458,14 @@ func (lxc *Container) CloneToDirectory(name string) error {
 	return lxc.Clone(name, 0, Directory)
 }
 
-// CloneToBtrFS clones the container using BtrFS backendstore
-func (lxc *Container) CloneToBtrFS(name string) error {
-	return lxc.Clone(name, 0, BtrFS)
+// CloneToBtrfs clones the container using Btrfs backendstore
+func (lxc *Container) CloneToBtrfs(name string) error {
+	return lxc.Clone(name, 0, Btrfs)
 }
 
-// CloneToOverlayFS clones the container using OverlayFS backendstore
-func (lxc *Container) CloneToOverlayFS(name string) error {
-	return lxc.Clone(name, CloneSnapshot, OverlayFS)
+// CloneToOverlayfs clones the container using Overlayfs backendstore
+func (lxc *Container) CloneToOverlayfs(name string) error {
+	return lxc.Clone(name, CloneSnapshot, Overlayfs)
 }
 
 // Rename renames the container

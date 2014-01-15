@@ -48,21 +48,21 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	directoryClone := name + "Directory"
-	overlayClone := name + "OverlayFS"
-	btrfsClone := name + "BtrFS"
+	overlayClone := name + "Overlayfs"
+	btrfsClone := name + "Btrfs"
 
 	log.Printf("Cloning the container using Directory backend...\n")
 	if err := c.CloneToDirectory(directoryClone); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
-	log.Printf("Cloning the container using OverlayFS backend...\n")
-	if err := c.CloneToOverlayFS(overlayClone); err != nil {
+	log.Printf("Cloning the container using Overlayfs backend...\n")
+	if err := c.CloneToOverlayfs(overlayClone); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
-	log.Printf("Cloning the container using BtrFS backend...\n")
-	if err := c.CloneToBtrFS(btrfsClone); err != nil {
+	log.Printf("Cloning the container using Btrfs backend...\n")
+	if err := c.CloneToBtrfs(btrfsClone); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }
