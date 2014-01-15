@@ -52,17 +52,17 @@ func main() {
 	btrfsClone := name + "Btrfs"
 
 	log.Printf("Cloning the container using Directory backend...\n")
-	if err := c.CloneToDirectory(directoryClone); err != nil {
+	if err := c.Clone(directoryClone); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
 	log.Printf("Cloning the container using Overlayfs backend...\n")
-	if err := c.CloneToOverlayfs(overlayClone); err != nil {
+	if err := c.CloneUsing(overlayClone, lxc.Overlayfs, lxc.CloneSnapshot); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
 	log.Printf("Cloning the container using Btrfs backend...\n")
-	if err := c.CloneToBtrfs(btrfsClone); err != nil {
+	if err := c.CloneUsing(btrfsClone, lxc.Btrfs, 0); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

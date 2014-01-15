@@ -152,11 +152,11 @@ func TestClone(t *testing.T) {
 	}
 	defer lxc.PutContainer(z)
 
-	if err := z.CloneToDirectory(CloneContainerName); err != nil {
+	if err := z.Clone(CloneContainerName); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	if err := z.CloneToOverlayfs(CloneOverlayContainerName); err != nil {
+	if err := z.CloneUsing(CloneOverlayContainerName, lxc.Overlayfs, lxc.CloneSnapshot|lxc.CloneKeepName|lxc.CloneKeepMACAddr); err != nil {
 		t.Errorf(err.Error())
 	}
 }

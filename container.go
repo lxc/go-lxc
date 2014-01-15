@@ -270,8 +270,8 @@ func (lxc *Container) Unfreeze() error {
 	return nil
 }
 
-// Create creates the container using given template and arguments
-func (lxc *Container) Create(template string, args ...string) error {
+// CreateUsing creates the container using given template and arguments with specified backend
+func (lxc *Container) CreateUsing(template string, backend BackendStore, args ...string) error {
 	// FIXME: Support bdevtype and bdev_specs
 	// bdevtypes:
 	// "btrfs", "zfs", "lvm", "dir"
@@ -293,23 +293,28 @@ func (lxc *Container) Create(template string, args ...string) error {
 	ctemplate := C.CString(template)
 	defer C.free(unsafe.Pointer(ctemplate))
 
-	cbdevtype := C.CString("dir")
-	defer C.free(unsafe.Pointer(cbdevtype))
+	cbackend := C.CString(backend.String())
+	defer C.free(unsafe.Pointer(cbackend))
 
 	ret := false
 	if args != nil {
 		cargs := makeNullTerminatedArgs(args)
 		defer freeNullTerminatedArgs(cargs, len(args))
 
-		ret = bool(C.lxc_container_create(lxc.container, ctemplate, cbdevtype, C.int(lxc.verbosity), cargs))
+		ret = bool(C.lxc_container_create(lxc.container, ctemplate, cbackend, C.int(lxc.verbosity), cargs))
 	} else {
-		ret = bool(C.lxc_container_create(lxc.container, ctemplate, cbdevtype, C.int(lxc.verbosity), nil))
+		ret = bool(C.lxc_container_create(lxc.container, ctemplate, cbackend, C.int(lxc.verbosity), nil))
 	}
 
 	if !ret {
 		return fmt.Errorf(errCreateFailed, C.GoString(lxc.container.name))
 	}
 	return nil
+}
+
+// Create creates the container using given template and arguments with Best backend
+func (lxc *Container) Create(template string, args ...string) error {
+	return lxc.CreateUsing(template, Best, args...)
 }
 
 // Start starts the container
@@ -419,8 +424,8 @@ func (lxc *Container) Destroy() error {
 	return nil
 }
 
-// Clone clones the container
-func (lxc *Container) Clone(name string, flags int, backend BackendStore) error {
+// CloneUsing clones the container using specified backend
+func (lxc *Container) CloneUsing(name string, backend BackendStore, flags CloneFlags) error {
 	// FIXME: support lxcpath, bdevtype, bdevdata, newsize and hookargs
 	//
 	// bdevtypes:
@@ -431,8 +436,6 @@ func (lxc *Container) Clone(name string, flags int, backend BackendStore) error 
 	// lvm requires lvname/vgname/thinpool as well as fstype and fssize
 	// btrfs requires nothing
 	// dir requires nothing
-	//
-	// flags: LXC_CLONE_SNAPSHOT || LXC_CLONE_KEEPNAME || LXC_CLONE_KEEPMACADDR || LXC_CLONE_COPYHOOKS
 	//
 	// newsize: for blockdev-backed backingstores
 	//
@@ -447,25 +450,18 @@ func (lxc *Container) Clone(name string, flags int, backend BackendStore) error 
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	if !bool(C.lxc_container_clone(lxc.container, cname, C.int(flags), C.CString(backend.String()))) {
+	cbackend := C.CString(backend.String())
+	defer C.free(unsafe.Pointer(cbackend))
+
+	if !bool(C.lxc_container_clone(lxc.container, cname, C.int(flags), cbackend)) {
 		return fmt.Errorf(errCloneFailed, C.GoString(lxc.container.name))
 	}
 	return nil
 }
 
-// CloneToDirectory clones the container using Directory backendstore
-func (lxc *Container) CloneToDirectory(name string) error {
-	return lxc.Clone(name, 0, Directory)
-}
-
-// CloneToBtrfs clones the container using Btrfs backendstore
-func (lxc *Container) CloneToBtrfs(name string) error {
-	return lxc.Clone(name, 0, Btrfs)
-}
-
-// CloneToOverlayfs clones the container using Overlayfs backendstore
-func (lxc *Container) CloneToOverlayfs(name string) error {
-	return lxc.Clone(name, CloneSnapshot, Overlayfs)
+// Clone clones the container using the Directory backendstore
+func (lxc *Container) Clone(name string) error {
+	return lxc.CloneUsing(name, Directory, 0)
 }
 
 // Rename renames the container
@@ -1061,13 +1057,13 @@ func (lxc *Container) AddDeviceNode(source string, destination ...string) error 
 		defer C.free(unsafe.Pointer(cdestination))
 
 		if !bool(C.lxc_container_add_device_node(lxc.container, csource, cdestination)) {
-			return fmt.Errorf("adding device %s to container %q failed", source, C.GoString(lxc.container.name))
+			return fmt.Errorf(errAddDeviceNodeFailed, source, C.GoString(lxc.container.name))
 		}
 		return nil
 	}
 
 	if !bool(C.lxc_container_add_device_node(lxc.container, csource, nil)) {
-		return fmt.Errorf("adding device %s to container %q failed", source, C.GoString(lxc.container.name))
+		return fmt.Errorf(errAddDeviceNodeFailed, source, C.GoString(lxc.container.name))
 	}
 	return nil
 
@@ -1090,13 +1086,13 @@ func (lxc *Container) RemoveDeviceNode(source string, destination ...string) err
 		defer C.free(unsafe.Pointer(cdestination))
 
 		if !bool(C.lxc_container_remove_device_node(lxc.container, csource, cdestination)) {
-			return fmt.Errorf("adding device %s to container %q failed", source, C.GoString(lxc.container.name))
+			return fmt.Errorf(errRemoveDeviceNodeFailed, source, C.GoString(lxc.container.name))
 		}
 		return nil
 	}
 
 	if !bool(C.lxc_container_remove_device_node(lxc.container, csource, nil)) {
-		return fmt.Errorf("adding device %s to container %q failed", source, C.GoString(lxc.container.name))
+		return fmt.Errorf(errRemoveDeviceNodeFailed, source, C.GoString(lxc.container.name))
 	}
 	return nil
 }

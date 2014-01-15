@@ -17,19 +17,7 @@ const (
 )
 
 const (
-	// CloneKeepName means do not edit the rootfs to change the hostname
-	CloneKeepName int = 1 << iota
-	// CloneKeepMACAddr means do not change the mac address on network interfaces
-	CloneKeepMACAddr
-	// CloneSnapshot means snapshot the original filesystem(s)
-	CloneSnapshot
-	// CloneKeepBdevType means use the same bdev type
-	CloneKeepBdevType
-	// CloneMaybeSnapshot means snapshot only if bdev supports it, else copy
-	CloneMaybeSnapshot
-)
-
-const (
+	errAddDeviceNodeFailed           = "adding device %s to container %q failed"
 	errAlreadyDefined                = "container %q already defined"
 	errAlreadyFrozen                 = "container %q is already frozen"
 	errAlreadyRunning                = "container %q is already running"
@@ -57,6 +45,7 @@ const (
 	errNotFrozen                     = "container %q is not frozen"
 	errNotRunning                    = "container %q is not running"
 	errRebootFailed                  = "rebooting the container %q failed"
+	errRemoveDeviceNodeFailed        = "removing device %s from container %q failed"
 	errRenameFailed                  = "renaming the container %q failed"
 	errRestoreSnapshotFailed         = "restoring the container %q failed"
 	errSaveConfigFailed              = "saving config file for the container %q failed (path: %s)"

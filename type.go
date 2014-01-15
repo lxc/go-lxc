@@ -42,6 +42,8 @@ const (
 	Overlayfs
 	// Loopback backendstore type
 	Loopback
+	// Best backendstore type
+	Best
 )
 
 // BackendStore as string
@@ -59,6 +61,8 @@ func (t BackendStore) String() string {
 		return "overlayfs"
 	case Loopback:
 		return "loopback"
+	case Best:
+		return "best"
 	}
 	return "<INVALID>"
 }
@@ -225,3 +229,19 @@ func (l LogLevel) String() string {
 	}
 	return "NOTSET"
 }
+
+// CloneFlags type
+type CloneFlags int
+
+const (
+	// CloneKeepName means do not edit the rootfs to change the hostname
+	CloneKeepName CloneFlags = 1 << iota
+	// CloneKeepMACAddr means do not change the mac address on network interfaces
+	CloneKeepMACAddr
+	// CloneSnapshot means snapshot the original filesystem(s)
+	CloneSnapshot
+	// CloneKeepBdevType means use the same bdev type
+	CloneKeepBdevType
+	// CloneMaybeSnapshot means snapshot only if bdev supports it, else copy
+	CloneMaybeSnapshot
+)
