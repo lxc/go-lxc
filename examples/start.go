@@ -51,10 +51,6 @@ func main() {
 	c.SetLogLevel(lxc.TRACE)
 
 	log.Printf("Starting the container...\n")
-	if err := c.WantDaemonize(true); err != nil {
-		log.Fatalf("ERROR: %s\n", err.Error())
-	}
-
 	if err := c.Start(); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}

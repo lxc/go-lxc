@@ -84,7 +84,6 @@ func main() {
 							log.Errorf("\t\t\tERROR: %s\n", err.Error())
 						}
 					} else if mode == "START" && createdestroy == false {
-						c.WantDaemonize(true)
 						log.Debugf("\t\tStarting the container (%d)...\n", i)
 						if err := c.Start(); err != nil {
 							log.Errorf("\t\t\tERROR: %s\n", err.Error())
