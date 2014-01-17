@@ -10,7 +10,9 @@
 package lxc_test
 
 import (
+	"log"
 	"math/rand"
+	"os"
 	"runtime"
 	"strconv"
 	"strings"
@@ -30,10 +32,20 @@ const (
 	CloneOverlayContainerName = "O_o"
 	ConfigFilePath            = "/var/lib/lxc"
 	ConfigFileName            = "/var/lib/lxc/rubik/config"
+	distro                    = "ubuntu"
+	release                   = "saucy"
+	arch                      = "amd64"
 )
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+}
+
+func unprivileged() bool {
+	if os.Geteuid() != 0 {
+		return true
+	}
+	return false
 }
 
 func TestVersion(t *testing.T) {
@@ -41,6 +53,10 @@ func TestVersion(t *testing.T) {
 }
 
 func TestDefaultConfigPath(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	if lxc.DefaultConfigPath() != ConfigFilePath {
 		t.Errorf("DefaultConfigPath failed...")
 	}
@@ -112,6 +128,10 @@ func TestDefined_Negative(t *testing.T) {
 }
 
 func TestExecute(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -140,12 +160,22 @@ func TestCreate(t *testing.T) {
 	}
 	defer lxc.PutContainer(z)
 
-	if err := z.Create(ContainerType); err != nil {
-		t.Errorf(err.Error())
+	if unprivileged() {
+		if err := z.CreateAsUser(distro, release, arch); err != nil {
+			log.Printf("ERROR: %s\n", err.Error())
+		}
+	} else {
+		if err := z.Create(ContainerType); err != nil {
+			t.Errorf(err.Error())
+		}
 	}
 }
 
 func TestClone(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -162,6 +192,10 @@ func TestClone(t *testing.T) {
 }
 
 func TestCreateSnapshot(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -174,6 +208,10 @@ func TestCreateSnapshot(t *testing.T) {
 }
 
 func TestRestoreSnapshot(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -187,6 +225,10 @@ func TestRestoreSnapshot(t *testing.T) {
 }
 
 func TestConcurrentCreate(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	var wg sync.WaitGroup
 
 	for i := 0; i < 10; i++ {
@@ -211,6 +253,10 @@ func TestConcurrentCreate(t *testing.T) {
 }
 
 func TestSnapshots(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -223,6 +269,10 @@ func TestSnapshots(t *testing.T) {
 }
 
 func TestConcurrentStart(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	var wg sync.WaitGroup
 
 	for i := 0; i < 10; i++ {
@@ -262,6 +312,10 @@ func TestDefinedContainerNames(t *testing.T) {
 }
 
 func TestActiveContainerNames(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	if lxc.ActiveContainerNames() == nil {
 		t.Errorf("ActiveContainerNames failed...")
 	}
@@ -280,12 +334,20 @@ func TestDefinedContainers(t *testing.T) {
 }
 
 func TestActiveContainers(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	if lxc.ActiveContainers() == nil {
 		t.Errorf("ActiveContainers failed...")
 	}
 }
 
 func TestConfigFileName(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -310,6 +372,10 @@ func TestDefined_Positive(t *testing.T) {
 }
 
 func TestConcurrentDefined_Positive(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	var wg sync.WaitGroup
 
 	for i := 0; i <= 100; i++ {
@@ -493,6 +559,10 @@ func TestUnfreeze(t *testing.T) {
 }
 
 func TestLoadConfigFile(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -505,6 +575,10 @@ func TestLoadConfigFile(t *testing.T) {
 }
 
 func TestSaveConfigFile(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -592,6 +666,10 @@ func TestConfigKeys(t *testing.T) {
 }
 
 func TestInterfaces(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -726,6 +804,10 @@ func TestCPUStats(t *testing.T) {
 }
 
 func TestRunCommand(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -739,6 +821,10 @@ func TestRunCommand(t *testing.T) {
 }
 
 func TestRunCommandWithClearEnvironment(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -764,6 +850,10 @@ func TestConsoleGetFD(t *testing.T) {
 }
 
 func TestIPAddress(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -776,6 +866,10 @@ func TestIPAddress(t *testing.T) {
 }
 
 func TestAddDeviceNode(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -788,6 +882,10 @@ func TestAddDeviceNode(t *testing.T) {
 }
 
 func TestRemoveDeviceNode(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -799,33 +897,39 @@ func TestRemoveDeviceNode(t *testing.T) {
 	}
 }
 
-/*
 func TestIPv4Addresses(t *testing.T) {
+	t.Skip("skipping test in unprivileged mode.")
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-    defer lxc.PutContainer(z)
+	defer lxc.PutContainer(z)
 
-    if _, err := z.IPv4Addresses(); err != nil {
+	if _, err := z.IPv4Addresses(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestIPv6Addresses(t *testing.T) {
+	t.Skip("skipping test in unprivileged mode.")
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-    defer lxc.PutContainer(z)
+	defer lxc.PutContainer(z)
 
-    if _, err := z.IPv6Addresses(); err != nil {
+	if _, err := z.IPv6Addresses(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
-*/
 
 func TestReboot(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -839,6 +943,10 @@ func TestReboot(t *testing.T) {
 }
 
 func TestConcurrentShutdown(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	var wg sync.WaitGroup
 
 	for i := 0; i < 10; i++ {
@@ -904,6 +1012,10 @@ func TestStop(t *testing.T) {
 }
 
 func TestDestroySnapshot(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -917,48 +1029,53 @@ func TestDestroySnapshot(t *testing.T) {
 }
 
 func TestDestroy(t *testing.T) {
-	z, err := lxc.NewContainer(CloneOverlayContainerName)
+	if !unprivileged() {
+		z, err := lxc.NewContainer(CloneOverlayContainerName)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		defer lxc.PutContainer(z)
+
+		if err := z.Destroy(); err != nil {
+			t.Errorf(err.Error())
+		}
+
+		z, err = lxc.NewContainer(CloneContainerName)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		defer lxc.PutContainer(z)
+
+		if err := z.Destroy(); err != nil {
+			t.Errorf(err.Error())
+		}
+
+		z, err = lxc.NewContainer(ContainerRestoreName)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		defer lxc.PutContainer(z)
+
+		if err := z.Destroy(); err != nil {
+			t.Errorf(err.Error())
+		}
+	}
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Destroy(); err != nil {
-		t.Errorf(err.Error())
-	}
-
-	z, err = lxc.NewContainer(CloneContainerName)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer lxc.PutContainer(z)
-
-	if err := z.Destroy(); err != nil {
-		t.Errorf(err.Error())
-	}
-
-	z, err = lxc.NewContainer(ContainerRestoreName)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer lxc.PutContainer(z)
-
-	if err := z.Destroy(); err != nil {
-		t.Errorf(err.Error())
-	}
-
-	z, err = lxc.NewContainer(ContainerName)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer lxc.PutContainer(z)
-
-	if err := z.Destroy(); err != nil {
+	if err := c.Destroy(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestConcurrentDestroy(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
 	var wg sync.WaitGroup
 
 	for i := 0; i < 10; i++ {

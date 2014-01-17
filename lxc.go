@@ -23,7 +23,7 @@ import (
 
 func init() {
 	if os.Geteuid() != 0 {
-		panic("Running as non-root.")
+		fmt.Printf("You are using LXC as an unprivileged user. Some functionality may not work.\n\n")
 	}
 }
 

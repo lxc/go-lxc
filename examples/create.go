@@ -25,6 +25,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/caglar10ur/lxc"
 )
@@ -32,12 +33,18 @@ import (
 var (
 	lxcpath  string
 	template string
+	distro   string
+	release  string
+	arch     string
 	name     string
 )
 
 func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
 	flag.StringVar(&template, "template", "busybox", "Template to use")
+	flag.StringVar(&distro, "distro", "ubuntu", "Template to use")
+	flag.StringVar(&release, "release", "saucy", "Template to use")
+	flag.StringVar(&arch, "arch", "amd64", "Template to use")
 	flag.StringVar(&name, "name", "rubik", "Name of the container")
 	flag.Parse()
 }
@@ -51,7 +58,14 @@ func main() {
 
 	log.Printf("Creating container...\n")
 	c.SetVerbosity(lxc.Verbose)
-	if err := c.Create(template, "amd64"); err != nil {
-		log.Printf("ERROR: %s\n", err.Error())
+
+	if os.Geteuid() != 0 {
+		if err := c.CreateAsUser(distro, release, arch); err != nil {
+			log.Printf("ERROR: %s\n", err.Error())
+		}
+	} else {
+		if err := c.Create(template, "-a", arch, "-r", release); err != nil {
+			log.Printf("ERROR: %s\n", err.Error())
+		}
 	}
 }
