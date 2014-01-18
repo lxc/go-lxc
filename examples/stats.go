@@ -62,6 +62,21 @@ func main() {
 		log.Printf("MemoryLimit: %s\n", memLimit)
 	}
 
+	// kmem
+	kmemUsed, err := c.KernelMemoryUsage()
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	} else {
+		log.Printf("KernelMemoryUsage: %s\n", kmemUsed)
+	}
+
+	kmemLimit, err := c.KernelMemoryLimit()
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	} else {
+		log.Printf("KernelMemoryLimit: %s\n", kmemLimit)
+	}
+
 	// swap
 	swapUsed, err := c.SwapUsage()
 	if err != nil {
@@ -75,6 +90,14 @@ func main() {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
 		log.Printf("SwapLimit: %s\n", swapLimit)
+	}
+
+	// blkio
+	blkioUsage, err := c.BlkioUsage()
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	} else {
+		log.Printf("BlkioUsage: %s\n", blkioUsage)
 	}
 
 	cpuTime, err := c.CPUTime()
