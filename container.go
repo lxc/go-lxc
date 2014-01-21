@@ -318,14 +318,14 @@ func (lxc *Container) Create(template string, args ...string) error {
 	return lxc.CreateUsing(template, Best, args...)
 }
 
-// CreateAsUser creates the container using given template and arguments with Best backend as an unprivileged user
+// CreateAsUser creates the container using given template and arguments with Directory backend as an unprivileged user
 func (lxc *Container) CreateAsUser(distro string, release string, arch string, args ...string) error {
 	// required parameters
 	nargs := []string{"-d", distro, "-r", release, "-a", arch}
 	// optional arguments
 	nargs = append(nargs, args...)
 
-	return lxc.CreateUsing("download", Best, nargs...)
+	return lxc.CreateUsing("download", Directory, nargs...)
 }
 
 // Start starts the container
