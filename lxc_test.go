@@ -24,11 +24,11 @@ import (
 
 const (
 	ContainerType             = "busybox"
-	ContainerName             = "rubik"
+	ContainerName             = "lorem"
 	SnapshotName              = "snap0"
-	ContainerRestoreName      = "rubik-restore"
-	ContainerCloneName        = "O"
-	ContainerCloneOverlayName = "O_o"
+	ContainerRestoreName      = "ipsum"
+	ContainerCloneName        = "consectetur"
+	ContainerCloneOverlayName = "adipiscing"
 	Distro                    = "ubuntu"
 	Release                   = "saucy"
 	Arch                      = "amd64"
@@ -833,10 +833,6 @@ func TestCPUStats(t *testing.T) {
 }
 
 func TestRunCommand(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -850,10 +846,6 @@ func TestRunCommand(t *testing.T) {
 }
 
 func TestRunCommandWithClearEnvironment(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())

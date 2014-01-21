@@ -12,6 +12,24 @@ test:
 	@echo "$(OK_COLOR)==> Running go test $(NO_COLOR)"
 	@sudo `which go` test -v
 
+#echo 1 | sudo tee -a /sys/fs/cgroup/cpuset/cgroup.clone_children > /dev/null
+#echo 1 | sudo tee -a /sys/fs/cgroup/memory/memory.use_hierarchy > /dev/null
+#for controller in /sys/fs/cgroup/*; do sudo mkdir -p $controller/$USER; sudo chown -R $USER $controller/$USER; echo $$ > $controller/$\$USER/tasks; done
+
+#cat /etc/lxc/lxc-usernet
+#caglar veth lxcbr0 1
+
+#cat ~/.config/lxc/default.conf
+#lxc.network.type = veth
+#lxc.network.link = lxcbr0
+#lxc.network.flags = up
+#
+#lxc.id_map = u 0 100000 100000
+#lxc.id_map = g 0 100000 100000
+test-unprivileged:
+	@echo "$(OK_COLOR)==> Running go test for unprivileged user$(NO_COLOR)"
+	@`which go` test -v
+
 # requires https://codereview.appspot.com/34680044/
 cover:
 	@sudo `which go` test -v -covermode=count -coverprofile=coverage.out

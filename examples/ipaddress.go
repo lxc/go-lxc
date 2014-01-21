@@ -64,6 +64,7 @@ func main() {
 			log.Printf("%d) %s\n", i, v)
 		}
 	}
+
 	log.Printf("IPv4Addresses()\n")
 	if addresses, err := c.IPv4Addresses(); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
@@ -72,6 +73,7 @@ func main() {
 			log.Printf("%d) %s\n", i, v)
 		}
 	}
+
 	log.Printf("IPv6Addresses()\n")
 	if addresses, err := c.IPv6Addresses(); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
