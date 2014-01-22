@@ -313,9 +313,9 @@ func (lxc *Container) CreateUsing(template string, backend BackendStore, args ..
 	return nil
 }
 
-// Create creates the container using given template and arguments with Best backend
+// Create creates the container using given template and arguments with Directory backend
 func (lxc *Container) Create(template string, args ...string) error {
-	return lxc.CreateUsing(template, Best, args...)
+	return lxc.CreateUsing(template, Directory, args...)
 }
 
 // CreateAsUser creates the container using given template and arguments with Directory backend as an unprivileged user
