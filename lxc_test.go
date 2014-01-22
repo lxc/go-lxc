@@ -639,10 +639,6 @@ func TestConfigKeys(t *testing.T) {
 }
 
 func TestInterfaces(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -871,10 +867,6 @@ func TestConsoleGetFD(t *testing.T) {
 }
 
 func TestIPAddress(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
