@@ -165,10 +165,6 @@ func TestCreate(t *testing.T) {
 }
 
 func TestClone(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -179,16 +175,14 @@ func TestClone(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if err := z.CloneUsing(ContainerCloneOverlayName, lxc.Overlayfs, lxc.CloneSnapshot|lxc.CloneKeepName|lxc.CloneKeepMACAddr); err != nil {
-		t.Errorf(err.Error())
+	if !unprivileged() {
+		if err := z.CloneUsing(ContainerCloneOverlayName, lxc.Overlayfs, lxc.CloneSnapshot|lxc.CloneKeepName|lxc.CloneKeepMACAddr); err != nil {
+			t.Errorf(err.Error())
+		}
 	}
 }
 
 func TestCreateSnapshot(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -201,10 +195,6 @@ func TestCreateSnapshot(t *testing.T) {
 }
 
 func TestRestoreSnapshot(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -246,10 +236,6 @@ func TestConcurrentCreate(t *testing.T) {
 }
 
 func TestSnapshots(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -1021,10 +1007,6 @@ func TestStop(t *testing.T) {
 }
 
 func TestDestroySnapshot(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -1048,27 +1030,28 @@ func TestDestroy(t *testing.T) {
 		if err := z.Destroy(); err != nil {
 			t.Errorf(err.Error())
 		}
-
-		z, err = lxc.NewContainer(ContainerCloneName)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		defer lxc.PutContainer(z)
-
-		if err := z.Destroy(); err != nil {
-			t.Errorf(err.Error())
-		}
-
-		z, err = lxc.NewContainer(ContainerRestoreName)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		defer lxc.PutContainer(z)
-
-		if err := z.Destroy(); err != nil {
-			t.Errorf(err.Error())
-		}
 	}
+
+    z, err := lxc.NewContainer(ContainerCloneName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if err := z.Destroy(); err != nil {
+		t.Errorf(err.Error())
+	}
+
+	z, err = lxc.NewContainer(ContainerRestoreName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(z)
+
+	if err := z.Destroy(); err != nil {
+		t.Errorf(err.Error())
+	}
+
 	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
