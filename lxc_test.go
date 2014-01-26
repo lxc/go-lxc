@@ -56,17 +56,17 @@ func TestDefaultConfigPath(t *testing.T) {
 }
 
 func TestSetConfigPath(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	currentPath := z.ConfigPath()
-	if err := z.SetConfigPath("/tmp"); err != nil {
+	currentPath := c.ConfigPath()
+	if err := c.SetConfigPath("/tmp"); err != nil {
 		t.Errorf(err.Error())
 	}
-	newPath := z.ConfigPath()
+	newPath := c.ConfigPath()
 
 	if currentPath == newPath {
 		t.Errorf("SetConfigPath failed...")
@@ -74,14 +74,14 @@ func TestSetConfigPath(t *testing.T) {
 }
 
 func TestGetContainer(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	lxc.GetContainer(z)
-	lxc.PutContainer(z)
+	lxc.GetContainer(c)
+	lxc.PutContainer(c)
 }
 
 func TestConcurrentDefined_Negative(t *testing.T) {
@@ -90,16 +90,16 @@ func TestConcurrentDefined_Negative(t *testing.T) {
 	for i := 0; i <= 100; i++ {
 		wg.Add(1)
 		go func() {
-			z, err := lxc.NewContainer(strconv.Itoa(rand.Intn(10)))
+			c, err := lxc.NewContainer(strconv.Itoa(rand.Intn(10)))
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer lxc.PutContainer(z)
+			defer lxc.PutContainer(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
-			if z.Defined() {
+			if c.Defined() {
 				t.Errorf("Defined_Negative failed...")
 			}
 			wg.Done()
@@ -109,13 +109,13 @@ func TestConcurrentDefined_Negative(t *testing.T) {
 }
 
 func TestDefined_Negative(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if z.Defined() {
+	if c.Defined() {
 		t.Errorf("Defined_Negative failed...")
 	}
 }
@@ -125,84 +125,84 @@ func TestExecute(t *testing.T) {
 		t.Skip("skipping test in unprivileged mode.")
 	}
 
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.Execute("/bin/true"); err != nil {
+	if _, err := c.Execute("/bin/true"); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestSetVerbosity(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	z.SetVerbosity(lxc.Quiet)
+	c.SetVerbosity(lxc.Quiet)
 }
 
 func TestCreate(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
 	if unprivileged() {
-		if err := z.CreateAsUser(Distro, Release, Arch); err != nil {
+		if err := c.CreateAsUser(Distro, Release, Arch); err != nil {
 			t.Errorf("ERROR: %s\n", err.Error())
 		}
 	} else {
-		if err := z.Create(ContainerType); err != nil {
+		if err := c.Create(ContainerType); err != nil {
 			t.Errorf(err.Error())
 		}
 	}
 }
 
 func TestClone(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Clone(ContainerCloneName); err != nil {
+	if err := c.Clone(ContainerCloneName); err != nil {
 		t.Errorf(err.Error())
 	}
 
 	if !unprivileged() {
-		if err := z.CloneUsing(ContainerCloneOverlayName, lxc.Overlayfs, lxc.CloneSnapshot|lxc.CloneKeepName|lxc.CloneKeepMACAddr); err != nil {
+		if err := c.CloneUsing(ContainerCloneOverlayName, lxc.Overlayfs, lxc.CloneSnapshot|lxc.CloneKeepName|lxc.CloneKeepMACAddr); err != nil {
 			t.Errorf(err.Error())
 		}
 	}
 }
 
 func TestCreateSnapshot(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.CreateSnapshot(); err != nil {
+	if _, err := c.CreateSnapshot(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestRestoreSnapshot(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
 	snapshot := lxc.Snapshot{Name: SnapshotName}
-	if err := z.RestoreSnapshot(snapshot, ContainerRestoreName); err != nil {
+	if err := c.RestoreSnapshot(snapshot, ContainerRestoreName); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -217,16 +217,16 @@ func TestConcurrentCreate(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
-			z, err := lxc.NewContainer(strconv.Itoa(i))
+			c, err := lxc.NewContainer(strconv.Itoa(i))
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer lxc.PutContainer(z)
+			defer lxc.PutContainer(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
-			if err := z.Create(ContainerType); err != nil {
+			if err := c.Create(ContainerType); err != nil {
 				t.Errorf(err.Error())
 			}
 			wg.Done()
@@ -236,13 +236,13 @@ func TestConcurrentCreate(t *testing.T) {
 }
 
 func TestSnapshots(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.Snapshots(); err != nil {
+	if _, err := c.Snapshots(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -257,18 +257,18 @@ func TestConcurrentStart(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
-			z, err := lxc.NewContainer(strconv.Itoa(i))
+			c, err := lxc.NewContainer(strconv.Itoa(i))
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer lxc.PutContainer(z)
+			defer lxc.PutContainer(c)
 
-			if err := z.Start(); err != nil {
+			if err := c.Start(); err != nil {
 				t.Errorf(err.Error())
 			}
 
-			z.Wait(lxc.RUNNING, 30)
-			if !z.Running() {
+			c.Wait(lxc.RUNNING, 30)
+			if !c.Running() {
 				t.Errorf("Starting the container failed...")
 			}
 
@@ -279,25 +279,25 @@ func TestConcurrentStart(t *testing.T) {
 }
 
 func TestConfigFileName(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if z.ConfigFileName() == "" {
+	if c.ConfigFileName() == "" {
 		t.Errorf("ConfigFileName failed...")
 	}
 }
 
 func TestDefined_Positive(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if !z.Defined() {
+	if !c.Defined() {
 		t.Errorf("Defined_Positive failed...")
 	}
 }
@@ -312,16 +312,16 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 	for i := 0; i <= 100; i++ {
 		wg.Add(1)
 		go func() {
-			z, err := lxc.NewContainer(strconv.Itoa(rand.Intn(10)))
+			c, err := lxc.NewContainer(strconv.Itoa(rand.Intn(10)))
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer lxc.PutContainer(z)
+			defer lxc.PutContainer(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
-			if !z.Defined() {
+			if !c.Defined() {
 				t.Errorf("Defined_Positive failed...")
 			}
 			wg.Done()
@@ -331,42 +331,42 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 }
 
 func TestInitPID_Negative(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if z.InitPID() != -1 {
+	if c.InitPID() != -1 {
 		t.Errorf("InitPID failed...")
 	}
 }
 
 func TestStart(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Start(); err != nil {
+	if err := c.Start(); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	z.Wait(lxc.RUNNING, 30)
-	if z.State() != lxc.RUNNING {
+	c.Wait(lxc.RUNNING, 30)
+	if c.State() != lxc.RUNNING {
 		t.Errorf("Starting the container failed...")
 	}
 }
 
 func TestControllable(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if !z.Controllable() {
+	if !c.Controllable() {
 		t.Errorf("Controling the container failed...")
 	}
 }
@@ -408,188 +408,188 @@ func TestActiveContainers(t *testing.T) {
 }
 
 func TestRunning(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if !z.Running() {
+	if !c.Running() {
 		t.Errorf("Checking the container failed...")
 	}
 }
 
 func TestWantDaemonize(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.WantDaemonize(false); err != nil || z.Daemonize() {
+	if err := c.WantDaemonize(false); err != nil || c.Daemonize() {
 		t.Errorf("WantDaemonize failed...")
 	}
 }
 
 func TestWantCloseAllFds(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.WantCloseAllFds(true); err != nil {
+	if err := c.WantCloseAllFds(true); err != nil {
 		t.Errorf("WantCloseAllFds failed...")
 	}
 }
 
 func TestSetLogLevel(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.SetLogLevel(lxc.WARN); err != nil || z.LogLevel() != lxc.WARN {
+	if err := c.SetLogLevel(lxc.WARN); err != nil || c.LogLevel() != lxc.WARN {
 		t.Errorf("SetLogLevel( failed...")
 	}
 }
 
 func TestSetLogFile(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.SetLogFile("/tmp/" + ContainerName); err != nil || z.LogFile() != "/tmp/"+ContainerName {
+	if err := c.SetLogFile("/tmp/" + ContainerName); err != nil || c.LogFile() != "/tmp/"+ContainerName {
 		t.Errorf("SetLogFile failed...")
 	}
 }
 
 func TestInitPID_Positive(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if z.InitPID() == -1 {
+	if c.InitPID() == -1 {
 		t.Errorf("InitPID failed...")
 	}
 }
 
 func TestName(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if z.Name() != ContainerName {
+	if c.Name() != ContainerName {
 		t.Errorf("Name failed...")
 	}
 }
 
 func TestFreeze(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Freeze(); err != nil {
+	if err := c.Freeze(); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	z.Wait(lxc.FROZEN, 30)
-	if z.State() != lxc.FROZEN {
+	c.Wait(lxc.FROZEN, 30)
+	if c.State() != lxc.FROZEN {
 		t.Errorf("Freezing the container failed...")
 	}
 }
 
 func TestUnfreeze(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Unfreeze(); err != nil {
+	if err := c.Unfreeze(); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	z.Wait(lxc.RUNNING, 30)
-	if z.State() != lxc.RUNNING {
+	c.Wait(lxc.RUNNING, 30)
+	if c.State() != lxc.RUNNING {
 		t.Errorf("Unfreezing the container failed...")
 	}
 }
 
 func TestLoadConfigFile(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.LoadConfigFile(z.ConfigFileName()); err != nil {
+	if err := c.LoadConfigFile(c.ConfigFileName()); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestSaveConfigFile(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.SaveConfigFile(z.ConfigFileName()); err != nil {
+	if err := c.SaveConfigFile(c.ConfigFileName()); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestConfigItem(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if z.ConfigItem("lxc.utsname")[0] != ContainerName {
+	if c.ConfigItem("lxc.utsname")[0] != ContainerName {
 		t.Errorf("ConfigItem failed...")
 	}
 }
 
 func TestSetConfigItem(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.SetConfigItem("lxc.utsname", ContainerName); err != nil {
+	if err := c.SetConfigItem("lxc.utsname", ContainerName); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	if z.ConfigItem("lxc.utsname")[0] != ContainerName {
+	if c.ConfigItem("lxc.utsname")[0] != ContainerName {
 		t.Errorf("ConfigItem failed...")
 	}
 }
 
 func TestSetCgroupItem(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	maxMem := z.CgroupItem("memory.max_usage_in_bytes")[0]
-	currentMem := z.CgroupItem("memory.limit_in_bytes")[0]
-	if err := z.SetCgroupItem("memory.limit_in_bytes", maxMem); err != nil {
+	maxMem := c.CgroupItem("memory.max_usage_in_bytes")[0]
+	currentMem := c.CgroupItem("memory.limit_in_bytes")[0]
+	if err := c.SetCgroupItem("memory.limit_in_bytes", maxMem); err != nil {
 		t.Errorf(err.Error())
 	}
-	newMem := z.CgroupItem("memory.limit_in_bytes")[0]
+	newMem := c.CgroupItem("memory.limit_in_bytes")[0]
 
 	if newMem == currentMem {
 		t.Errorf("SetCgroupItem failed...")
@@ -597,143 +597,143 @@ func TestSetCgroupItem(t *testing.T) {
 }
 
 func TestClearConfigItem(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.ClearConfigItem("lxc.cap.drop"); err != nil {
+	if err := c.ClearConfigItem("lxc.cap.drop"); err != nil {
 		t.Errorf(err.Error())
 	}
-	if z.ConfigItem("lxc.cap.drop")[0] != "" {
+	if c.ConfigItem("lxc.cap.drop")[0] != "" {
 		t.Errorf("ClearConfigItem failed...")
 	}
 }
 
 func TestConfigKeys(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	keys := strings.Join(z.ConfigKeys("lxc.network.0"), " ")
+	keys := strings.Join(c.ConfigKeys("lxc.network.0"), " ")
 	if !strings.Contains(keys, "mtu") {
 		t.Errorf("Keys failed...")
 	}
 }
 
 func TestInterfaces(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.Interfaces(); err != nil {
+	if _, err := c.Interfaces(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestMemoryUsage(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.MemoryUsage(); err != nil {
+	if _, err := c.MemoryUsage(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestKernelMemoryUsage(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.KernelMemoryUsage(); err != nil {
+	if _, err := c.KernelMemoryUsage(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestSwapUsage(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.SwapUsage(); err != nil {
+	if _, err := c.SwapUsage(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestBlkioUsage(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.BlkioUsage(); err != nil {
+	if _, err := c.BlkioUsage(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestMemoryLimit(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.MemoryLimit(); err != nil {
+	if _, err := c.MemoryLimit(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestKernelMemoryLimit(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.KernelMemoryLimit(); err != nil {
+	if _, err := c.KernelMemoryLimit(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestSwapLimit(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.SwapLimit(); err != nil {
+	if _, err := c.SwapLimit(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestSetMemoryLimit(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	oldMemLimit, _ := z.MemoryLimit()
+	oldMemLimit, _ := c.MemoryLimit()
 
-	if err := z.SetMemoryLimit(oldMemLimit * 4); err != nil {
+	if err := c.SetMemoryLimit(oldMemLimit * 4); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	newMemLimit, _ := z.MemoryLimit()
+	newMemLimit, _ := c.MemoryLimit()
 	if newMemLimit != oldMemLimit*4 {
 		t.Errorf("SetMemoryLimit failed")
 	}
@@ -742,124 +742,124 @@ func TestSetMemoryLimit(t *testing.T) {
 func TestSetKernelMemoryLimit(t *testing.T) {
 	t.Skip("skipping test")
 
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	oldMemLimit, _ := z.KernelMemoryLimit()
-	if err := z.SetKernelMemoryLimit(oldMemLimit * 4); err != nil {
+	oldMemLimit, _ := c.KernelMemoryLimit()
+	if err := c.SetKernelMemoryLimit(oldMemLimit * 4); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	newMemLimit, _ := z.KernelMemoryLimit()
+	newMemLimit, _ := c.KernelMemoryLimit()
 	if newMemLimit != oldMemLimit*4 {
 		t.Errorf("SetKernelMemoryLimit failed")
 	}
 }
 
 func TestSetSwapLimit(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	oldSwapLimit, _ := z.SwapLimit()
+	oldSwapLimit, _ := c.SwapLimit()
 
-	if err := z.SetSwapLimit(oldSwapLimit / 4); err != nil {
+	if err := c.SetSwapLimit(oldSwapLimit / 4); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	newSwapLimit, _ := z.SwapLimit()
+	newSwapLimit, _ := c.SwapLimit()
 	if newSwapLimit != oldSwapLimit/4 {
 		t.Errorf("SetSwapLimit failed")
 	}
 }
 
 func TestCPUTime(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.CPUTime(); err != nil {
+	if _, err := c.CPUTime(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestCPUTimePerCPU(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.CPUTimePerCPU(); err != nil {
+	if _, err := c.CPUTimePerCPU(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestCPUStats(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.CPUStats(); err != nil {
+	if _, err := c.CPUStats(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestRunCommand(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	if err := z.RunCommand(argsThree...); err != nil {
+	if err := c.RunCommand(argsThree...); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestRunCommandWithClearEnvironment(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	if err := z.RunCommandWithClearEnvironment(argsThree...); err != nil {
+	if err := c.RunCommandWithClearEnvironment(argsThree...); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestConsoleGetFD(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.ConsoleGetFD(0); err != nil {
+	if _, err := c.ConsoleGetFD(0); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestIPAddress(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.IPAddress("lo"); err != nil {
+	if _, err := c.IPAddress("lo"); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -869,13 +869,13 @@ func TestAddDeviceNode(t *testing.T) {
 		t.Skip("skipping test in unprivileged mode.")
 	}
 
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.AddDeviceNode("/dev/network_latency"); err != nil {
+	if err := c.AddDeviceNode("/dev/network_latency"); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -885,13 +885,13 @@ func TestRemoveDeviceNode(t *testing.T) {
 		t.Skip("skipping test in unprivileged mode.")
 	}
 
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.RemoveDeviceNode("/dev/network_latency"); err != nil {
+	if err := c.RemoveDeviceNode("/dev/network_latency"); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -899,13 +899,13 @@ func TestRemoveDeviceNode(t *testing.T) {
 func TestIPv4Addresses(t *testing.T) {
 	t.Skip("skipping test")
 
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.IPv4Addresses(); err != nil {
+	if _, err := c.IPv4Addresses(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -913,28 +913,28 @@ func TestIPv4Addresses(t *testing.T) {
 func TestIPv6Addresses(t *testing.T) {
 	t.Skip("skipping test")
 
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if _, err := z.IPv6Addresses(); err != nil {
+	if _, err := c.IPv6Addresses(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestReboot(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Reboot(); err != nil {
+	if err := c.Reboot(); err != nil {
 		t.Errorf("Rebooting the container failed...")
 	}
-	z.Wait(lxc.RUNNING, 30)
+	c.Wait(lxc.RUNNING, 30)
 }
 
 func TestConcurrentShutdown(t *testing.T) {
@@ -947,18 +947,18 @@ func TestConcurrentShutdown(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
-			z, err := lxc.NewContainer(strconv.Itoa(i))
+			c, err := lxc.NewContainer(strconv.Itoa(i))
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer lxc.PutContainer(z)
+			defer lxc.PutContainer(c)
 
-			if err := z.Shutdown(3); err != nil {
+			if err := c.Shutdown(3); err != nil {
 				t.Errorf(err.Error())
 			}
 
-			z.Wait(lxc.STOPPED, 30)
-			if z.Running() {
+			c.Wait(lxc.STOPPED, 30)
+			if c.Running() {
 				t.Errorf("Shutting down the container failed...")
 			}
 
@@ -969,90 +969,90 @@ func TestConcurrentShutdown(t *testing.T) {
 }
 
 func TestShutdown(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Shutdown(3); err != nil {
+	if err := c.Shutdown(3); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	z.Wait(lxc.STOPPED, 30)
-	if z.Running() {
+	c.Wait(lxc.STOPPED, 30)
+	if c.Running() {
 		t.Errorf("Shutting down the container failed...")
 	}
 }
 
 func TestStop(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Start(); err != nil {
+	if err := c.Start(); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	if err := z.Stop(); err != nil {
+	if err := c.Stop(); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	z.Wait(lxc.STOPPED, 30)
-	if z.Running() {
+	c.Wait(lxc.STOPPED, 30)
+	if c.Running() {
 		t.Errorf("Stopping the container failed...")
 	}
 }
 
 func TestDestroySnapshot(t *testing.T) {
-	z, err := lxc.NewContainer(ContainerName)
+	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
 	snapshot := lxc.Snapshot{Name: SnapshotName}
-	if err := z.DestroySnapshot(snapshot); err != nil {
+	if err := c.DestroySnapshot(snapshot); err != nil {
 		t.Errorf(err.Error())
 	}
 }
 
 func TestDestroy(t *testing.T) {
 	if !unprivileged() {
-		z, err := lxc.NewContainer(ContainerCloneOverlayName)
+		c, err := lxc.NewContainer(ContainerCloneOverlayName)
 		if err != nil {
 			t.Errorf(err.Error())
 		}
-		defer lxc.PutContainer(z)
+		defer lxc.PutContainer(c)
 
-		if err := z.Destroy(); err != nil {
+		if err := c.Destroy(); err != nil {
 			t.Errorf(err.Error())
 		}
 	}
 
-	z, err := lxc.NewContainer(ContainerCloneName)
+	c, err := lxc.NewContainer(ContainerCloneName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Destroy(); err != nil {
+	if err := c.Destroy(); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	z, err = lxc.NewContainer(ContainerRestoreName)
+	c, err = lxc.NewContainer(ContainerRestoreName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer lxc.PutContainer(z)
+	defer lxc.PutContainer(c)
 
-	if err := z.Destroy(); err != nil {
+	if err := c.Destroy(); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	c, err := lxc.NewContainer(ContainerName)
+	c, err = lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1073,16 +1073,16 @@ func TestConcurrentDestroy(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
-			z, err := lxc.NewContainer(strconv.Itoa(i))
+			c, err := lxc.NewContainer(strconv.Itoa(i))
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer lxc.PutContainer(z)
+			defer lxc.PutContainer(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
-			if err := z.Destroy(); err != nil {
+			if err := c.Destroy(); err != nil {
 				t.Errorf(err.Error())
 			}
 			wg.Done()
