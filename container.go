@@ -355,7 +355,7 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 	defer c.mu.Unlock()
 
 	/*
-	 * FIXME: Go runtime and src/c/start.c signal_handler are not playing nice together so use c-execute for now
+	 * FIXME: Go runtime and src/lxc/start.c signal_handler are not playing nice together so use lxc-execute for now
 	 */
 	output, err := exec.Command(cargs[0], cargs[1:]...).CombinedOutput()
 	if err != nil {
@@ -508,7 +508,7 @@ func (c *Container) ConfigFileName() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	// allocated in c.c
+	// allocated in lxc.c
 	configFileName := C.lxc_config_file_name(c.container)
 	defer C.free(unsafe.Pointer(configFileName))
 
@@ -523,7 +523,7 @@ func (c *Container) ConfigItem(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
-	// allocated in c.c
+	// allocated in lxc.c
 	configItem := C.lxc_get_config_item(c.container, ckey)
 	defer C.free(unsafe.Pointer(configItem))
 
@@ -556,7 +556,7 @@ func (c *Container) CgroupItem(key string) []string {
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
-	// allocated in c.c
+	// allocated in lxc.c
 	cgroupItem := C.lxc_get_cgroup_item(c.container, ckey)
 	defer C.free(unsafe.Pointer(cgroupItem))
 
@@ -606,11 +606,11 @@ func (c *Container) ConfigKeys(key ...string) []string {
 		ckey := C.CString(key[0])
 		defer C.free(unsafe.Pointer(ckey))
 
-		// allocated in c.c
+		// allocated in lxc.c
 		keys = C.lxc_get_keys(c.container, ckey)
 		defer C.free(unsafe.Pointer(keys))
 	} else {
-		// allocated in c.c
+		// allocated in lxc.c
 		keys = C.lxc_get_keys(c.container, nil)
 		defer C.free(unsafe.Pointer(keys))
 	}
