@@ -42,20 +42,6 @@ import (
 	"unsafe"
 )
 
-/*
-func makeArgs(args []string) **C.char {
-	cparams := C.makeCharArray(C.int(len(args)))
-	for i, s := range args {
-		C.setArrayString(cparams, C.CString(s), C.int(i))
-	}
-	return cparams
-}
-
-func freeArgs(cArgs **C.char, length int) {
-	C.freeCharArray(cArgs, C.int(length))
-}
-*/
-
 func sptr(p uintptr) *C.char {
 	return *(**C.char)(unsafe.Pointer(p))
 }
