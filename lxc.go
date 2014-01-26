@@ -17,15 +17,8 @@ import "C"
 
 import (
 	"fmt"
-	"os"
 	"unsafe"
 )
-
-func init() {
-	if os.Geteuid() != 0 {
-		fmt.Printf("You are using LXC as an unprivileged user. Some functionality may not work.\n\n")
-	}
-}
 
 // NewContainer returns a new container struct
 func NewContainer(name string, lxcpath ...string) (*Container, error) {

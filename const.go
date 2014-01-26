@@ -17,6 +17,13 @@ const (
 )
 
 const (
+	isDefined = 1 << iota
+	isNotDefined
+	isRunning
+	isNotRunning
+)
+
+const (
 	errAddDeviceNodeFailed           = "adding device %s to container %q failed"
 	errAlreadyDefined                = "container %q already defined"
 	errAlreadyFrozen                 = "container %q is already frozen"

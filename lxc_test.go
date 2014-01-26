@@ -359,14 +359,14 @@ func TestStart(t *testing.T) {
 	}
 }
 
-func TestMayControl(t *testing.T) {
+func TestControllable(t *testing.T) {
 	z, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(z)
 
-	if !z.MayControl() {
+	if !z.Controllable() {
 		t.Errorf("Controling the container failed...")
 	}
 }
@@ -1032,7 +1032,7 @@ func TestDestroy(t *testing.T) {
 		}
 	}
 
-    z, err := lxc.NewContainer(ContainerCloneName)
+	z, err := lxc.NewContainer(ContainerCloneName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
