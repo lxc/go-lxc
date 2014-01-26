@@ -26,7 +26,7 @@ const (
 	Verbose
 )
 
-// BackendStore type
+// BackendStore type specifies possible backend types.
 type BackendStore int
 
 const (
@@ -67,7 +67,7 @@ func (t BackendStore) String() string {
 	return "<INVALID>"
 }
 
-// State type
+// State type specifies possible container states.
 type State int
 
 const (
@@ -170,7 +170,7 @@ func (b ByteSize) String() string {
 	return fmt.Sprintf("%.2fB", b)
 }
 
-// LogLevel type
+// LogLevel type specifies possible log levels.
 type LogLevel int
 
 const (

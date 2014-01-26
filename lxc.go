@@ -7,7 +7,7 @@
 
 // +build linux
 
-// Package lxc provides Go (golang) Bindings for LXC (Linux Containers) C API.
+// Package lxc provides Go Bindings for LXC (Linux Containers) C API.
 package lxc
 
 // #cgo pkg-config: lxc
@@ -20,7 +20,7 @@ import (
 	"unsafe"
 )
 
-// NewContainer returns a new container struct
+// NewContainer returns a new container struct.
 func NewContainer(name string, lxcpath ...string) (*Container, error) {
 	var container *C.struct_lxc_container
 
@@ -42,22 +42,22 @@ func NewContainer(name string, lxcpath ...string) (*Container, error) {
 	return &Container{container: container, verbosity: Quiet, name: name}, nil
 }
 
-// GetContainer increments reference counter of the container object
-func GetContainer(lxc *Container) bool {
-	return C.lxc_container_get(lxc.container) == 1
+// GetContainer increments the reference counter of the container object.
+func GetContainer(c *Container) bool {
+	return C.lxc_container_get(c.container) == 1
 }
 
-// PutContainer decrements reference counter of the container object
-func PutContainer(lxc *Container) bool {
-	return C.lxc_container_put(lxc.container) == 1
+// PutContainer decrements the reference counter of the container object.
+func PutContainer(c *Container) bool {
+	return C.lxc_container_put(c.container) == 1
 }
 
-// Version returns LXC version
+// Version returns the LXC version.
 func Version() string {
 	return C.GoString(C.lxc_get_version())
 }
 
-// GlobalConfigItem returns the value of the given global config key
+// GlobalConfigItem returns the value of the given global config key.
 func GlobalConfigItem(name string) string {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
@@ -65,17 +65,17 @@ func GlobalConfigItem(name string) string {
 	return C.GoString(C.lxc_get_global_config_item(cname))
 }
 
-// DefaultConfigPath returns default config path
+// DefaultConfigPath returns default config path.
 func DefaultConfigPath() string {
 	return GlobalConfigItem("lxc.lxcpath")
 }
 
-// DefaultLvmVg returns default LVM volume group
+// DefaultLvmVg returns the name of the default LVM volume group.
 func DefaultLvmVg() string {
 	return GlobalConfigItem("lxc.bdev.lvm.vg")
 }
 
-// DefaultZfsRoot returns default ZFS root
+// DefaultZfsRoot returns the name of the default ZFS root.
 func DefaultZfsRoot() string {
 	return GlobalConfigItem("lxc.bdec.zfs.root")
 }

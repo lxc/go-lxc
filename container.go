@@ -59,7 +59,7 @@ func (c *Container) makeSure(flags int) error {
 	return nil
 }
 
-// Name returns the name of the container
+// Name returns the name of the container.
 func (c *Container) Name() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -67,7 +67,7 @@ func (c *Container) Name() string {
 	return C.GoString(c.container.name)
 }
 
-// Defined returns true if the container is already defined
+// Defined returns true if the container is already defined.
 func (c *Container) Defined() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -75,7 +75,7 @@ func (c *Container) Defined() bool {
 	return bool(C.lxc_defined(c.container))
 }
 
-// Running returns true if the container is already running
+// Running returns true if the container is already running.
 func (c *Container) Running() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -83,7 +83,7 @@ func (c *Container) Running() bool {
 	return bool(C.lxc_running(c.container))
 }
 
-// Controllable returns true if the caller may control the container
+// Controllable returns true if the caller can control the container.
 func (c *Container) Controllable() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -91,7 +91,7 @@ func (c *Container) Controllable() bool {
 	return bool(C.lxc_may_control(c.container))
 }
 
-// CreateSnapshot creates a new snapshot
+// CreateSnapshot creates a new snapshot.
 func (c *Container) CreateSnapshot() (*Snapshot, error) {
 	if err := c.makeSure(isDefined | isNotRunning); err != nil {
 		return nil, err
@@ -107,7 +107,7 @@ func (c *Container) CreateSnapshot() (*Snapshot, error) {
 	return &Snapshot{Name: fmt.Sprintf("snap%d", ret)}, nil
 }
 
-// RestoreSnapshot creates a new container based on a snapshot
+// RestoreSnapshot creates a new container based on a snapshot.
 func (c *Container) RestoreSnapshot(snapshot Snapshot, name string) error {
 	if err := c.makeSure(isDefined); err != nil {
 		return err
@@ -128,7 +128,7 @@ func (c *Container) RestoreSnapshot(snapshot Snapshot, name string) error {
 	return nil
 }
 
-// DestroySnapshot destroys the specified snapshot
+// DestroySnapshot destroys the specified snapshot.
 func (c *Container) DestroySnapshot(snapshot Snapshot) error {
 	if err := c.makeSure(isDefined); err != nil {
 		return err
@@ -146,7 +146,7 @@ func (c *Container) DestroySnapshot(snapshot Snapshot) error {
 	return nil
 }
 
-// Snapshots returns the list of container snapshots
+// Snapshots returns the list of container snapshots.
 func (c *Container) Snapshots() ([]Snapshot, error) {
 	if err := c.makeSure(isDefined); err != nil {
 		return nil, err
@@ -176,7 +176,7 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 	return snapshots, nil
 }
 
-// State returns the state of the container
+// State returns the state of the container.
 func (c *Container) State() State {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -184,7 +184,8 @@ func (c *Container) State() State {
 	return stateMap[C.GoString(C.lxc_state(c.container))]
 }
 
-// InitPID returns the process ID of the container's init process seen from outside the container
+// InitPID returns the process ID of the container's init process
+// seen from outside the container.
 func (c *Container) InitPID() int {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -192,7 +193,7 @@ func (c *Container) InitPID() int {
 	return int(C.lxc_init_pid(c.container))
 }
 
-// Daemonize returns whether the container wished to be daemonized
+// Daemonize returns true if the container wished to be daemonized.
 func (c *Container) Daemonize() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -200,7 +201,7 @@ func (c *Container) Daemonize() bool {
 	return bool(c.container.daemonize)
 }
 
-// WantDaemonize sets the daemonize flag for the container
+// WantDaemonize determines if the container wants to run daemonized.
 func (c *Container) WantDaemonize(state bool) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -211,7 +212,8 @@ func (c *Container) WantDaemonize(state bool) error {
 	return nil
 }
 
-// WantCloseAllFds sets the close_all_fds flag for the container
+// WantCloseAllFds determines whether container wishes all file descriptors
+// to be closed on startup.
 func (c *Container) WantCloseAllFds(state bool) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -230,7 +232,7 @@ func (c *Container) SetVerbosity(verbosity Verbosity) {
 	c.verbosity = verbosity
 }
 
-// Freeze freezes the running container
+// Freeze freezes the running container.
 func (c *Container) Freeze() error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -250,7 +252,7 @@ func (c *Container) Freeze() error {
 	return nil
 }
 
-// Unfreeze thaws the frozen container
+// Unfreeze thaws the frozen container.
 func (c *Container) Unfreeze() error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -270,7 +272,7 @@ func (c *Container) Unfreeze() error {
 	return nil
 }
 
-// CreateUsing creates the container using given template and arguments with specified backend
+// CreateUsing creates the container using given arguments with specified backend.
 func (c *Container) CreateUsing(template string, backend BackendStore, args ...string) error {
 	// FIXME: Support bdevtype and bdev_specs
 	// bdevtypes:
@@ -312,12 +314,12 @@ func (c *Container) CreateUsing(template string, backend BackendStore, args ...s
 	return nil
 }
 
-// Create creates the container using given template and arguments with Directory backend
+// Create creates the container using the Directory backendstore.
 func (c *Container) Create(template string, args ...string) error {
 	return c.CreateUsing(template, Directory, args...)
 }
 
-// CreateAsUser creates the container using given template and arguments with Directory backend as an unprivileged user
+// CreateAsUser creates the container as "unprivileged user" using the Directory backendstore.
 func (c *Container) CreateAsUser(distro string, release string, arch string, args ...string) error {
 	// required parameters
 	nargs := []string{"-d", distro, "-r", release, "-a", arch}
@@ -327,7 +329,7 @@ func (c *Container) CreateAsUser(distro string, release string, arch string, arg
 	return c.CreateUsing("download", Directory, nargs...)
 }
 
-// Start starts the container
+// Start starts the container.
 func (c *Container) Start() error {
 	if err := c.makeSure(isDefined | isNotRunning); err != nil {
 		return err
@@ -342,7 +344,7 @@ func (c *Container) Start() error {
 	return nil
 }
 
-// Execute executes the given command in a temporary container
+// Execute executes the given command in a temporary container.
 func (c *Container) Execute(args ...string) ([]byte, error) {
 	if err := c.makeSure(isNotDefined); err != nil {
 		return nil, err
@@ -374,7 +376,7 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 	*/
 }
 
-// Stop stops the container
+// Stop stops the container.
 func (c *Container) Stop() error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -389,7 +391,7 @@ func (c *Container) Stop() error {
 	return nil
 }
 
-// Reboot reboots the container
+// Reboot reboots the container.
 func (c *Container) Reboot() error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -404,7 +406,7 @@ func (c *Container) Reboot() error {
 	return nil
 }
 
-// Shutdown shutdowns the container
+// Shutdown shuts down the container.
 func (c *Container) Shutdown(timeout int) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -419,7 +421,7 @@ func (c *Container) Shutdown(timeout int) error {
 	return nil
 }
 
-// Destroy destroys the container
+// Destroy destroys the container.
 func (c *Container) Destroy() error {
 	if err := c.makeSure(isDefined | isNotRunning); err != nil {
 		return err
@@ -434,7 +436,7 @@ func (c *Container) Destroy() error {
 	return nil
 }
 
-// CloneUsing clones the container using specified backend
+// CloneUsing clones the container using given arguments with specified backend.
 func (c *Container) CloneUsing(name string, backend BackendStore, flags CloneFlags) error {
 	// FIXME: support lxcpath, bdevtype, bdevdata, newsize and hookargs
 	//
@@ -469,12 +471,12 @@ func (c *Container) CloneUsing(name string, backend BackendStore, flags CloneFla
 	return nil
 }
 
-// Clone clones the container using the Directory backendstore
+// Clone clones the container using the Directory backendstore.
 func (c *Container) Clone(name string) error {
 	return c.CloneUsing(name, Directory, 0)
 }
 
-// Rename renames the container
+// Rename renames the container.
 func (c *Container) Rename(name string) error {
 	if err := c.makeSure(isDefined | isNotRunning); err != nil {
 		return err
@@ -492,7 +494,7 @@ func (c *Container) Rename(name string) error {
 	return nil
 }
 
-// Wait waits for container to reach a given state or timeouts
+// Wait waits for container to reach a given state until it timeouts.
 func (c *Container) Wait(state State, timeout int) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -503,7 +505,7 @@ func (c *Container) Wait(state State, timeout int) bool {
 	return bool(C.lxc_wait(c.container, cstate, C.int(timeout)))
 }
 
-// ConfigFileName returns the container's configuration file's name
+// ConfigFileName returns the container's configuration file's name.
 func (c *Container) ConfigFileName() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -515,7 +517,7 @@ func (c *Container) ConfigFileName() string {
 	return C.GoString(configFileName)
 }
 
-// ConfigItem returns the value of the given config item
+// ConfigItem returns the value of the given config item.
 func (c *Container) ConfigItem(key string) []string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -531,7 +533,7 @@ func (c *Container) ConfigItem(key string) []string {
 	return strings.Split(ret, "\n")
 }
 
-// SetConfigItem sets the value of the given config item
+// SetConfigItem sets the value of the given config item.
 func (c *Container) SetConfigItem(key string, value string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -548,7 +550,7 @@ func (c *Container) SetConfigItem(key string, value string) error {
 	return nil
 }
 
-// CgroupItem returns the value of the given cgroup subsystem value
+// CgroupItem returns the value of the given cgroup subsystem value.
 func (c *Container) CgroupItem(key string) []string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -564,7 +566,7 @@ func (c *Container) CgroupItem(key string) []string {
 	return strings.Split(ret, "\n")
 }
 
-// SetCgroupItem sets the value of given cgroup subsystem value
+// SetCgroupItem sets the value of given cgroup subsystem value.
 func (c *Container) SetCgroupItem(key string, value string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -581,7 +583,7 @@ func (c *Container) SetCgroupItem(key string, value string) error {
 	return nil
 }
 
-// ClearConfigItem clears the value of given config item
+// ClearConfigItem clears the value of given config item.
 func (c *Container) ClearConfigItem(key string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -595,7 +597,7 @@ func (c *Container) ClearConfigItem(key string) error {
 	return nil
 }
 
-// ConfigKeys returns the names of the config items
+// ConfigKeys returns the names of the config items.
 func (c *Container) ConfigKeys(key ...string) []string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -618,7 +620,7 @@ func (c *Container) ConfigKeys(key ...string) []string {
 	return strings.Split(ret, "\n")
 }
 
-// LoadConfigFile loads the configuration file from given path
+// LoadConfigFile loads the configuration file from given path.
 func (c *Container) LoadConfigFile(path string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -632,7 +634,7 @@ func (c *Container) LoadConfigFile(path string) error {
 	return nil
 }
 
-// SaveConfigFile saves the configuration file to given path
+// SaveConfigFile saves the configuration file to given path.
 func (c *Container) SaveConfigFile(path string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -646,7 +648,7 @@ func (c *Container) SaveConfigFile(path string) error {
 	return nil
 }
 
-// ConfigPath returns the configuration file's path
+// ConfigPath returns the configuration file's path.
 func (c *Container) ConfigPath() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -654,7 +656,7 @@ func (c *Container) ConfigPath() string {
 	return C.GoString(C.lxc_get_config_path(c.container))
 }
 
-// SetConfigPath sets the configuration file's path
+// SetConfigPath sets the configuration file's path.
 func (c *Container) SetConfigPath(path string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -668,7 +670,7 @@ func (c *Container) SetConfigPath(path string) error {
 	return nil
 }
 
-// MemoryUsage returns memory usage of the container in bytes
+// MemoryUsage returns memory usage of the container in bytes.
 func (c *Container) MemoryUsage() (ByteSize, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
@@ -684,7 +686,7 @@ func (c *Container) MemoryUsage() (ByteSize, error) {
 	return ByteSize(memUsed), err
 }
 
-// KernelMemoryUsage returns current kernel memory allocation of the container in bytes
+// KernelMemoryUsage returns current kernel memory allocation of the container in bytes.
 func (c *Container) KernelMemoryUsage() (ByteSize, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
@@ -700,7 +702,7 @@ func (c *Container) KernelMemoryUsage() (ByteSize, error) {
 	return ByteSize(kmemUsed), err
 }
 
-// SwapUsage returns swap usage of the container in bytes
+// SwapUsage returns swap usage of the container in bytes.
 func (c *Container) SwapUsage() (ByteSize, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
@@ -716,7 +718,7 @@ func (c *Container) SwapUsage() (ByteSize, error) {
 	return ByteSize(swapUsed), err
 }
 
-// BlkioUsage returns number of bytes transferred to/from the disk by the container
+// BlkioUsage returns number of bytes transferred to/from the disk by the container.
 func (c *Container) BlkioUsage() (ByteSize, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
@@ -738,7 +740,7 @@ func (c *Container) BlkioUsage() (ByteSize, error) {
 	return -1, fmt.Errorf(errBlkioUsage, c.name)
 }
 
-// MemoryLimit returns memory limit of the container in bytes
+// MemoryLimit returns memory limit of the container in bytes.
 func (c *Container) MemoryLimit() (ByteSize, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
@@ -754,7 +756,7 @@ func (c *Container) MemoryLimit() (ByteSize, error) {
 	return ByteSize(memLimit), err
 }
 
-// SetMemoryLimit sets memory limit of the container in bytes
+// SetMemoryLimit sets memory limit of the container in bytes.
 func (c *Container) SetMemoryLimit(limit ByteSize) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -766,7 +768,7 @@ func (c *Container) SetMemoryLimit(limit ByteSize) error {
 	return nil
 }
 
-// KernelMemoryLimit returns kernel memory limit of the container in bytes
+// KernelMemoryLimit returns kernel memory limit of the container in bytes.
 func (c *Container) KernelMemoryLimit() (ByteSize, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
@@ -782,7 +784,7 @@ func (c *Container) KernelMemoryLimit() (ByteSize, error) {
 	return ByteSize(kmemLimit), err
 }
 
-// SetKernelMemoryLimit sets kernel memory limit of the container in bytes
+// SetKernelMemoryLimit sets kernel memory limit of the container in bytes.
 func (c *Container) SetKernelMemoryLimit(limit ByteSize) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -794,7 +796,7 @@ func (c *Container) SetKernelMemoryLimit(limit ByteSize) error {
 	return nil
 }
 
-// SwapLimit returns the swap limit of the container in bytes
+// SwapLimit returns the swap limit of the container in bytes.
 func (c *Container) SwapLimit() (ByteSize, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
@@ -810,7 +812,7 @@ func (c *Container) SwapLimit() (ByteSize, error) {
 	return ByteSize(swapLimit), err
 }
 
-// SetSwapLimit sets memory limit of the container in bytes
+// SetSwapLimit sets memory limit of the container in bytes.
 func (c *Container) SetSwapLimit(limit ByteSize) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -822,7 +824,8 @@ func (c *Container) SetSwapLimit(limit ByteSize) error {
 	return nil
 }
 
-// CPUTime returns the total CPU time (in nanoseconds) consumed by all tasks in this cgroup (including tasks lower in the hierarchy).
+// CPUTime returns the total CPU time (in nanoseconds) consumed by all tasks
+// in this cgroup (including tasks lower in the hierarchy).
 func (c *Container) CPUTime() (time.Duration, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
@@ -929,7 +932,7 @@ func (c *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) err
 	return nil
 }
 
-// AttachShell runs a shell inside the container
+// AttachShell attaches a shell to the container.
 func (c *Container) AttachShell() error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -944,8 +947,8 @@ func (c *Container) AttachShell() error {
 	return nil
 }
 
-// AttachShellWithClearEnvironment runs a shell inside the container and
-// clears all environment variables before attaching
+// AttachShellWithClearEnvironment attaches a shell to the container.
+// It clears all environment variables before attaching.
 func (c *Container) AttachShellWithClearEnvironment() error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -960,7 +963,7 @@ func (c *Container) AttachShellWithClearEnvironment() error {
 	return nil
 }
 
-// RunCommand runs the user specified command inside the container and waits it to exit
+// RunCommand runs the user specified command inside the container and waits for it to exit.
 func (c *Container) RunCommand(args ...string) error {
 	if args == nil {
 		return fmt.Errorf(errInsufficientNumberOfArguments)
@@ -983,7 +986,7 @@ func (c *Container) RunCommand(args ...string) error {
 }
 
 // RunCommandWithClearEnvironment runs the user specified command inside the container
-// and waits it to exit. It also clears all environment variables before attaching.
+// and waits for it to exit. It clears all environment variables before runnign.
 func (c *Container) RunCommandWithClearEnvironment(args ...string) error {
 	if args == nil {
 		return fmt.Errorf(errInsufficientNumberOfArguments)
@@ -1005,7 +1008,7 @@ func (c *Container) RunCommandWithClearEnvironment(args ...string) error {
 	return nil
 }
 
-// Interfaces returns the name of the network interfaces from the container
+// Interfaces returns the names of the network interfaces.
 func (c *Container) Interfaces() ([]string, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return nil, err
@@ -1021,7 +1024,7 @@ func (c *Container) Interfaces() ([]string, error) {
 	return convertArgs(result), nil
 }
 
-// IPAddress returns the IP address of the given network interface from the container
+// IPAddress returns the IP address of the given network interface.
 func (c *Container) IPAddress(interfaceName string) ([]string, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return nil, err
@@ -1040,7 +1043,7 @@ func (c *Container) IPAddress(interfaceName string) ([]string, error) {
 	return convertArgs(result), nil
 }
 
-// IPAddresses returns all IP addresses from the container
+// IPAddresses returns all IP addresses.
 func (c *Container) IPAddresses() ([]string, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return nil, err
@@ -1057,7 +1060,7 @@ func (c *Container) IPAddresses() ([]string, error) {
 
 }
 
-// IPv4Addresses returns all IPv4 addresses from the container
+// IPv4Addresses returns all IPv4 addresses.
 func (c *Container) IPv4Addresses() ([]string, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return nil, err
@@ -1076,7 +1079,7 @@ func (c *Container) IPv4Addresses() ([]string, error) {
 	return convertArgs(result), nil
 }
 
-// IPv6Addresses returns all IPv6 addresses from the container
+// IPv6Addresses returns all IPv6 addresses.
 func (c *Container) IPv6Addresses() ([]string, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return nil, err
@@ -1095,12 +1098,12 @@ func (c *Container) IPv6Addresses() ([]string, error) {
 	return convertArgs(result), nil
 }
 
-// LogFile returns the name of the logfile
+// LogFile returns the name of the logfile.
 func (c *Container) LogFile() string {
 	return c.ConfigItem("lxc.logfile")[0]
 }
 
-// SetLogFile sets the logfile to given filename
+// SetLogFile sets the name of the logfile.
 func (c *Container) SetLogFile(filename string) error {
 	if err := c.SetConfigItem("lxc.logfile", filename); err != nil {
 		return err
@@ -1108,12 +1111,12 @@ func (c *Container) SetLogFile(filename string) error {
 	return nil
 }
 
-// LogLevel returns the name of the logfile
+// LogLevel returns the level of the logfile.
 func (c *Container) LogLevel() LogLevel {
 	return logLevelMap[c.ConfigItem("lxc.loglevel")[0]]
 }
 
-// SetLogLevel sets the logfile to given filename
+// SetLogLevel sets the level of the logfile.
 func (c *Container) SetLogLevel(level LogLevel) error {
 	if err := c.SetConfigItem("lxc.loglevel", level.String()); err != nil {
 		return err
@@ -1121,7 +1124,7 @@ func (c *Container) SetLogLevel(level LogLevel) error {
 	return nil
 }
 
-// AddDeviceNode adds specified device to the container
+// AddDeviceNode adds specified device to the container.
 func (c *Container) AddDeviceNode(source string, destination ...string) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
@@ -1150,7 +1153,7 @@ func (c *Container) AddDeviceNode(source string, destination ...string) error {
 
 }
 
-// RemoveDeviceNode removes the specified device from the container
+// RemoveDeviceNode removes the specified device from the container.
 func (c *Container) RemoveDeviceNode(source string, destination ...string) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
