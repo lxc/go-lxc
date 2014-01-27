@@ -63,10 +63,10 @@ const (
 	errSettingConfigPathFailed       = "setting config file for the container %q failed (path: %s)"
 	errSettingKMemoryLimitFailed     = "setting kernel memory limit for the container %q failed"
 	errSettingMemoryLimitFailed      = "setting memory limit for the container %q failed"
-	errSettingSwapLimitFailed        = "setting swap limit for the container %q failed"
+	errSettingMemorySwapLimitFailed  = "setting memroy+swap limit for the container %q failed"
 	errShutdownFailed                = "shutting down the container %q failed"
 	errStartFailed                   = "starting the container %q failed"
 	errStopFailed                    = "stopping the container %q failed"
-	errSwapLimit                     = "your kernel does not support cgroup swap controller"
+	errMemorySwapLimit               = "your kernel does not support cgroup swap controller"
 	errUnfreezeFailed                = "unfreezing the container %q failed"
 )

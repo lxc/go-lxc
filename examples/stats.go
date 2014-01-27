@@ -78,18 +78,18 @@ func main() {
 	}
 
 	// swap
-	swapUsed, err := c.SwapUsage()
+	swapUsed, err := c.MemorySwapUsage()
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
-		log.Printf("SwapUsage: %s\n", swapUsed)
+		log.Printf("MemorySwapUsage: %s\n", swapUsed)
 	}
 
-	swapLimit, err := c.SwapLimit()
+	swapLimit, err := c.MemorySwapLimit()
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	} else {
-		log.Printf("SwapLimit: %s\n", swapLimit)
+		log.Printf("MemorySwapLimit: %s\n", swapLimit)
 	}
 
 	// blkio

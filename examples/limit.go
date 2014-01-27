@@ -51,7 +51,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	swapLimit, err := c.SwapLimit()
+	memorySwapLimit, err := c.MemorySwapLimit()
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
@@ -59,7 +59,7 @@ func main() {
 	if err := c.SetMemoryLimit(memLimit / 4); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	if err := c.SetSwapLimit(swapLimit / 4); err != nil {
+	if err := c.SetMemorySwapLimit(memorySwapLimit / 4); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

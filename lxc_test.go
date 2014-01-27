@@ -660,14 +660,14 @@ func TestKernelMemoryUsage(t *testing.T) {
 	}
 }
 
-func TestSwapUsage(t *testing.T) {
+func TestMemorySwapUsage(t *testing.T) {
 	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(c)
 
-	if _, err := c.SwapUsage(); err != nil {
+	if _, err := c.MemorySwapUsage(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -708,14 +708,14 @@ func TestKernelMemoryLimit(t *testing.T) {
 	}
 }
 
-func TestSwapLimit(t *testing.T) {
+func TestMemorySwapLimit(t *testing.T) {
 	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(c)
 
-	if _, err := c.SwapLimit(); err != nil {
+	if _, err := c.MemorySwapLimit(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -759,21 +759,21 @@ func TestSetKernelMemoryLimit(t *testing.T) {
 	}
 }
 
-func TestSetSwapLimit(t *testing.T) {
+func TestSetMemorySwapLimit(t *testing.T) {
 	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(c)
 
-	oldSwapLimit, _ := c.SwapLimit()
+	oldMemorySwapLimit, _ := c.MemorySwapLimit()
 
-	if err := c.SetSwapLimit(oldSwapLimit / 4); err != nil {
+	if err := c.SetMemorySwapLimit(oldMemorySwapLimit / 4); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	newSwapLimit, _ := c.SwapLimit()
-	if newSwapLimit != oldSwapLimit/4 {
+	newMemorySwapLimit, _ := c.MemorySwapLimit()
+	if newMemorySwapLimit != oldMemorySwapLimit/4 {
 		t.Errorf("SetSwapLimit failed")
 	}
 }
