@@ -865,7 +865,7 @@ func (c *Container) CPUTimePerCPU() ([]time.Duration, error) {
 
 // CPUStats returns the number of CPU cycles (in the units defined by USER_HZ on the system)
 // consumed by tasks in this cgroup and its children in both user mode and system (kernel) mode.
-func (c *Container) CPUStats() ([]int64, error) {
+func (c *Container) CPUStats() (map[string]int64, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return nil, err
 	}
@@ -874,15 +874,16 @@ func (c *Container) CPUStats() ([]int64, error) {
 	defer c.mu.RUnlock()
 
 	cpuStat := c.CgroupItem("cpuacct.stat")
-	user, err := strconv.ParseInt(strings.Split(cpuStat[0], " ")[1], 10, 64)
+	user, err := strconv.ParseInt(strings.Split(cpuStat[0], "user ")[1], 10, 64)
 	if err != nil {
 		return nil, err
 	}
-	system, err := strconv.ParseInt(strings.Split(cpuStat[1], " ")[1], 10, 64)
+	system, err := strconv.ParseInt(strings.Split(cpuStat[1], "system ")[1], 10, 64)
 	if err != nil {
 		return nil, err
 	}
-	return []int64{user, system}, nil
+
+	return map[string]int64{"user": user, "system": system}, nil
 }
 
 // ConsoleGetFD allocates a console tty from container
