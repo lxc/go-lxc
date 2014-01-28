@@ -97,6 +97,10 @@ bool lxc_clear_config_item(struct lxc_container *c, const char *key) {
 	return c->clear_config_item(c, key);
 }
 
+char* lxc_get_running_config_item(struct lxc_container *c, const char *key) {
+    return c->get_running_config_item(c, key);
+}
+
 char* lxc_get_keys(struct lxc_container *c, const char *key) {
 	int len = c->get_keys(c, key, NULL, 0);
 	if (len <= 0) {

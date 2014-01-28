@@ -550,6 +550,22 @@ func (c *Container) SetConfigItem(key string, value string) error {
 	return nil
 }
 
+// RunningConfigItem returns the value of the given config item.
+func (c *Container) RunningConfigItem(key string) []string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(ckey))
+
+	// allocated in lxc.c
+	configItem := C.lxc_get_running_config_item(c.container, ckey)
+	defer C.free(unsafe.Pointer(configItem))
+
+	ret := strings.TrimSpace(C.GoString(configItem))
+	return strings.Split(ret, "\n")
+}
+
 // CgroupItem returns the value of the given cgroup subsystem value.
 func (c *Container) CgroupItem(key string) []string {
 	c.mu.RLock()
