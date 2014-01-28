@@ -15,6 +15,7 @@ import "C"
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -1038,6 +1039,53 @@ func (c *Container) Interfaces() ([]string, error) {
 		return nil, fmt.Errorf(errInterfaces, c.name)
 	}
 	return convertArgs(result), nil
+}
+
+// InterfaceStats returns the stats about container's network interfaces
+func (c *Container) InterfaceStats() (map[string]map[string]ByteSize, error) {
+	if err := c.makeSure(isDefined | isRunning); err != nil {
+		return nil, err
+	}
+
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	var interfaceName string
+
+	statistics := make(map[string]map[string]ByteSize)
+
+	for i := 0; i < len(c.ConfigItem("lxc.network")); i++ {
+		interfaceType := c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.type", i))
+		if interfaceType == nil {
+			continue
+		}
+
+		if interfaceType[0] == "veth" {
+			interfaceName = c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.veth.pair", i))[0]
+		} else {
+			interfaceName = c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.link", i))[0]
+		}
+
+		for _, v := range []string{"rx", "tx"} {
+			/* tx and rx are reversed from the host vs container */
+			content, err := ioutil.ReadFile(fmt.Sprintf("/sys/class/net/%s/statistics/%s_bytes", interfaceName, v))
+			if err != nil {
+				return nil, err
+			}
+
+			bytes, err := strconv.ParseInt(strings.Split(string(content), "\n")[0], 10, 64)
+			if err != nil {
+				return nil, err
+			}
+
+			if statistics[interfaceName] == nil {
+				statistics[interfaceName] = make(map[string]ByteSize)
+			}
+			statistics[interfaceName][v] = ByteSize(bytes)
+		}
+	}
+
+	return statistics, nil
 }
 
 // IPAddress returns the IP address of the given network interface.

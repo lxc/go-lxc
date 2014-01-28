@@ -110,11 +110,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	log.Printf("cpuacct.usageerrpercpu: %s\n", cpuTimePerCPU)
+	log.Printf("cpuacct.usageerrpercpu: %v\n", cpuTimePerCPU)
 
 	cpuStats, err := c.CPUStats()
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 	log.Printf("cpuacct.stat: %v\n", cpuStats)
+
+	interfaceStats, err := c.InterfaceStats()
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
+	log.Printf("InterfaceStats: %v\n", interfaceStats)
 }
