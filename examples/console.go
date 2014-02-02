@@ -25,6 +25,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/caglar10ur/lxc"
 )
@@ -48,7 +49,7 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	log.Printf("Attaching to container's console...\n")
-	if err := c.Console(-1, 0, 1, 2, 1); err != nil {
+	if err := c.Console(-1, os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), 1); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

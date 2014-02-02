@@ -933,7 +933,7 @@ func (c *Container) ConsoleGetFD(ttynum int) (int, error) {
 // escape: he escape character (1 == 'a', 2 == 'b', ...)
 //
 // This function will not return until the console has been exited by the user.
-func (c *Container) Console(ttynum, stdinfd, stdoutfd, stderrfd, escape int) error {
+func (c *Container) Console(ttynum int, stdinfd, stdoutfd, stderrfd uintptr, escape int) error {
 	// FIXME: Make idiomatic
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
