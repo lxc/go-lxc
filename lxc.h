@@ -41,7 +41,7 @@ extern char* lxc_get_keys(struct lxc_container *c, const char *key);
 extern char* lxc_get_running_config_item(struct lxc_container *c, const char *key);
 extern const char* lxc_get_config_path(struct lxc_container *c);
 extern const char* lxc_state(struct lxc_container *c);
-extern int lxc_attach_run_wait(struct lxc_container *c, bool clear_env, const char * const argv[]);
+extern int lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd, int stdoutfd, int stderrfd, const char * const argv[]);
 extern int lxc_attach(struct lxc_container *c, bool clear_env);
 extern int lxc_console_getfd(struct lxc_container *c, int ttynum);
 extern int lxc_snapshot_list(struct lxc_container *c, struct lxc_snapshot **ret);

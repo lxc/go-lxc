@@ -224,7 +224,7 @@ int lxc_attach(struct lxc_container *c, bool clear_env) {
 	return -1;
 }
 
-int lxc_attach_run_wait(struct lxc_container *c, bool clear_env, const char * const argv[]) {
+int lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd, int stdoutfd, int stderrfd, const char * const argv[]) {
 	int ret;
 	lxc_attach_options_t attach_options = LXC_ATTACH_OPTIONS_DEFAULT;
 
@@ -232,6 +232,9 @@ int lxc_attach_run_wait(struct lxc_container *c, bool clear_env, const char * co
 	if (clear_env) {
 		attach_options.env_policy = LXC_ATTACH_CLEAR_ENV;
 	}
+	attach_options.stdin_fd = stdinfd;
+	attach_options.stdout_fd = stdoutfd;
+	attach_options.stderr_fd = stderrfd;
 
 	ret = c->attach_run_wait(c, &attach_options, argv[0], argv);
 	if (WIFEXITED(ret) && WEXITSTATUS(ret) == 255)
