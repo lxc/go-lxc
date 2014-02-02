@@ -49,6 +49,8 @@ func main() {
 
 	log.Printf("Shutting down the container...\n")
 	if err := c.Shutdown(30); err != nil {
-		log.Fatalf("ERROR: %s\n", err.Error())
+		if err = c.Stop(); err != nil {
+			log.Fatalf("ERROR: %s\n", err.Error())
+		}
 	}
 }
