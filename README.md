@@ -6,11 +6,12 @@ This package implements [Go](http://golang.org) bindings for the [LXC](http://li
 
 This package requires [LXC 0.9+](https://github.com/lxc/lxc/releases) and [Go 1.x](https://code.google.com/p/go/downloads/list).
 
-It has been tested on 
+It has been tested on
 
-+ Ubuntu 12.10 (quantal) by manually installing LXC 0.9 
++ Ubuntu 12.10 (quantal) by manually installing LXC 0.9
 + Ubuntu 13.04 (raring) by using distribution [provided packages](https://launchpad.net/ubuntu/raring/+package/lxc)
 + Ubuntu 13.10 (saucy) by using distribution [provided packages](https://launchpad.net/ubuntu/saucy/+package/lxc)
++ Ubuntu 14.04 (trusty) by using distribution [provided packages](https://launchpad.net/ubuntu/trusty/+package/lxc)
 
 ## Installing
 
@@ -26,9 +27,7 @@ See the [examples](https://github.com/caglar10ur/lxc/tree/master/examples) direc
 
 ## Notes
 
-Note that as we don’t have full user namespaces support at the moment, any code using the LXC API needs to run as root.
-
-Also please be aware that LXC C API is not considered stable until LXC 1.0 release. Development branch (see below) is currently **under heavy development with incompatible changes** and will be merged to master once LXC 1.0 released.
+Please be aware that LXC C API is not considered stable until LXC 1.0 release. Development branch (see below) is currently **under heavy development with incompatible changes** and will be merged to master once LXC 1.0 released.
 
 ## Contributing
 
