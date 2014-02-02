@@ -12,12 +12,28 @@ test:
 	@echo "$(OK_COLOR)==> Running go test $(NO_COLOR)"
 	@sudo `which go` test -v
 
-#echo 1 | sudo tee -a /sys/fs/cgroup/cpuset/cgroup.clone_children > /dev/null
+# Using LXC as an unprivileged user - https://gist.github.com/caglar10ur/8429502
+# 
 #echo 1 | sudo tee -a /sys/fs/cgroup/memory/memory.use_hierarchy > /dev/null
-#for controller in /sys/fs/cgroup/*; do sudo mkdir -p $controller/$USER; sudo chown -R $USER $controller/$USER; echo $$ > $controller/$\$USER/tasks; done
+#
+#for entry in /sys/fs/cgroup/*/cgroup.clone_children; do
+#    echo 1 | sudo tee -a $entry > /dev/null
+#done
+#
+#for controller in /sys/fs/cgroup/*; do
+#    sudo mkdir -p $controller/$USER
+#    sudo chown -R $USER $controller/$USER
+#    echo $$ > $controller/$USER/tasks
+#done
 
 #cat /etc/lxc/lxc-usernet
 #caglar veth lxcbr0 1
+
+#cat /etc/subuid
+#caglar:100000:100000
+
+#cat /etc/subgid
+#caglar:100000:100000
 
 #cat ~/.config/lxc/default.conf
 #lxc.network.type = veth
