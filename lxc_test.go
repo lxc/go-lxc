@@ -822,7 +822,7 @@ func TestRunCommand(t *testing.T) {
 	defer lxc.PutContainer(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	if err := c.RunCommand(argsThree...); err != nil {
+	if err := c.RunCommand(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -835,7 +835,7 @@ func TestRunCommandWithClearEnvironment(t *testing.T) {
 	defer lxc.PutContainer(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	if err := c.RunCommandWithClearEnvironment(argsThree...); err != nil {
+	if err := c.RunCommandWithClearEnvironment(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...); err != nil {
 		t.Errorf(err.Error())
 	}
 }

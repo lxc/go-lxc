@@ -981,7 +981,10 @@ func (c *Container) AttachShellWithClearEnvironment() error {
 }
 
 // RunCommand runs the user specified command inside the container and waits for it to exit.
-func (c *Container) RunCommand(args ...string) error {
+// stdinfd: fd to read input from
+// stdoutfd: fd to write output to
+// stderrfd: fd to write error output to
+func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...string) error {
 	if args == nil {
 		return fmt.Errorf(errInsufficientNumberOfArguments)
 	}
@@ -996,7 +999,7 @@ func (c *Container) RunCommand(args ...string) error {
 	cargs := makeNullTerminatedArgs(args)
 	defer freeNullTerminatedArgs(cargs, len(args))
 
-	if int(C.lxc_attach_run_wait(c.container, false, cargs)) < 0 {
+	if int(C.lxc_attach_run_wait(c.container, false, C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs)) < 0 {
 		return fmt.Errorf(errAttachFailed, c.name)
 	}
 	return nil
@@ -1004,7 +1007,10 @@ func (c *Container) RunCommand(args ...string) error {
 
 // RunCommandWithClearEnvironment runs the user specified command inside the container
 // and waits for it to exit. It clears all environment variables before runnign.
-func (c *Container) RunCommandWithClearEnvironment(args ...string) error {
+// stdinfd: fd to read input from
+// stdoutfd: fd to write output to
+// stderrfd: fd to write error output to
+func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd uintptr, args ...string) error {
 	if args == nil {
 		return fmt.Errorf(errInsufficientNumberOfArguments)
 	}
@@ -1019,7 +1025,7 @@ func (c *Container) RunCommandWithClearEnvironment(args ...string) error {
 	cargs := makeNullTerminatedArgs(args)
 	defer freeNullTerminatedArgs(cargs, len(args))
 
-	if int(C.lxc_attach_run_wait(c.container, true, cargs)) < 0 {
+	if int(C.lxc_attach_run_wait(c.container, true, C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs)) < 0 {
 		return fmt.Errorf(errAttachFailed, c.name)
 	}
 	return nil
