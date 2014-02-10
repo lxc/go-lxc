@@ -34,10 +34,6 @@ const (
 	Arch                      = "amd64"
 )
 
-func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-}
-
 func unprivileged() bool {
 	if os.Geteuid() != 0 {
 		return true
@@ -85,6 +81,8 @@ func TestGetContainer(t *testing.T) {
 }
 
 func TestConcurrentDefined_Negative(t *testing.T) {
+	defer runtime.GOMAXPROCS(runtime.NumCPU())
+
 	var wg sync.WaitGroup
 
 	for i := 0; i <= 100; i++ {
@@ -208,6 +206,8 @@ func TestRestoreSnapshot(t *testing.T) {
 }
 
 func TestConcurrentCreate(t *testing.T) {
+	defer runtime.GOMAXPROCS(runtime.NumCPU())
+
 	if unprivileged() {
 		t.Skip("skipping test in unprivileged mode.")
 	}
@@ -248,6 +248,8 @@ func TestSnapshots(t *testing.T) {
 }
 
 func TestConcurrentStart(t *testing.T) {
+	defer runtime.GOMAXPROCS(runtime.NumCPU())
+
 	if unprivileged() {
 		t.Skip("skipping test in unprivileged mode.")
 	}
@@ -303,6 +305,8 @@ func TestDefined_Positive(t *testing.T) {
 }
 
 func TestConcurrentDefined_Positive(t *testing.T) {
+	defer runtime.GOMAXPROCS(runtime.NumCPU())
+
 	if unprivileged() {
 		t.Skip("skipping test in unprivileged mode.")
 	}
@@ -354,7 +358,7 @@ func TestStart(t *testing.T) {
 	}
 
 	c.Wait(lxc.RUNNING, 30)
-	if c.State() != lxc.RUNNING {
+	if !c.Running() {
 		t.Errorf("Starting the container failed...")
 	}
 }
@@ -520,7 +524,7 @@ func TestUnfreeze(t *testing.T) {
 	}
 
 	c.Wait(lxc.RUNNING, 30)
-	if c.State() != lxc.RUNNING {
+	if !c.Running() {
 		t.Errorf("Unfreezing the container failed...")
 	}
 }
@@ -938,6 +942,8 @@ func TestReboot(t *testing.T) {
 }
 
 func TestConcurrentShutdown(t *testing.T) {
+	defer runtime.GOMAXPROCS(runtime.NumCPU())
+
 	if unprivileged() {
 		t.Skip("skipping test in unprivileged mode.")
 	}
@@ -953,7 +959,7 @@ func TestConcurrentShutdown(t *testing.T) {
 			}
 			defer lxc.PutContainer(c)
 
-			if err := c.Shutdown(3); err != nil {
+			if err := c.Shutdown(30); err != nil {
 				t.Errorf(err.Error())
 			}
 
@@ -975,7 +981,7 @@ func TestShutdown(t *testing.T) {
 	}
 	defer lxc.PutContainer(c)
 
-	if err := c.Shutdown(3); err != nil {
+	if err := c.Shutdown(30); err != nil {
 		t.Errorf(err.Error())
 	}
 
@@ -1064,6 +1070,8 @@ func TestDestroy(t *testing.T) {
 }
 
 func TestConcurrentDestroy(t *testing.T) {
+	defer runtime.GOMAXPROCS(runtime.NumCPU())
+
 	if unprivileged() {
 		t.Skip("skipping test in unprivileged mode.")
 	}
