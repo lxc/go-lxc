@@ -29,6 +29,7 @@ const (
 	ContainerRestoreName      = "ipsum"
 	ContainerCloneName        = "consectetur"
 	ContainerCloneOverlayName = "adipiscing"
+	ContainerCloneAufsName    = "pellentesque"
 	Distro                    = "ubuntu"
 	Release                   = "saucy"
 	Arch                      = "amd64"
@@ -172,11 +173,33 @@ func TestClone(t *testing.T) {
 	if err := c.Clone(ContainerCloneName); err != nil {
 		t.Errorf(err.Error())
 	}
+}
 
-	if !unprivileged() {
-		if err := c.CloneUsing(ContainerCloneOverlayName, lxc.Overlayfs, lxc.CloneSnapshot|lxc.CloneKeepName|lxc.CloneKeepMACAddr); err != nil {
-			t.Errorf(err.Error())
-		}
+func TestCloneUsingOverlayfs(t *testing.T) {
+	c, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(c)
+
+	if err := c.CloneUsing(ContainerCloneOverlayName, lxc.Overlayfs, lxc.CloneSnapshot|lxc.CloneKeepName|lxc.CloneKeepMACAddr); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestCloneUsingAufs(t *testing.T) {
+	if unprivileged() {
+		t.Skip("skipping test in unprivileged mode.")
+	}
+
+	c, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(c)
+
+	if err := c.CloneUsing(ContainerCloneAufsName, lxc.Aufs, lxc.CloneSnapshot|lxc.CloneKeepName|lxc.CloneKeepMACAddr); err != nil {
+		t.Errorf(err.Error())
 	}
 }
 
@@ -578,6 +601,18 @@ func TestSetConfigItem(t *testing.T) {
 
 	if c.ConfigItem("lxc.utsname")[0] != ContainerName {
 		t.Errorf("ConfigItem failed...")
+	}
+}
+
+func TestRunningConfigItem(t *testing.T) {
+	c, err := lxc.NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(c)
+
+	if c.RunningConfigItem("lxc.network.0.type") == nil {
+		t.Errorf("RunningConfigItem failed...")
 	}
 }
 
@@ -1026,8 +1061,18 @@ func TestDestroySnapshot(t *testing.T) {
 }
 
 func TestDestroy(t *testing.T) {
+	c, err := lxc.NewContainer(ContainerCloneOverlayName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer lxc.PutContainer(c)
+
+	if err := c.Destroy(); err != nil {
+		t.Errorf(err.Error())
+	}
+
 	if !unprivileged() {
-		c, err := lxc.NewContainer(ContainerCloneOverlayName)
+		c, err = lxc.NewContainer(ContainerCloneAufsName)
 		if err != nil {
 			t.Errorf(err.Error())
 		}
@@ -1038,7 +1083,7 @@ func TestDestroy(t *testing.T) {
 		}
 	}
 
-	c, err := lxc.NewContainer(ContainerCloneName)
+	c, err = lxc.NewContainer(ContainerCloneName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

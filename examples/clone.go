@@ -50,6 +50,7 @@ func main() {
 	directoryClone := name + "Directory"
 	overlayClone := name + "Overlayfs"
 	btrfsClone := name + "Btrfs"
+	aufsClone := name + "Aufs"
 
 	log.Printf("Cloning the container using Directory backend...\n")
 	if err := c.Clone(directoryClone); err != nil {
@@ -58,6 +59,11 @@ func main() {
 
 	log.Printf("Cloning the container using Overlayfs backend...\n")
 	if err := c.CloneUsing(overlayClone, lxc.Overlayfs, lxc.CloneSnapshot); err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
+
+	log.Printf("Cloning the container using Aufs backend...\n")
+	if err := c.CloneUsing(aufsClone, lxc.Aufs, lxc.CloneSnapshot); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 

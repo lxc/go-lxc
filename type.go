@@ -38,6 +38,8 @@ const (
 	LVM
 	// ZFS backendstore type
 	ZFS
+	// AUFS backendstore type
+	Aufs
 	// Overlayfs backendstore type
 	Overlayfs
 	// Loopback backendstore type
@@ -57,6 +59,8 @@ func (t BackendStore) String() string {
 		return "btrfs"
 	case LVM:
 		return "lvm"
+	case Aufs:
+		return "aufs"
 	case Overlayfs:
 		return "overlayfs"
 	case Loopback:
