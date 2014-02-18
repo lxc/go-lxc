@@ -30,7 +30,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/caglar10ur/lxc"
+	"github.com/lxc/go-lxc"
 )
 
 var (

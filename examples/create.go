@@ -27,7 +27,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/caglar10ur/lxc"
+	"github.com/lxc/go-lxc"
 )
 
 var (

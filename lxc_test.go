@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caglar10ur/lxc"
+	"github.com/lxc/go-lxc"
 )
 
 const (

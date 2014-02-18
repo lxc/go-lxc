@@ -29,7 +29,7 @@ import (
 	"sync"
 
 	logger "github.com/caglar10ur/gologger"
-	"github.com/caglar10ur/lxc"
+	"github.com/lxc/go-lxc"
 )
 
 var (
