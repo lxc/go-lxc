@@ -38,7 +38,7 @@ const (
 	LVM
 	// ZFS backendstore type
 	ZFS
-	// AUFS backendstore type
+	// Aufs backendstore type
 	Aufs
 	// Overlayfs backendstore type
 	Overlayfs
