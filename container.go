@@ -43,19 +43,19 @@ type Snapshot struct {
 
 func (c *Container) makeSure(flags int) error {
 	if flags&isDefined != 0 && !c.Defined() {
-		return fmt.Errorf(errNotDefined, c.name)
+		return ErrNotDefined
 	}
 
 	if flags&isNotDefined != 0 && c.Defined() {
-		return fmt.Errorf(errAlreadyDefined, c.name)
+		return ErrAlreadyDefined
 	}
 
 	if flags&isRunning != 0 && !c.Running() {
-		return fmt.Errorf(errNotRunning, c.name)
+		return ErrNotRunning
 	}
 
 	if flags&isNotRunning != 0 && c.Running() {
-		return fmt.Errorf(errAlreadyRunning, c.name)
+		return ErrAlreadyRunning
 	}
 	return nil
 }
@@ -103,7 +103,7 @@ func (c *Container) CreateSnapshot() (*Snapshot, error) {
 
 	ret := int(C.lxc_snapshot(c.container))
 	if ret < 0 {
-		return nil, fmt.Errorf(errCreateSnapshotFailed, c.name)
+		return nil, ErrCreateSnapshotFailed
 	}
 	return &Snapshot{Name: fmt.Sprintf("snap%d", ret)}, nil
 }
@@ -124,7 +124,7 @@ func (c *Container) RestoreSnapshot(snapshot Snapshot, name string) error {
 	defer C.free(unsafe.Pointer(csnapname))
 
 	if !bool(C.lxc_snapshot_restore(c.container, csnapname, cname)) {
-		return fmt.Errorf(errRestoreSnapshotFailed, c.name)
+		return ErrRestoreSnapshotFailed
 	}
 	return nil
 }
@@ -142,7 +142,7 @@ func (c *Container) DestroySnapshot(snapshot Snapshot) error {
 	defer C.free(unsafe.Pointer(csnapname))
 
 	if !bool(C.lxc_snapshot_destroy(c.container, csnapname)) {
-		return fmt.Errorf(errDestroySnapshotFailed, c.name)
+		return ErrDestroySnapshotFailed
 	}
 	return nil
 }
@@ -208,7 +208,7 @@ func (c *Container) WantDaemonize(state bool) error {
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_want_daemonize(c.container, C.bool(state))) {
-		return fmt.Errorf(errDaemonizeFailed, c.name)
+		return ErrDaemonizeFailed
 	}
 	return nil
 }
@@ -220,7 +220,7 @@ func (c *Container) WantCloseAllFds(state bool) error {
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_want_close_all_fds(c.container, C.bool(state))) {
-		return fmt.Errorf(errCloseAllFdsFailed, c.name)
+		return ErrCloseAllFdsFailed
 	}
 	return nil
 }
@@ -240,14 +240,14 @@ func (c *Container) Freeze() error {
 	}
 
 	if c.State() == FROZEN {
-		return fmt.Errorf(errAlreadyFrozen, c.name)
+		return ErrAlreadyFrozen
 	}
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_freeze(c.container)) {
-		return fmt.Errorf(errFreezeFailed, c.name)
+		return ErrFreezeFailed
 	}
 
 	return nil
@@ -260,14 +260,14 @@ func (c *Container) Unfreeze() error {
 	}
 
 	if c.State() != FROZEN {
-		return fmt.Errorf(errNotFrozen, c.name)
+		return ErrNotFrozen
 	}
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_unfreeze(c.container)) {
-		return fmt.Errorf(errUnfreezeFailed, c.name)
+		return ErrUnfreezeFailed
 	}
 
 	return nil
@@ -310,7 +310,7 @@ func (c *Container) CreateUsing(template string, backend BackendStore, args ...s
 	}
 
 	if !ret {
-		return fmt.Errorf(errCreateFailed, c.name)
+		return ErrCreateFailed
 	}
 	return nil
 }
@@ -340,7 +340,7 @@ func (c *Container) Start() error {
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_start(c.container, 0, nil)) {
-		return fmt.Errorf(errStartFailed, c.name)
+		return ErrStartFailed
 	}
 	return nil
 }
@@ -363,7 +363,7 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 	 */
 	output, err := exec.Command(cargs[0], cargs[1:]...).CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf(errExecuteFailed, c.name)
+		return nil, ErrExecuteFailed
 	}
 
 	return output, nil
@@ -372,7 +372,7 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 		defer freeNullTerminatedArgs(cargs, len(args))
 
 		if !bool(C.lxc_start(c.container, 1, cargs)) {
-			return fmt.Errorf(errExecuteFailed, c.name)
+			return ErrExecuteFailed
 		}
 		return nil
 	*/
@@ -388,7 +388,7 @@ func (c *Container) Stop() error {
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_stop(c.container)) {
-		return fmt.Errorf(errStopFailed, c.name)
+		return ErrStopFailed
 	}
 	return nil
 }
@@ -403,7 +403,7 @@ func (c *Container) Reboot() error {
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_reboot(c.container)) {
-		return fmt.Errorf(errRebootFailed, c.name)
+		return ErrRebootFailed
 	}
 	return nil
 }
@@ -418,7 +418,7 @@ func (c *Container) Shutdown(timeout int) error {
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_shutdown(c.container, C.int(timeout))) {
-		return fmt.Errorf(errShutdownFailed, c.name)
+		return ErrShutdownFailed
 	}
 	return nil
 }
@@ -433,7 +433,7 @@ func (c *Container) Destroy() error {
 	defer c.mu.Unlock()
 
 	if !bool(C.lxc_destroy(c.container)) {
-		return fmt.Errorf(errDestroyFailed, c.name)
+		return ErrDestroyFailed
 	}
 	return nil
 }
@@ -471,7 +471,7 @@ func (c *Container) CloneUsing(name string, backend BackendStore, flags CloneFla
 	defer C.free(unsafe.Pointer(cbackend))
 
 	if !bool(C.lxc_clone(c.container, cname, C.int(flags), cbackend)) {
-		return fmt.Errorf(errCloneFailed, c.name)
+		return ErrCloneFailed
 	}
 	return nil
 }
@@ -494,7 +494,7 @@ func (c *Container) Rename(name string) error {
 	defer C.free(unsafe.Pointer(cname))
 
 	if !bool(C.lxc_rename(c.container, cname)) {
-		return fmt.Errorf(errRenameFailed, c.name)
+		return ErrRenameFailed
 	}
 	return nil
 }
@@ -550,7 +550,7 @@ func (c *Container) SetConfigItem(key string, value string) error {
 	defer C.free(unsafe.Pointer(cvalue))
 
 	if !bool(C.lxc_set_config_item(c.container, ckey, cvalue)) {
-		return fmt.Errorf(errSettingConfigItemFailed, c.name, key, value)
+		return ErrSettingConfigItemFailed
 	}
 	return nil
 }
@@ -599,7 +599,7 @@ func (c *Container) SetCgroupItem(key string, value string) error {
 	defer C.free(unsafe.Pointer(cvalue))
 
 	if !bool(C.lxc_set_cgroup_item(c.container, ckey, cvalue)) {
-		return fmt.Errorf(errSettingCgroupItemFailed, c.name, key, value)
+		return ErrSettingCgroupItemFailed
 	}
 	return nil
 }
@@ -621,7 +621,7 @@ func (c *Container) ClearConfigItem(key string) error {
 	defer C.free(unsafe.Pointer(ckey))
 
 	if !bool(C.lxc_clear_config_item(c.container, ckey)) {
-		return fmt.Errorf(errClearingCgroupItemFailed, c.name, key)
+		return ErrClearingCgroupItemFailed
 	}
 	return nil
 }
@@ -658,7 +658,7 @@ func (c *Container) LoadConfigFile(path string) error {
 	defer C.free(unsafe.Pointer(cpath))
 
 	if !bool(C.lxc_load_config(c.container, cpath)) {
-		return fmt.Errorf(errLoadConfigFailed, c.name, path)
+		return ErrLoadConfigFailed
 	}
 	return nil
 }
@@ -672,7 +672,7 @@ func (c *Container) SaveConfigFile(path string) error {
 	defer C.free(unsafe.Pointer(cpath))
 
 	if !bool(C.lxc_save_config(c.container, cpath)) {
-		return fmt.Errorf(errSaveConfigFailed, c.name, path)
+		return ErrSaveConfigFailed
 	}
 	return nil
 }
@@ -694,7 +694,7 @@ func (c *Container) SetConfigPath(path string) error {
 	defer C.free(unsafe.Pointer(cpath))
 
 	if !bool(C.lxc_set_config_path(c.container, cpath)) {
-		return fmt.Errorf(errSettingConfigPathFailed, c.name, path)
+		return ErrSettingConfigPathFailed
 	}
 	return nil
 }
@@ -710,7 +710,7 @@ func (c *Container) MemoryUsage() (ByteSize, error) {
 
 	memUsed, err := strconv.ParseFloat(c.CgroupItem("memory.usage_in_bytes")[0], 64)
 	if err != nil {
-		return -1, fmt.Errorf(errMemLimit)
+		return -1, ErrMemLimit
 	}
 	return ByteSize(memUsed), nil
 }
@@ -726,7 +726,7 @@ func (c *Container) MemoryLimit() (ByteSize, error) {
 
 	memLimit, err := strconv.ParseFloat(c.CgroupItem("memory.limit_in_bytes")[0], 64)
 	if err != nil {
-		return -1, fmt.Errorf(errMemLimit)
+		return -1, ErrMemLimit
 	}
 	return ByteSize(memLimit), nil
 }
@@ -738,7 +738,7 @@ func (c *Container) SetMemoryLimit(limit ByteSize) error {
 	}
 
 	if err := c.SetCgroupItem("memory.limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
-		return fmt.Errorf(errSettingMemoryLimitFailed, c.name)
+		return ErrSettingMemoryLimitFailed
 	}
 	return nil
 }
@@ -754,7 +754,7 @@ func (c *Container) KernelMemoryUsage() (ByteSize, error) {
 
 	kmemUsed, err := strconv.ParseFloat(c.CgroupItem("memory.kmem.usage_in_bytes")[0], 64)
 	if err != nil {
-		return -1, fmt.Errorf(errKMemLimit)
+		return -1, ErrKMemLimit
 	}
 	return ByteSize(kmemUsed), nil
 }
@@ -770,7 +770,7 @@ func (c *Container) KernelMemoryLimit() (ByteSize, error) {
 
 	kmemLimit, err := strconv.ParseFloat(c.CgroupItem("memory.kmem.limit_in_bytes")[0], 64)
 	if err != nil {
-		return -1, fmt.Errorf(errKMemLimit)
+		return -1, ErrKMemLimit
 	}
 	return ByteSize(kmemLimit), nil
 }
@@ -782,7 +782,7 @@ func (c *Container) SetKernelMemoryLimit(limit ByteSize) error {
 	}
 
 	if err := c.SetCgroupItem("memory.kmem.limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
-		return fmt.Errorf(errSettingKMemoryLimitFailed, c.name)
+		return ErrSettingKMemoryLimitFailed
 	}
 	return nil
 }
@@ -798,7 +798,7 @@ func (c *Container) MemorySwapUsage() (ByteSize, error) {
 
 	memorySwapUsed, err := strconv.ParseFloat(c.CgroupItem("memory.memsw.usage_in_bytes")[0], 64)
 	if err != nil {
-		return -1, fmt.Errorf(errMemorySwapLimit)
+		return -1, ErrMemorySwapLimit
 	}
 	return ByteSize(memorySwapUsed), nil
 }
@@ -814,7 +814,7 @@ func (c *Container) MemorySwapLimit() (ByteSize, error) {
 
 	memorySwapLimit, err := strconv.ParseFloat(c.CgroupItem("memory.memsw.limit_in_bytes")[0], 64)
 	if err != nil {
-		return -1, fmt.Errorf(errMemorySwapLimit)
+		return -1, ErrMemorySwapLimit
 	}
 	return ByteSize(memorySwapLimit), nil
 }
@@ -826,7 +826,7 @@ func (c *Container) SetMemorySwapLimit(limit ByteSize) error {
 	}
 
 	if err := c.SetCgroupItem("memory.memsw.limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
-		return fmt.Errorf(errSettingMemorySwapLimitFailed, c.name)
+		return ErrSettingMemorySwapLimitFailed
 	}
 	return nil
 }
@@ -850,7 +850,7 @@ func (c *Container) BlkioUsage() (ByteSize, error) {
 			return ByteSize(blkioUsed), nil
 		}
 	}
-	return -1, fmt.Errorf(errBlkioUsage, c.name)
+	return -1, ErrBlkioUsage
 }
 
 // CPUTime returns the total CPU time (in nanoseconds) consumed by all tasks
@@ -932,7 +932,7 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 
 	ret := int(C.lxc_console_getfd(c.container, C.int(ttynum)))
 	if ret < 0 {
-		return -1, fmt.Errorf(errAttachFailed, c.name)
+		return -1, ErrAttachFailed
 	}
 	return ret, nil
 }
@@ -956,7 +956,7 @@ func (c *Container) Console(ttynum int, stdinfd, stdoutfd, stderrfd uintptr, esc
 
 	if !bool(C.lxc_console(c.container, C.int(ttynum), C.int(stdinfd),
 		C.int(stdoutfd), C.int(stderrfd), C.int(escape))) {
-		return fmt.Errorf(errAttachFailed, c.name)
+		return ErrAttachFailed
 	}
 	return nil
 }
@@ -971,7 +971,7 @@ func (c *Container) AttachShell() error {
 	defer c.mu.Unlock()
 
 	if int(C.lxc_attach(c.container, false)) < 0 {
-		return fmt.Errorf(errAttachFailed, c.name)
+		return ErrAttachFailed
 	}
 	return nil
 }
@@ -987,7 +987,7 @@ func (c *Container) AttachShellWithClearEnvironment() error {
 	defer c.mu.Unlock()
 
 	if int(C.lxc_attach(c.container, true)) < 0 {
-		return fmt.Errorf(errAttachFailed, c.name)
+		return ErrAttachFailed
 	}
 	return nil
 }
@@ -998,7 +998,7 @@ func (c *Container) AttachShellWithClearEnvironment() error {
 // stderrfd: fd to write error output to
 func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...string) error {
 	if args == nil {
-		return fmt.Errorf(errInsufficientNumberOfArguments)
+		return ErrInsufficientNumberOfArguments
 	}
 
 	if err := c.makeSure(isDefined | isRunning); err != nil {
@@ -1012,7 +1012,7 @@ func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...stri
 	defer freeNullTerminatedArgs(cargs, len(args))
 
 	if int(C.lxc_attach_run_wait(c.container, false, C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs)) < 0 {
-		return fmt.Errorf(errAttachFailed, c.name)
+		return ErrAttachFailed
 	}
 	return nil
 }
@@ -1024,7 +1024,7 @@ func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...stri
 // stderrfd: fd to write error output to
 func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd uintptr, args ...string) error {
 	if args == nil {
-		return fmt.Errorf(errInsufficientNumberOfArguments)
+		return ErrInsufficientNumberOfArguments
 	}
 
 	if err := c.makeSure(isDefined | isRunning); err != nil {
@@ -1038,7 +1038,7 @@ func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd u
 	defer freeNullTerminatedArgs(cargs, len(args))
 
 	if int(C.lxc_attach_run_wait(c.container, true, C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs)) < 0 {
-		return fmt.Errorf(errAttachFailed, c.name)
+		return ErrAttachFailed
 	}
 	return nil
 }
@@ -1054,7 +1054,7 @@ func (c *Container) Interfaces() ([]string, error) {
 
 	result := C.lxc_get_interfaces(c.container)
 	if result == nil {
-		return nil, fmt.Errorf(errInterfaces, c.name)
+		return nil, ErrInterfaces
 	}
 	return convertArgs(result), nil
 }
@@ -1120,7 +1120,7 @@ func (c *Container) IPAddress(interfaceName string) ([]string, error) {
 
 	result := C.lxc_get_ips(c.container, cinterface, nil, 0)
 	if result == nil {
-		return nil, fmt.Errorf(errIPAddress, interfaceName, c.name)
+		return nil, ErrIPAddress
 	}
 	return convertArgs(result), nil
 }
@@ -1136,7 +1136,7 @@ func (c *Container) IPAddresses() ([]string, error) {
 
 	result := C.lxc_get_ips(c.container, nil, nil, 0)
 	if result == nil {
-		return nil, fmt.Errorf(errIPAddresses, c.name)
+		return nil, ErrIPAddresses
 	}
 	return convertArgs(result), nil
 
@@ -1156,7 +1156,7 @@ func (c *Container) IPv4Addresses() ([]string, error) {
 
 	result := C.lxc_get_ips(c.container, nil, cfamily, 0)
 	if result == nil {
-		return nil, fmt.Errorf(errIPv4Addresses, c.name)
+		return nil, ErrIPv4Addresses
 	}
 	return convertArgs(result), nil
 }
@@ -1175,7 +1175,7 @@ func (c *Container) IPv6Addresses() ([]string, error) {
 
 	result := C.lxc_get_ips(c.container, nil, cfamily, 0)
 	if result == nil {
-		return nil, fmt.Errorf(errIPv6Addresses, c.name)
+		return nil, ErrIPv6Addresses
 	}
 	return convertArgs(result), nil
 }
@@ -1223,13 +1223,13 @@ func (c *Container) AddDeviceNode(source string, destination ...string) error {
 		defer C.free(unsafe.Pointer(cdestination))
 
 		if !bool(C.lxc_add_device_node(c.container, csource, cdestination)) {
-			return fmt.Errorf(errAddDeviceNodeFailed, source, c.name)
+			return ErrAddDeviceNodeFailed
 		}
 		return nil
 	}
 
 	if !bool(C.lxc_add_device_node(c.container, csource, nil)) {
-		return fmt.Errorf(errAddDeviceNodeFailed, source, c.name)
+		return ErrAddDeviceNodeFailed
 	}
 	return nil
 
@@ -1252,13 +1252,13 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 		defer C.free(unsafe.Pointer(cdestination))
 
 		if !bool(C.lxc_remove_device_node(c.container, csource, cdestination)) {
-			return fmt.Errorf(errRemoveDeviceNodeFailed, source, c.name)
+			return ErrRemoveDeviceNodeFailed
 		}
 		return nil
 	}
 
 	if !bool(C.lxc_remove_device_node(c.container, csource, nil)) {
-		return fmt.Errorf(errRemoveDeviceNodeFailed, source, c.name)
+		return ErrRemoveDeviceNodeFailed
 	}
 	return nil
 }

@@ -15,10 +15,7 @@ package lxc
 // #include "lxc.h"
 import "C"
 
-import (
-	"fmt"
-	"unsafe"
-)
+import "unsafe"
 
 // NewContainer returns a new container struct.
 func NewContainer(name string, lxcpath ...string) (*Container, error) {
@@ -37,7 +34,7 @@ func NewContainer(name string, lxcpath ...string) (*Container, error) {
 	}
 
 	if container == nil {
-		return nil, fmt.Errorf(errNewFailed, name)
+		return nil, ErrNewFailed
 	}
 	return &Container{container: container, verbosity: Quiet, name: name}, nil
 }
