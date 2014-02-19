@@ -93,6 +93,10 @@ bool lxc_set_config_item(struct lxc_container *c, const char *key, const char *v
 	return c->set_config_item(c, key, value);
 }
 
+void lxc_clear_config(struct lxc_container *c) {
+    c->clear_config(c);
+}
+
 bool lxc_clear_config_item(struct lxc_container *c, const char *key) {
 	return c->clear_config_item(c, key);
 }

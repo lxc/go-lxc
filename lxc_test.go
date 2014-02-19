@@ -357,15 +357,15 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 	wg.Wait()
 }
 
-func TestInitPID_Negative(t *testing.T) {
+func TestInitPid_Negative(t *testing.T) {
 	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(c)
 
-	if c.InitPID() != -1 {
-		t.Errorf("InitPID failed...")
+	if c.InitPid() != -1 {
+		t.Errorf("InitPid failed...")
 	}
 }
 
@@ -494,15 +494,15 @@ func TestSetLogFile(t *testing.T) {
 	}
 }
 
-func TestInitPID_Positive(t *testing.T) {
+func TestInitPid_Positive(t *testing.T) {
 	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(c)
 
-	if c.InitPID() == -1 {
-		t.Errorf("InitPID failed...")
+	if c.InitPid() == -1 {
+		t.Errorf("InitPid failed...")
 	}
 }
 
@@ -879,14 +879,14 @@ func TestRunCommandWithClearEnvironment(t *testing.T) {
 	}
 }
 
-func TestConsoleGetFD(t *testing.T) {
+func TestConsoleFd(t *testing.T) {
 	c, err := lxc.NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer lxc.PutContainer(c)
 
-	if _, err := c.ConsoleGetFD(0); err != nil {
+	if _, err := c.ConsoleFd(0); err != nil {
 		t.Errorf(err.Error())
 	}
 }

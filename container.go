@@ -185,9 +185,9 @@ func (c *Container) State() State {
 	return stateMap[C.GoString(C.lxc_state(c.container))]
 }
 
-// InitPID returns the process ID of the container's init process
+// InitPid returns the process ID of the container's init process
 // seen from outside the container.
-func (c *Container) InitPID() int {
+func (c *Container) InitPid() int {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -439,6 +439,9 @@ func (c *Container) Destroy() error {
 }
 
 // CloneUsing clones the container using given arguments with specified backend.
+//
+// Additional flags to change the cloning behaviour:
+// CloneKeepName, CloneKeepMACAddr, CloneSnapshot and CloneMaybeSnapshot
 func (c *Container) CloneUsing(name string, backend BackendStore, flags CloneFlags) error {
 	// FIXME: support lxcpath, bdevtype, bdevdata, newsize and hookargs
 	//
@@ -496,7 +499,7 @@ func (c *Container) Rename(name string) error {
 	return nil
 }
 
-// Wait waits for container to reach a given state until it timeouts.
+// Wait waits for container to reach a particular state.
 func (c *Container) Wait(state State, timeout int) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -599,6 +602,14 @@ func (c *Container) SetCgroupItem(key string, value string) error {
 		return fmt.Errorf(errSettingCgroupItemFailed, c.name, key, value)
 	}
 	return nil
+}
+
+// ClearConfig completely clears the containers in-memory configuration.
+func (c *Container) ClearConfig() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	C.lxc_clear_config(c.container)
 }
 
 // ClearConfigItem clears the value of given config item.
@@ -931,7 +942,7 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 // stdinfd: fd to read input from
 // stdoutfd: fd to write output to
 // stderrfd: fd to write error output to
-// escape: he escape character (1 == 'a', 2 == 'b', ...)
+// escape: the escape character (1 == 'a', 2 == 'b', ...)
 //
 // This function will not return until the console has been exited by the user.
 func (c *Container) Console(ttynum int, stdinfd, stdoutfd, stderrfd uintptr, escape int) error {
@@ -1007,7 +1018,7 @@ func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...stri
 }
 
 // RunCommandWithClearEnvironment runs the user specified command inside the container
-// and waits for it to exit. It clears all environment variables before runnign.
+// and waits for it to exit. It clears all environment variables before running.
 // stdinfd: fd to read input from
 // stdoutfd: fd to write output to
 // stderrfd: fd to write error output to

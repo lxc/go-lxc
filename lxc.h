@@ -6,6 +6,7 @@
 // S.Çağlar Onur <caglar@10ur.org>
 
 extern bool lxc_add_device_node(struct lxc_container *c, const char *src_path, const char *dest_path);
+extern void lxc_clear_config(struct lxc_container *c);
 extern bool lxc_clear_config_item(struct lxc_container *c, const char *key);
 extern bool lxc_clone(struct lxc_container *c, const char *newname, int flags, const char *bdevtype);
 extern bool lxc_console(struct lxc_container *c, int ttynum, int stdinfd, int stdoutfd, int stderrfd, int escape);

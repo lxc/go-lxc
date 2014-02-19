@@ -22,7 +22,7 @@ cover:
 	@`which go` tool cover -func=coverage.out
 
 doc:
-	@`which godoc` github.com/caglar10ur/lxc | less
+	@`which godoc` github.com/lxc/go-lxc | less
 
 vet:
 	@echo "$(OK_COLOR)==> Running go vet $(NO_COLOR)"
