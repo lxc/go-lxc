@@ -1,16 +1,10 @@
 # Go Bindings for LXC (Linux Containers)
 
-This package implements [Go](http://golang.org) bindings for the [LXC](http://linuxcontainers.org/) C API.
+This package implements [Go](http://golang.org) bindings for the [LXC](http://linuxcontainers.org/) C API (liblxc).
 
 ## Requirements
 
-This package requires [LXC 1.0+](https://github.com/lxc/lxc/releases) and [Go 1.x](https://code.google.com/p/go/downloads/list).
-
-It has been tested on
-
-+ Ubuntu 13.04 (raring) by using distribution [provided packages](https://launchpad.net/ubuntu/raring/+package/lxc)
-+ Ubuntu 13.10 (saucy) by using distribution [provided packages](https://launchpad.net/ubuntu/saucy/+package/lxc)
-+ Ubuntu 14.04 (trusty) by using distribution [provided packages](https://launchpad.net/ubuntu/trusty/+package/lxc)
+This package requires [LXC 1.x](https://github.com/lxc/lxc/releases) and its development package to be installed. Works with [Go 1.x](https://code.google.com/p/go/downloads/list).
 
 ## Installing
 
@@ -18,7 +12,7 @@ The typical `go get github.com/lxc/go-lxc` will install LXC Go Bindings.
 
 ## Documentation
 
-Documentation can be found at [GoDoc](http://godoc.org/github.com/lxc/go-lxc)
+Documentation can be found at [GoDoc](http://godoc.org/github.com/lxc/go-lxc).
 
 ## Examples
 
