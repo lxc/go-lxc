@@ -36,7 +36,7 @@ func NewContainer(name string, lxcpath ...string) (*Container, error) {
 	if container == nil {
 		return nil, ErrNewFailed
 	}
-	return &Container{container: container, verbosity: Quiet, name: name}, nil
+	return &Container{container: container, verbosity: Quiet}, nil
 }
 
 // GetContainer increments the reference counter of the container object.

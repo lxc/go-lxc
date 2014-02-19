@@ -29,7 +29,6 @@ type Container struct {
 	container *C.struct_lxc_container
 	mu        sync.RWMutex
 
-	name      string
 	verbosity Verbosity
 }
 
@@ -163,7 +162,7 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 	defer freeSnapshots(csnapshots, size)
 
 	if size < 1 {
-		return nil, fmt.Errorf("%s has no snapshots", c.name)
+		return nil, ErrNoSnapshot
 	}
 
 	p := uintptr(unsafe.Pointer(csnapshots))

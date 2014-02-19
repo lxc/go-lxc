@@ -26,7 +26,9 @@ var (
 	ErrKMemLimit                     = NewError("your kernel does not support cgroup memory controller")
 	ErrLoadConfigFailed              = NewError("loading config file for the container failed")
 	ErrMemLimit                      = NewError("your kernel does not support cgroup memory controller")
+	ErrMemorySwapLimit               = NewError("your kernel does not support cgroup swap controller")
 	ErrNewFailed                     = NewError("allocating the container failed")
+	ErrNoSnapshot                    = NewError("container has no snapshot")
 	ErrNotDefined                    = NewError("container is not defined")
 	ErrNotFrozen                     = NewError("container is not frozen")
 	ErrNotRunning                    = NewError("container is not running")
@@ -44,7 +46,6 @@ var (
 	ErrShutdownFailed                = NewError("shutting down the container failed")
 	ErrStartFailed                   = NewError("starting the container failed")
 	ErrStopFailed                    = NewError("stopping the container failed")
-	ErrMemorySwapLimit               = NewError("your kernel does not support cgroup swap controller")
 	ErrUnfreezeFailed                = NewError("unfreezing the container failed")
 )
 
