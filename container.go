@@ -903,14 +903,14 @@ func (c *Container) CPUStats() (map[string]int64, error) {
 	return map[string]int64{"user": user, "system": system}, nil
 }
 
-// ConsoleGetFD allocates a console tty from container
+// ConsoleFd allocates a console tty from container
 // ttynum: tty number to attempt to allocate or -1 to allocate the first available tty
 //
 // Returns "ttyfd" on success, -1 on failure. The returned "ttyfd" is
 // used to keep the tty allocated. The caller should close "ttyfd" to
 // indicate that it is done with the allocated console so that it can
 // be allocated by another caller.
-func (c *Container) ConsoleGetFD(ttynum int) (int, error) {
+func (c *Container) ConsoleFd(ttynum int) (int, error) {
 	// FIXME: Make idiomatic
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return -1, err
