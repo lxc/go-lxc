@@ -49,16 +49,18 @@ var (
 	ErrUnfreezeFailed                = NewError("unfreezing the container failed")
 )
 
+// Error represents a basic error that implies the error interface.
 type Error struct {
 	Message string
 }
 
-func NewError(msg string) *Error {
+// NewError creates a new error with the given msg argument.
+func NewError(msg string) error {
 	return &Error{
 		Message: msg,
 	}
 }
 
-func (e Error) Error() string {
+func (e *Error) Error() string {
 	return e.Message
 }
