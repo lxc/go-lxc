@@ -40,6 +40,14 @@ func unprivileged() bool {
 	return false
 }
 
+func supported(moduleName string) bool {
+	_, err := os.Stat("/sys/module/" + moduleName)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func TestVersion(t *testing.T) {
 	t.Logf("LXC version: %s", Version())
 }
@@ -174,6 +182,10 @@ func TestClone(t *testing.T) {
 }
 
 func TestCloneUsingOverlayfs(t *testing.T) {
+	if !supported("overlayfs") {
+		t.Skip("skipping test as overlayfs support is missing.")
+	}
+
 	c, err := NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -188,6 +200,10 @@ func TestCloneUsingOverlayfs(t *testing.T) {
 func TestCloneUsingAufs(t *testing.T) {
 	if unprivileged() {
 		t.Skip("skipping test in unprivileged mode.")
+	}
+
+	if !supported("aufs") {
+		t.Skip("skipping test as aufs support is missing.")
 	}
 
 	c, err := NewContainer(ContainerName)
@@ -1059,18 +1075,8 @@ func TestDestroySnapshot(t *testing.T) {
 }
 
 func TestDestroy(t *testing.T) {
-	c, err := NewContainer(ContainerCloneOverlayName)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer PutContainer(c)
-
-	if err := c.Destroy(); err != nil {
-		t.Errorf(err.Error())
-	}
-
-	if !unprivileged() {
-		c, err = NewContainer(ContainerCloneAufsName)
+	if supported("overlayfs") {
+		c, err := NewContainer(ContainerCloneOverlayName)
 		if err != nil {
 			t.Errorf(err.Error())
 		}
@@ -1081,7 +1087,18 @@ func TestDestroy(t *testing.T) {
 		}
 	}
 
-	c, err = NewContainer(ContainerCloneName)
+	if !unprivileged() && supported("aufs") {
+		c, err := NewContainer(ContainerCloneAufsName)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		defer PutContainer(c)
+
+		if err := c.Destroy(); err != nil {
+			t.Errorf(err.Error())
+		}
+	}
+	c, err := NewContainer(ContainerCloneName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
