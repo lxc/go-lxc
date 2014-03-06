@@ -1,4 +1,4 @@
-// Copyright © 2013, S.Çağlar Onur
+// Copyright © 2013, 2014, S.Çağlar Onur
 // Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
 //

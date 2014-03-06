@@ -1,7 +1,7 @@
 /*
  * attach.go
  *
- * Copyright © 2013, S.Çağlar Onur
+ * Copyright © 2013, 2014, S.Çağlar Onur
  *
  * Authors:
  * S.Çağlar Onur <caglar@10ur.org>
