@@ -28,9 +28,10 @@ const (
 	ContainerCloneName        = "consectetur"
 	ContainerCloneOverlayName = "adipiscing"
 	ContainerCloneAufsName    = "pellentesque"
-	Distro                    = "ubuntu"
-	Release                   = "saucy"
-	Arch                      = "amd64"
+	// used by unprivileged test cases
+	UnprivilegedContainerType = "ubuntu"
+	UnprivilegedRelease       = "saucy"
+	UnprivilegedArch          = "amd64"
 )
 
 func unprivileged() bool {
@@ -159,7 +160,7 @@ func TestCreate(t *testing.T) {
 	defer PutContainer(c)
 
 	if unprivileged() {
-		if err := c.CreateAsUser(Distro, Release, Arch); err != nil {
+		if err := c.CreateAsUser(UnprivilegedContainerType, UnprivilegedRelease, UnprivilegedArch); err != nil {
 			t.Errorf("ERROR: %s\n", err.Error())
 		}
 	} else {

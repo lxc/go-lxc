@@ -18,7 +18,7 @@ test-unprivileged:
 
 # requires https://codereview.appspot.com/34680044/
 cover:
-	@sudo `which go` test -v -covermode=count -coverprofile=coverage.out
+	@sudo `which go` test -v -coverprofile=coverage.out
 	@`which go` tool cover -func=coverage.out
 
 doc:
