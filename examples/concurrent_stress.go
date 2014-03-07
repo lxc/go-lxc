@@ -24,20 +24,21 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
+	"log"
 	"runtime"
 	"strconv"
 	"sync"
 
-	logger "github.com/caglar10ur/gologger"
 	"github.com/lxc/go-lxc"
 )
 
 var (
 	lxcpath       string
 	iteration     int
-	count         int
+	threads       int
 	template      string
-	debug         bool
+	quiet         bool
 	startstop     bool
 	createdestroy bool
 )
@@ -47,29 +48,27 @@ func init() {
 
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
 	flag.StringVar(&template, "template", "busybox", "Template to use")
-	flag.IntVar(&count, "count", 10, "Number of operations to run concurrently")
+	flag.IntVar(&threads, "threads", 10, "Number of operations to run concurrently")
 	flag.IntVar(&iteration, "iteration", 1, "Number times to run the test")
-	flag.BoolVar(&debug, "debug", false, "Flag to control debug output")
+	flag.BoolVar(&quiet, "quiet", false, "Don't produce any output")
 	flag.BoolVar(&startstop, "startstop", false, "Flag to execute Start and Stop")
 	flag.BoolVar(&createdestroy, "createdestroy", false, "Flag to execute Create and Destroy")
 	flag.Parse()
 }
 
 func main() {
-	log := logger.New(nil)
-	if debug {
-		log.SetLogLevel(logger.Debug)
+	if quiet {
+		log.SetOutput(ioutil.Discard)
 	}
-
-	log.Debugf("Using %d GOMAXPROCS", runtime.NumCPU())
+	log.Printf("Using %d GOMAXPROCS\n", runtime.NumCPU())
 
 	var wg sync.WaitGroup
 
 	for i := 0; i < iteration; i++ {
-		log.Debugf("-- ITERATION %d --", i+1)
+		log.Printf("-- ITERATION %d --\n", i+1)
 		for _, mode := range []string{"CREATE", "START", "STOP", "DESTROY"} {
-			log.Debugf("\t-- %s --", mode)
-			for j := 0; j < count; j++ {
+			log.Printf("\t-- %s --\n", mode)
+			for j := 0; j < threads; j++ {
 				wg.Add(1)
 				go func(i int, mode string) {
 					c, err := lxc.NewContainer(strconv.Itoa(i), lxcpath)
@@ -79,24 +78,24 @@ func main() {
 					defer lxc.PutContainer(c)
 
 					if mode == "CREATE" && startstop == false {
-						log.Debugf("\t\tCreating the container (%d)...\n", i)
+						log.Printf("\t\tCreating the container (%d)...\n", i)
 						if err := c.Create(template); err != nil {
-							log.Errorf("\t\t\tERROR: %s\n", err.Error())
+							log.Fatalf("\t\t\tERROR: %s\n", err.Error())
 						}
 					} else if mode == "START" && createdestroy == false {
-						log.Debugf("\t\tStarting the container (%d)...\n", i)
+						log.Printf("\t\tStarting the container (%d)...\n", i)
 						if err := c.Start(); err != nil {
-							log.Errorf("\t\t\tERROR: %s\n", err.Error())
+							log.Fatalf("\t\t\tERROR: %s\n", err.Error())
 						}
 					} else if mode == "STOP" && createdestroy == false {
-						log.Debugf("\t\tStoping the container (%d)...\n", i)
+						log.Printf("\t\tStoping the container (%d)...\n", i)
 						if err := c.Stop(); err != nil {
-							log.Errorf("\t\t\tERROR: %s\n", err.Error())
+							log.Fatalf("\t\t\tERROR: %s\n", err.Error())
 						}
 					} else if mode == "DESTROY" && startstop == false {
-						log.Debugf("\t\tDestroying the container (%d)...\n", i)
+						log.Printf("\t\tDestroying the container (%d)...\n", i)
 						if err := c.Destroy(); err != nil {
-							log.Errorf("\t\t\tERROR: %s\n", err.Error())
+							log.Fatalf("\t\t\tERROR: %s\n", err.Error())
 						}
 					}
 					wg.Done()
