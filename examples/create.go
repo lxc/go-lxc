@@ -43,7 +43,7 @@ func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
 	flag.StringVar(&template, "template", "busybox", "Template to use")
 	flag.StringVar(&distro, "distro", "ubuntu", "Template to use")
-	flag.StringVar(&release, "release", "saucy", "Template to use")
+	flag.StringVar(&release, "release", "trusty", "Template to use")
 	flag.StringVar(&arch, "arch", "amd64", "Template to use")
 	flag.StringVar(&name, "name", "rubik", "Name of the container")
 	flag.Parse()

@@ -30,7 +30,7 @@ const (
 	ContainerCloneAufsName    = "pellentesque"
 	// used by unprivileged test cases
 	UnprivilegedContainerType = "ubuntu"
-	UnprivilegedRelease       = "saucy"
+	UnprivilegedRelease       = "trusty"
 	UnprivilegedArch          = "amd64"
 )
 
