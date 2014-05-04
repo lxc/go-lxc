@@ -750,6 +750,18 @@ func TestMemoryLimit(t *testing.T) {
 	}
 }
 
+func TestSoftMemoryLimit(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer PutContainer(c)
+
+	if _, err := c.SoftMemoryLimit(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestKernelMemoryLimit(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
@@ -790,6 +802,25 @@ func TestSetMemoryLimit(t *testing.T) {
 	newMemLimit, _ := c.MemoryLimit()
 	if newMemLimit != oldMemLimit*4 {
 		t.Errorf("SetMemoryLimit failed")
+	}
+}
+
+func TestSetSoftMemoryLimit(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer PutContainer(c)
+
+	oldMemLimit, _ := c.MemoryLimit()
+
+	if err := c.SetSoftMemoryLimit(oldMemLimit * 4); err != nil {
+		t.Errorf(err.Error())
+	}
+
+	newMemLimit, _ := c.SoftMemoryLimit()
+	if newMemLimit != oldMemLimit*4 {
+		t.Errorf("SetSoftMemoryLimit failed")
 	}
 }
 
@@ -912,6 +943,10 @@ func TestIPAddress(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	defer PutContainer(c)
+
+	if unprivileged() {
+		time.Sleep(time.Second * 3)
+	}
 
 	if _, err := c.IPAddress("lo"); err != nil {
 		t.Errorf(err.Error())

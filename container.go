@@ -742,6 +742,34 @@ func (c *Container) SetMemoryLimit(limit ByteSize) error {
 	return nil
 }
 
+// SoftMemoryLimit returns soft memory limit of the container in bytes.
+func (c *Container) SoftMemoryLimit() (ByteSize, error) {
+	if err := c.makeSure(isDefined | isRunning); err != nil {
+		return -1, err
+	}
+
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	memLimit, err := strconv.ParseFloat(c.CgroupItem("memory.soft_limit_in_bytes")[0], 64)
+	if err != nil {
+		return -1, ErrSoftMemLimit
+	}
+	return ByteSize(memLimit), nil
+}
+
+// SetSoftMemoryLimit sets soft  memory limit of the container in bytes.
+func (c *Container) SetSoftMemoryLimit(limit ByteSize) error {
+	if err := c.makeSure(isDefined | isRunning); err != nil {
+		return err
+	}
+
+	if err := c.SetCgroupItem("memory.soft_limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
+		return ErrSettingSoftMemoryLimitFailed
+	}
+	return nil
+}
+
 // KernelMemoryUsage returns current kernel memory allocation of the container in bytes.
 func (c *Container) KernelMemoryUsage() (ByteSize, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
