@@ -6,7 +6,7 @@ all: format vet lint
 format:
 	@echo "$(OK_COLOR)==> Formatting the code $(NO_COLOR)"
 	@gofmt -s -w *.go
-	@goimports -w *.go
+	@goimports -w *.go || true
 
 test:
 	@echo "$(OK_COLOR)==> Running go test $(NO_COLOR)"
@@ -30,7 +30,7 @@ vet:
 
 lint:
 	@echo "$(OK_COLOR)==> Running golint $(NO_COLOR)"
-	@`which golint` .
+	@`which golint` . || true
 
 ctags:
 	@ctags -R --languages=c,go

@@ -14,6 +14,7 @@ package lxc
 #include <lxc/lxccontainer.h>
 
 static char** makeCharArray(int size) {
+    // caller checks return value
     return calloc(sizeof(char*), size);
 }
 
@@ -23,8 +24,9 @@ static void setArrayString(char **array, char *string, int n) {
 
 static void freeCharArray(char **array, int size) {
     int i;
-    for (i = 0; i < size; i++)
+    for (i = 0; i < size; i++) {
         free(array[i]);
+    }
     free(array);
 }
 
@@ -48,10 +50,15 @@ func sptr(p uintptr) *C.char {
 
 func makeNullTerminatedArgs(args []string) **C.char {
 	cparams := C.makeCharArray(C.int(len(args) + 1))
+	if cparams == nil {
+		return nil
+	}
+
 	for i, s := range args {
 		C.setArrayString(cparams, C.CString(s), C.int(i))
 	}
 	C.setArrayString(cparams, nil, C.int(len(args)))
+
 	return cparams
 }
 

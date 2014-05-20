@@ -59,6 +59,21 @@ func (c *Container) makeSure(flags int) error {
 	return nil
 }
 
+func (c *Container) cgroupItemAsByteSize(filename string, missing error) (ByteSize, error) {
+	size, err := strconv.ParseFloat(c.CgroupItem(filename)[0], 64)
+	if err != nil {
+		return -1, missing
+	}
+	return ByteSize(size), nil
+}
+
+func (c *Container) setCgroupItemWithByteSize(filename string, limit ByteSize, missing error) error {
+	if err := c.SetCgroupItem(filename, fmt.Sprintf("%.f", limit)); err != nil {
+		return missing
+	}
+	return nil
+}
+
 // Name returns the name of the container.
 func (c *Container) Name() string {
 	c.mu.RLock()
@@ -301,6 +316,9 @@ func (c *Container) CreateUsing(template string, backend BackendStore, args ...s
 	ret := false
 	if args != nil {
 		cargs := makeNullTerminatedArgs(args)
+		if cargs == nil {
+			return ErrAllocationFailed
+		}
 		defer freeNullTerminatedArgs(cargs, len(args))
 
 		ret = bool(C.go_lxc_create(c.container, ctemplate, cbackend, C.int(c.verbosity), cargs))
@@ -367,13 +385,16 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 
 	return output, nil
 	/*
-		cargs := makeNullTerminatedArgs(args)
-		defer freeNullTerminatedArgs(cargs, len(args))
+	   cargs := makeNullTerminatedArgs(args)
+	   if cargs == nil {
+	       return ErrAllocationFailed
+	   }
+	   defer freeNullTerminatedArgs(cargs, len(args))
 
-		if !bool(C.go_lxc_start(c.container, 1, cargs)) {
-			return ErrExecuteFailed
-		}
-		return nil
+	   if !bool(C.go_lxc_start(c.container, 1, cargs)) {
+	       return ErrExecuteFailed
+	   }
+	   return nil
 	*/
 }
 
@@ -704,14 +725,7 @@ func (c *Container) MemoryUsage() (ByteSize, error) {
 		return -1, err
 	}
 
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	memUsed, err := strconv.ParseFloat(c.CgroupItem("memory.usage_in_bytes")[0], 64)
-	if err != nil {
-		return -1, ErrMemLimit
-	}
-	return ByteSize(memUsed), nil
+	return c.cgroupItemAsByteSize("memory.usage_in_bytes", ErrMemLimit)
 }
 
 // MemoryLimit returns memory limit of the container in bytes.
@@ -720,14 +734,7 @@ func (c *Container) MemoryLimit() (ByteSize, error) {
 		return -1, err
 	}
 
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	memLimit, err := strconv.ParseFloat(c.CgroupItem("memory.limit_in_bytes")[0], 64)
-	if err != nil {
-		return -1, ErrMemLimit
-	}
-	return ByteSize(memLimit), nil
+	return c.cgroupItemAsByteSize("memory.limit_in_bytes", ErrMemLimit)
 }
 
 // SetMemoryLimit sets memory limit of the container in bytes.
@@ -736,10 +743,7 @@ func (c *Container) SetMemoryLimit(limit ByteSize) error {
 		return err
 	}
 
-	if err := c.SetCgroupItem("memory.limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
-		return ErrSettingMemoryLimitFailed
-	}
-	return nil
+	return c.setCgroupItemWithByteSize("memory.limit_in_bytes", limit, ErrSettingMemoryLimitFailed)
 }
 
 // SoftMemoryLimit returns soft memory limit of the container in bytes.
@@ -748,14 +752,7 @@ func (c *Container) SoftMemoryLimit() (ByteSize, error) {
 		return -1, err
 	}
 
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	memLimit, err := strconv.ParseFloat(c.CgroupItem("memory.soft_limit_in_bytes")[0], 64)
-	if err != nil {
-		return -1, ErrSoftMemLimit
-	}
-	return ByteSize(memLimit), nil
+	return c.cgroupItemAsByteSize("memory.soft_limit_in_bytes", ErrSoftMemLimit)
 }
 
 // SetSoftMemoryLimit sets soft  memory limit of the container in bytes.
@@ -764,10 +761,7 @@ func (c *Container) SetSoftMemoryLimit(limit ByteSize) error {
 		return err
 	}
 
-	if err := c.SetCgroupItem("memory.soft_limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
-		return ErrSettingSoftMemoryLimitFailed
-	}
-	return nil
+	return c.setCgroupItemWithByteSize("memory.soft_limit_in_bytes", limit, ErrSettingSoftMemoryLimitFailed)
 }
 
 // KernelMemoryUsage returns current kernel memory allocation of the container in bytes.
@@ -776,14 +770,7 @@ func (c *Container) KernelMemoryUsage() (ByteSize, error) {
 		return -1, err
 	}
 
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	kmemUsed, err := strconv.ParseFloat(c.CgroupItem("memory.kmem.usage_in_bytes")[0], 64)
-	if err != nil {
-		return -1, ErrKMemLimit
-	}
-	return ByteSize(kmemUsed), nil
+	return c.cgroupItemAsByteSize("memory.kmem.usage_in_bytes", ErrKMemLimit)
 }
 
 // KernelMemoryLimit returns kernel memory limit of the container in bytes.
@@ -792,14 +779,7 @@ func (c *Container) KernelMemoryLimit() (ByteSize, error) {
 		return -1, err
 	}
 
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	kmemLimit, err := strconv.ParseFloat(c.CgroupItem("memory.kmem.limit_in_bytes")[0], 64)
-	if err != nil {
-		return -1, ErrKMemLimit
-	}
-	return ByteSize(kmemLimit), nil
+	return c.cgroupItemAsByteSize("memory.kmem.usage_in_bytes", ErrKMemLimit)
 }
 
 // SetKernelMemoryLimit sets kernel memory limit of the container in bytes.
@@ -808,10 +788,7 @@ func (c *Container) SetKernelMemoryLimit(limit ByteSize) error {
 		return err
 	}
 
-	if err := c.SetCgroupItem("memory.kmem.limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
-		return ErrSettingKMemoryLimitFailed
-	}
-	return nil
+	return c.setCgroupItemWithByteSize("memory.kmem.limit_in_bytes", limit, ErrSettingKMemoryLimitFailed)
 }
 
 // MemorySwapUsage returns memory+swap usage of the container in bytes.
@@ -820,14 +797,7 @@ func (c *Container) MemorySwapUsage() (ByteSize, error) {
 		return -1, err
 	}
 
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	memorySwapUsed, err := strconv.ParseFloat(c.CgroupItem("memory.memsw.usage_in_bytes")[0], 64)
-	if err != nil {
-		return -1, ErrMemorySwapLimit
-	}
-	return ByteSize(memorySwapUsed), nil
+	return c.cgroupItemAsByteSize("memory.memsw.usage_in_bytes", ErrMemorySwapLimit)
 }
 
 // MemorySwapLimit returns the memory+swap limit of the container in bytes.
@@ -836,14 +806,7 @@ func (c *Container) MemorySwapLimit() (ByteSize, error) {
 		return -1, err
 	}
 
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	memorySwapLimit, err := strconv.ParseFloat(c.CgroupItem("memory.memsw.limit_in_bytes")[0], 64)
-	if err != nil {
-		return -1, ErrMemorySwapLimit
-	}
-	return ByteSize(memorySwapLimit), nil
+	return c.cgroupItemAsByteSize("memory.memsw.limit_in_bytes", ErrMemorySwapLimit)
 }
 
 // SetMemorySwapLimit sets memory+swap limit of the container in bytes.
@@ -852,10 +815,7 @@ func (c *Container) SetMemorySwapLimit(limit ByteSize) error {
 		return err
 	}
 
-	if err := c.SetCgroupItem("memory.memsw.limit_in_bytes", fmt.Sprintf("%.f", limit)); err != nil {
-		return ErrSettingMemorySwapLimitFailed
-	}
-	return nil
+	return c.setCgroupItemWithByteSize("memory.memsw.limit_in_bytes", limit, ErrSettingMemorySwapLimitFailed)
 }
 
 // BlkioUsage returns number of bytes transferred to/from the disk by the container.
@@ -1036,6 +996,9 @@ func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...stri
 	defer c.mu.Unlock()
 
 	cargs := makeNullTerminatedArgs(args)
+	if cargs == nil {
+		return ErrAllocationFailed
+	}
 	defer freeNullTerminatedArgs(cargs, len(args))
 
 	if int(C.go_lxc_attach_run_wait(c.container, false, C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs)) < 0 {
@@ -1062,6 +1025,9 @@ func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd u
 	defer c.mu.Unlock()
 
 	cargs := makeNullTerminatedArgs(args)
+	if cargs == nil {
+		return ErrAllocationFailed
+	}
 	defer freeNullTerminatedArgs(cargs, len(args))
 
 	if int(C.go_lxc_attach_run_wait(c.container, true, C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs)) < 0 {

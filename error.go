@@ -11,6 +11,7 @@
 package lxc
 
 var (
+	ErrAllocationFailed              = NewError("allocating memory failed")
 	ErrAddDeviceNodeFailed           = NewError("adding device to container failed")
 	ErrAlreadyDefined                = NewError("container already defined")
 	ErrAlreadyFrozen                 = NewError("container is already frozen")
