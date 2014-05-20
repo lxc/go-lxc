@@ -850,7 +850,6 @@ func TestSetKernelMemoryLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	t.Logf("%s\n", oldMemLimit)
 
 	if err := c.SetKernelMemoryLimit(oldMemLimit * 4); err != nil {
 		t.Errorf(err.Error())
