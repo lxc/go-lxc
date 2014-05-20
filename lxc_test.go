@@ -42,8 +42,7 @@ func unprivileged() bool {
 }
 
 func supported(moduleName string) bool {
-	_, err := os.Stat("/sys/module/" + moduleName)
-	if err != nil {
+	if _, err := os.Stat("/sys/module/" + moduleName); err != nil {
 		return false
 	}
 	return true
@@ -793,13 +792,20 @@ func TestSetMemoryLimit(t *testing.T) {
 	}
 	defer PutContainer(c)
 
-	oldMemLimit, _ := c.MemoryLimit()
+	oldMemLimit, err := c.MemoryLimit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	if err := c.SetMemoryLimit(oldMemLimit * 4); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	newMemLimit, _ := c.MemoryLimit()
+	newMemLimit, err := c.MemoryLimit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	if newMemLimit != oldMemLimit*4 {
 		t.Errorf("SetMemoryLimit failed")
 	}
@@ -812,20 +818,27 @@ func TestSetSoftMemoryLimit(t *testing.T) {
 	}
 	defer PutContainer(c)
 
-	oldMemLimit, _ := c.MemoryLimit()
+	oldMemLimit, err := c.MemoryLimit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	if err := c.SetSoftMemoryLimit(oldMemLimit * 4); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	newMemLimit, _ := c.SoftMemoryLimit()
+	newMemLimit, err := c.SoftMemoryLimit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	if newMemLimit != oldMemLimit*4 {
 		t.Errorf("SetSoftMemoryLimit failed")
 	}
 }
 
 func TestSetKernelMemoryLimit(t *testing.T) {
-	t.Skip("skipping test")
+	t.Skip("skipping the test as it requires memory.kmem.limit_in_bytes to be set")
 
 	c, err := NewContainer(ContainerName)
 	if err != nil {
@@ -833,12 +846,20 @@ func TestSetKernelMemoryLimit(t *testing.T) {
 	}
 	defer PutContainer(c)
 
-	oldMemLimit, _ := c.KernelMemoryLimit()
+	oldMemLimit, err := c.KernelMemoryLimit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s\n", oldMemLimit)
+
 	if err := c.SetKernelMemoryLimit(oldMemLimit * 4); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	newMemLimit, _ := c.KernelMemoryLimit()
+	newMemLimit, err := c.KernelMemoryLimit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 	if newMemLimit != oldMemLimit*4 {
 		t.Errorf("SetKernelMemoryLimit failed")
 	}
@@ -851,13 +872,19 @@ func TestSetMemorySwapLimit(t *testing.T) {
 	}
 	defer PutContainer(c)
 
-	oldMemorySwapLimit, _ := c.MemorySwapLimit()
-
+	oldMemorySwapLimit, err := c.MemorySwapLimit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 	if err := c.SetMemorySwapLimit(oldMemorySwapLimit / 4); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	newMemorySwapLimit, _ := c.MemorySwapLimit()
+	newMemorySwapLimit, err := c.MemorySwapLimit()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	if newMemorySwapLimit != oldMemorySwapLimit/4 {
 		t.Errorf("SetSwapLimit failed")
 	}
