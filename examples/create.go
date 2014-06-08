@@ -37,15 +37,17 @@ var (
 	release  string
 	arch     string
 	name     string
+	verbose  bool
 )
 
 func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
-	flag.StringVar(&template, "template", "busybox", "Template to use")
+	flag.StringVar(&template, "template", "ubuntu", "Template to use")
 	flag.StringVar(&distro, "distro", "ubuntu", "Template to use")
 	flag.StringVar(&release, "release", "trusty", "Template to use")
 	flag.StringVar(&arch, "arch", "amd64", "Template to use")
 	flag.StringVar(&name, "name", "rubik", "Name of the container")
+	flag.BoolVar(&verbose, "verbose", false, "Verbose output")
 	flag.Parse()
 }
 
@@ -57,7 +59,9 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	log.Printf("Creating container...\n")
-	c.SetVerbosity(lxc.Verbose)
+	if verbose {
+		c.SetVerbosity(lxc.Verbose)
+	}
 
 	if os.Geteuid() != 0 {
 		if err := c.CreateAsUser(distro, release, arch); err != nil {
