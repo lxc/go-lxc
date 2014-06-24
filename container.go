@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/exec"
+	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -171,7 +172,6 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 	defer c.mu.Unlock()
 
 	var csnapshots *C.struct_lxc_snapshot
-	var snapshots []Snapshot
 
 	size := int(C.go_lxc_snapshot_list(c.container, &csnapshots))
 	defer freeSnapshots(csnapshots, size)
@@ -180,14 +180,23 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 		return nil, ErrNoSnapshot
 	}
 
-	p := uintptr(unsafe.Pointer(csnapshots))
-	for i := 0; i < size; i++ {
-		z := (*C.struct_lxc_snapshot)(unsafe.Pointer(p))
-		s := &Snapshot{Name: C.GoString(z.name), Timestamp: C.GoString(z.timestamp),
-			CommentPath: C.GoString(z.comment_pathname), Path: C.GoString(z.lxcpath)}
-		snapshots = append(snapshots, *s)
-		p += unsafe.Sizeof(*csnapshots)
+	hdr := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(csnapshots)),
+		Len:  size,
+		Cap:  size,
 	}
+	gosnapshots := *(*[]C.struct_lxc_snapshot)(unsafe.Pointer(&hdr))
+
+	snapshots := make([]Snapshot, size, size)
+	for i := 0; i < size; i++ {
+		snapshots[i] = Snapshot{
+			Name:        C.GoString(gosnapshots[i].name),
+			Timestamp:   C.GoString(gosnapshots[i].timestamp),
+			CommentPath: C.GoString(gosnapshots[i].comment_pathname),
+			Path:        C.GoString(gosnapshots[i].lxcpath),
+		}
+	}
+
 	return snapshots, nil
 }
 
