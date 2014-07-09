@@ -1220,3 +1220,23 @@ func TestConcurrentDestroy(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func TestBackendStore(t *testing.T) {
+	var X struct {
+		store BackendStore
+	}
+
+	if X.store.String() != "<INVALID>" {
+		t.Error("zero value of BackendStore should be invalid")
+	}
+}
+
+func TestState(t *testing.T) {
+	var X struct {
+		state State
+	}
+
+	if X.state.String() != "<INVALID>" {
+		t.Error("zero value of State should be invalid")
+	}
+}
