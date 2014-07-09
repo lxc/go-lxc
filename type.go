@@ -31,7 +31,7 @@ type BackendStore int
 
 const (
 	// Btrfs backendstore type
-	Btrfs BackendStore = iota
+	Btrfs BackendStore = iota + 1
 	// Directory backendstore type
 	Directory
 	// LVM backendstore type
@@ -76,7 +76,7 @@ type State int
 
 const (
 	// STOPPED means container is not running
-	STOPPED State = iota
+	STOPPED State = iota + 1
 	// STARTING means container is starting
 	STARTING
 	// RUNNING means container is running
