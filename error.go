@@ -34,7 +34,7 @@ var (
 	ErrIPAddress                     = NewError("getting IP address on the interface of the container failed")
 	ErrIPv4Addresses                 = NewError("getting IPv4 addresses of the container failed")
 	ErrIPv6Addresses                 = NewError("getting IPv6 addresses of the container failed")
-	ErrKMemLimit                     = NewError("your kernel does not support cgroup memory controller")
+	ErrKMemLimit                     = NewError("your kernel does not support cgroup kernel memory controller")
 	ErrLoadConfigFailed              = NewError("loading config file for the container failed")
 	ErrMemLimit                      = NewError("your kernel does not support cgroup memory controller")
 	ErrSoftMemLimit                  = NewError("your kernel does not support cgroup memory controller")
