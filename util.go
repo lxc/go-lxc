@@ -54,8 +54,8 @@ func makeNullTerminatedArgs(args []string) **C.char {
 		return nil
 	}
 
-	for i, s := range args {
-		C.setArrayString(cparams, C.CString(s), C.int(i))
+	for i := range args {
+		C.setArrayString(cparams, C.CString(args[i]), C.int(i))
 	}
 	C.setArrayString(cparams, nil, C.int(len(args)))
 
