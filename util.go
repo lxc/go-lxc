@@ -13,57 +13,63 @@ package lxc
 #include <stdlib.h>
 #include <lxc/lxccontainer.h>
 
-static char** makeCharArray(int size) {
+static char** makeCharArray(size_t size) {
     // caller checks return value
     return calloc(sizeof(char*), size);
 }
 
-static void setArrayString(char **array, char *string, int n) {
+static void setArrayString(char **array, char *string, size_t n) {
     array[n] = string;
 }
 
-static void freeCharArray(char **array, int size) {
-    int i;
+static void freeCharArray(char **array, size_t size) {
+    size_t i;
     for (i = 0; i < size; i++) {
         free(array[i]);
     }
     free(array);
 }
 
-static void freeSnapshotArray(struct lxc_snapshot *s, int size) {
-    int i;
+static void freeSnapshotArray(struct lxc_snapshot *s, size_t size) {
+    size_t i;
     for (i = 0; i < size; i++) {
         s[i].free(&s[i]);
     }
     free(s);
 }
+
+static size_t getArrayLength(char **array) {
+    char **p;
+    size_t size = 0;
+    for (p = (char **)array; *p; p++) {
+        size++;
+    }
+    return size;
+}
 */
 import "C"
 
 import (
+	"reflect"
 	"unsafe"
 )
 
-func sptr(p uintptr) *C.char {
-	return *(**C.char)(unsafe.Pointer(p))
-}
-
 func makeNullTerminatedArgs(args []string) **C.char {
-	cparams := C.makeCharArray(C.int(len(args) + 1))
+	cparams := C.makeCharArray(C.size_t(len(args) + 1))
 	if cparams == nil {
 		return nil
 	}
 
-	for i := range args {
-		C.setArrayString(cparams, C.CString(args[i]), C.int(i))
+	for i := 0; i < len(args); i++ {
+		C.setArrayString(cparams, C.CString(args[i]), C.size_t(i))
 	}
-	C.setArrayString(cparams, nil, C.int(len(args)))
+	C.setArrayString(cparams, nil, C.size_t(len(args)))
 
 	return cparams
 }
 
 func freeNullTerminatedArgs(cArgs **C.char, length int) {
-	C.freeCharArray(cArgs, C.int(length+1))
+	C.freeCharArray(cArgs, C.size_t(length+1))
 }
 
 func convertArgs(cArgs **C.char) []string {
@@ -71,17 +77,7 @@ func convertArgs(cArgs **C.char) []string {
 		return nil
 	}
 
-	var s []string
-
-	// duplicate
-	for p := uintptr(unsafe.Pointer(cArgs)); sptr(p) != nil; p += unsafe.Sizeof(uintptr(0)) {
-		s = append(s, C.GoString(sptr(p)))
-	}
-
-	// free the original
-	C.freeCharArray(cArgs, C.int(len(s)))
-
-	return s
+	return convertNArgs(cArgs, int(C.getArrayLength(cArgs)))
 }
 
 func convertNArgs(cArgs **C.char, size int) []string {
@@ -89,21 +85,24 @@ func convertNArgs(cArgs **C.char, size int) []string {
 		return nil
 	}
 
-	var s []string
+	var A []*C.char
 
-	// duplicate
-	p := uintptr(unsafe.Pointer(cArgs))
-	for i := 0; i < size; i++ {
-		s = append(s, C.GoString(sptr(p)))
-		p += unsafe.Sizeof(uintptr(0))
+	hdr := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(cArgs)),
+		Len:  size,
+		Cap:  size,
 	}
+	cArgsInterface := reflect.NewAt(reflect.TypeOf(A), unsafe.Pointer(&hdr)).Elem().Interface()
 
-	// free the original
-	C.freeCharArray(cArgs, C.int(size))
+	result := make([]string, size)
+	for i := 0; i < size; i++ {
+		result[i] = C.GoString(cArgsInterface.([]*C.char)[i])
+	}
+	C.freeCharArray(cArgs, C.size_t(size))
 
-	return s
+	return result
 }
 
 func freeSnapshots(snapshots *C.struct_lxc_snapshot, size int) {
-	C.freeSnapshotArray(snapshots, C.int(size))
+	C.freeSnapshotArray(snapshots, C.size_t(size))
 }
