@@ -27,7 +27,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/lxc/go-lxc"
+	"gopkg.in/lxc/go-lxc.v1"
 )
 
 var (
