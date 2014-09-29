@@ -8,11 +8,17 @@ This package requires [LXC 1.x](https://github.com/lxc/lxc/releases) and its dev
 
 ## Installing
 
-The typical `go get github.com/lxc/go-lxc` will install LXC Go Bindings.
+To install it, run:
+
+    go get gopkg.in/lxc/go-lxc.v1
 
 ## Documentation
 
-Documentation can be found at [GoDoc](http://godoc.org/github.com/lxc/go-lxc).
+Documentation can be found at [GoDoc](http://godoc.org/gopkg.in/lxc/go-lxc.v1).
+
+## Stability
+
+The package API will remain stable as described in [gopkg.in](https://gopkg.in).
 
 ## Examples
 
