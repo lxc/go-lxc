@@ -25,7 +25,7 @@ package main
 import (
 	"log"
 
-	"github.com/lxc/go-lxc"
+	"gopkg.in/lxc/go-lxc.v1"
 )
 
 func main() {
