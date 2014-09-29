@@ -40,21 +40,24 @@ func init() {
 
 func main() {
 	log.Printf("Defined containers:\n")
-	for _, v := range lxc.DefinedContainers(lxcpath) {
-		log.Printf("%s (%s)\n", v.Name(), v.State())
+	c := lxc.DefinedContainers(lxcpath)
+	for i := range c {
+		log.Printf("%s (%s)\n", c[i].Name(), c[i].State())
 	}
 
 	log.Println()
 
 	log.Printf("Active containers:\n")
-	for _, v := range lxc.ActiveContainers(lxcpath) {
-		log.Printf("%s (%s)\n", v.Name(), v.State())
+	c = lxc.ActiveContainers(lxcpath)
+	for i := range c {
+		log.Printf("%s (%s)\n", c[i].Name(), c[i].State())
 	}
 
 	log.Println()
 
 	log.Printf("Active and Defined containers:\n")
-	for _, v := range lxc.ActiveContainers(lxcpath) {
-		log.Printf("%s (%s)\n", v.Name(), v.State())
+	c = lxc.ActiveContainers(lxcpath)
+	for i := range c {
+		log.Printf("%s (%s)\n", c[i].Name(), c[i].State())
 	}
 }

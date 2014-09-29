@@ -12,9 +12,17 @@ test:
 	@echo "$(OK_COLOR)==> Running go test $(NO_COLOR)"
 	@sudo `which go` test -v
 
+test-race:
+	@echo "$(OK_COLOR)==> Running go test $(NO_COLOR)"
+	@sudo `which go` test -race -v
+
 test-unprivileged:
 	@echo "$(OK_COLOR)==> Running go test for unprivileged user$(NO_COLOR)"
 	@`which go` test -v
+
+test-unprivileged-race:
+	@echo "$(OK_COLOR)==> Running go test for unprivileged user$(NO_COLOR)"
+	@`which go` test -race -v
 
 # requires https://codereview.appspot.com/34680044/
 cover:

@@ -29,16 +29,17 @@ import (
 )
 
 func main() {
-	for _, v := range lxc.Containers() {
-		log.Printf("%s\n", v.Name())
-		l, err := v.Snapshots()
+	c := lxc.Containers()
+	for i := range c {
+		log.Printf("%s\n", c[i].Name())
+		l, err := c[i].Snapshots()
 		if err != nil {
 			log.Fatalf("ERROR: %s\n", err.Error())
 		}
 
 		for _, s := range l {
 			log.Printf("Destroying Snaphot: %s\n", s.Name)
-			if err := v.DestroySnapshot(s); err != nil {
+			if err := c[i].DestroySnapshot(s); err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
 		}
