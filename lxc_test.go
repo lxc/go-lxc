@@ -933,8 +933,21 @@ func TestRunCommand(t *testing.T) {
 	defer PutContainer(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	if err := c.RunCommand(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...); err != nil {
+	ok, err := c.RunCommand(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
+	if err != nil {
 		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+
+	argsThree = []string{"/bin/sh", "-c", "exit 1"}
+	ok, err = c.RunCommand(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != false {
+		t.Errorf("Expected failure")
 	}
 }
 
@@ -946,8 +959,21 @@ func TestRunCommandWithClearEnvironment(t *testing.T) {
 	defer PutContainer(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	if err := c.RunCommandWithClearEnvironment(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...); err != nil {
+	ok, err := c.RunCommandWithClearEnvironment(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
+	if err != nil {
 		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+
+	argsThree = []string{"/bin/sh", "-c", "exit 1"}
+	ok, err = c.RunCommandWithClearEnvironment(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != false {
+		t.Errorf("Expected failure")
 	}
 }
 
