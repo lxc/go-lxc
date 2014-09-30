@@ -4,6 +4,7 @@
 //
 // Authors:
 // S.Çağlar Onur <caglar@10ur.org>
+// David Cramer <dcramer@gmail.com>
 
 // +build linux
 
@@ -933,7 +934,11 @@ func TestRunCommand(t *testing.T) {
 	defer PutContainer(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	ok, err := c.RunCommand(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
+	ok, err := c.RunCommand(argsThree, &AttachOptions{
+		Stdinfd:  os.Stdin.Fd(),
+		Stdoutfd: os.Stdout.Fd(),
+		Stderrfd: os.Stderr.Fd(),
+	})
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -942,7 +947,11 @@ func TestRunCommand(t *testing.T) {
 	}
 
 	argsThree = []string{"/bin/sh", "-c", "exit 1"}
-	ok, err = c.RunCommand(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
+	ok, err = c.RunCommand(argsThree, &AttachOptions{
+		Stdinfd:  os.Stdin.Fd(),
+		Stdoutfd: os.Stdout.Fd(),
+		Stderrfd: os.Stderr.Fd(),
+	})
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -951,29 +960,50 @@ func TestRunCommand(t *testing.T) {
 	}
 }
 
-func TestRunCommandWithClearEnvironment(t *testing.T) {
+func TestCommandWithEnvVars(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer PutContainer(c)
 
-	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	ok, err := c.RunCommandWithClearEnvironment(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
+	args := []string{"/bin/sh", "-c", "test $FOO = 'BAR'"}
+	ok, err := c.RunCommand(args, &AttachOptions{
+		Env:      []string{"FOO=BAR"},
+		ClearEnv: true,
+		Stdinfd:  os.Stdin.Fd(),
+		Stdoutfd: os.Stdout.Fd(),
+		Stderrfd: os.Stderr.Fd(),
+	})
+
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	if ok != true {
 		t.Errorf("Expected success")
 	}
+}
 
-	argsThree = []string{"/bin/sh", "-c", "exit 1"}
-	ok, err = c.RunCommandWithClearEnvironment(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
+func TestCommandWithCwd(t *testing.T) {
+	c, err := NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if ok != false {
-		t.Errorf("Expected failure")
+	defer PutContainer(c)
+
+	args := []string{"/bin/sh", "-c", "test `pwd` = /tmp"}
+	ok, err := c.RunCommand(args, &AttachOptions{
+		Stdinfd:  os.Stdin.Fd(),
+		Stdoutfd: os.Stdout.Fd(),
+		Stderrfd: os.Stderr.Fd(),
+		Cwd:      "/tmp",
+	})
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
 	}
 }
 

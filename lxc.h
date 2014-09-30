@@ -4,6 +4,7 @@
 //
 // Authors:
 // S.Çağlar Onur <caglar@10ur.org>
+// David Cramer <dcramer@gmail.com>
 
 extern bool go_lxc_add_device_node(struct lxc_container *c, const char *src_path, const char *dest_path);
 extern void go_lxc_clear_config(struct lxc_container *c);
@@ -42,7 +43,7 @@ extern char* go_lxc_get_keys(struct lxc_container *c, const char *key);
 extern char* go_lxc_get_running_config_item(struct lxc_container *c, const char *key);
 extern const char* go_lxc_get_config_path(struct lxc_container *c);
 extern const char* go_lxc_state(struct lxc_container *c);
-extern int go_lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd, int stdoutfd, int stderrfd, const char * const argv[]);
+extern int go_lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd, int stdoutfd, int stderrfd, char *initial_cwd, char **extra_env_vars, const char * const argv[]);
 extern int go_lxc_attach(struct lxc_container *c, bool clear_env);
 extern int go_lxc_console_getfd(struct lxc_container *c, int ttynum);
 extern int go_lxc_snapshot_list(struct lxc_container *c, struct lxc_snapshot **ret);
