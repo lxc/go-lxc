@@ -25,6 +25,7 @@ package main
 import (
 	"flag"
 	"log"
+	"time"
 
 	"gopkg.in/lxc/go-lxc.v1"
 )
@@ -51,5 +52,5 @@ func main() {
 	if err := c.Freeze(); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	c.Wait(lxc.FROZEN, 10)
+	c.Wait(lxc.FROZEN, 10*time.Second)
 }
