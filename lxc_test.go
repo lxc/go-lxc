@@ -977,6 +977,56 @@ func TestRunCommandWithClearEnvironment(t *testing.T) {
 	}
 }
 
+func TestCommandWithEnvVars(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer PutContainer(c)
+
+	cmd := &Command{
+		Args: []string{"/bin/sh", "-c", "test $FOO = 'BAR'"},
+		Env: []string{"FOO=BAR"},
+		ClearEnv: true,
+		Stdinfd: os.Stdin.Fd(),
+		Stdoutfd: os.Stdout.Fd(),
+		Stderrfd: os.Stderr.Fd(),
+	}
+	ok, err := cmd.Run(c)
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+}
+
+func TestCommandWithCwd(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer PutContainer(c)
+
+	cmd := &Command{
+		Args: []string{"/bin/sh", "-c", "test `pwd` = /tmp"},
+		ClearEnv: true,
+		Stdinfd: os.Stdin.Fd(),
+		Stdoutfd: os.Stdout.Fd(),
+		Stderrfd: os.Stderr.Fd(),
+		Cwd: "/tmp",
+	}
+	ok, err := cmd.Run(c)
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+}
+
 func TestConsoleFd(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {

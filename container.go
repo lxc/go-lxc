@@ -396,12 +396,12 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 	/*
 	   cargs := makeNullTerminatedArgs(args)
 	   if cargs == nil {
-	       return ErrAllocationFailed
+		   return ErrAllocationFailed
 	   }
 	   defer freeNullTerminatedArgs(cargs, len(args))
 
 	   if !bool(C.go_lxc_start(c.container, 1, cargs)) {
-	       return ErrExecuteFailed
+		   return ErrExecuteFailed
 	   }
 	   return nil
 	*/
@@ -987,25 +987,18 @@ func (c *Container) AttachShellWithClearEnvironment() error {
 	return nil
 }
 
-// RunCommand runs the user specified command inside the container and waits for it to exit.
-// stdinfd: fd to read input from
-// stdoutfd: fd to write output to
-// stderrfd: fd to write error output to
-func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...string) (bool, error) {
-	return c.runCommand(stdinfd, stdoutfd, stderrfd, false, args...)
+type Command struct {
+	Stdinfd uintptr
+	Stdoutfd uintptr
+	Stderrfd uintptr
+	Args []string
+	Env []string
+	Cwd string
+	ClearEnv bool
 }
 
-// RunCommandWithClearEnvironment runs the user specified command inside the container
-// and waits for it to exit. It clears all environment variables before running.
-// stdinfd: fd to read input from
-// stdoutfd: fd to write output to
-// stderrfd: fd to write error output to
-func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd uintptr, args ...string) (bool, error) {
-	return c.runCommand(stdinfd, stdoutfd, stderrfd, true, args...)
-}
-
-func (c *Container) runCommand(stdinfd, stdoutfd, stderrfd uintptr, clearenv bool, args ...string) (bool, error) {
-	if args == nil {
+func (cmd *Command) Run(c *Container) (bool, error) {
+	if len(cmd.Args) == 0 {
 		return false, ErrInsufficientNumberOfArguments
 	}
 
@@ -1016,18 +1009,67 @@ func (c *Container) runCommand(stdinfd, stdoutfd, stderrfd uintptr, clearenv boo
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	cargs := makeNullTerminatedArgs(args)
+	cargs := makeNullTerminatedArgs(cmd.Args)
 	if cargs == nil {
 		return false, ErrAllocationFailed
 	}
-	defer freeNullTerminatedArgs(cargs, len(args))
+	defer freeNullTerminatedArgs(cargs, len(cmd.Args))
 
-	ret := int(C.go_lxc_attach_run_wait(c.container, C.bool(clearenv), C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs))
+	cenv := makeNullTerminatedArgs(cmd.Env)
+	if cenv == nil {
+		return false, ErrAllocationFailed
+	}
+	defer freeNullTerminatedArgs(cenv, len(cmd.Env))
+
+	cwd := C.CString(cmd.Cwd)
+	defer C.free(unsafe.Pointer(cwd))
+
+	ret := int(C.go_lxc_attach_run_wait(
+		c.container,
+		C.bool(cmd.ClearEnv),
+		C.int(cmd.Stdinfd),
+		C.int(cmd.Stdoutfd),
+		C.int(cmd.Stderrfd),
+		*cwd,
+		*cenv,
+		cargs,
+	))
 
 	if ret < 0 {
 		return false, ErrAttachFailed
 	}
 	return ret == 0, nil
+}
+
+// RunCommand runs the user specified command inside the container and waits for it to exit.
+// stdinfd: fd to read input from
+// stdoutfd: fd to write output to
+// stderrfd: fd to write error output to
+func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...string) (bool, error) {
+	cmd := &Command{
+		Stdinfd: stdinfd,
+		Stdoutfd: stdoutfd,
+		Stderrfd: stderrfd,
+		Args: args,
+		ClearEnv: false,
+	}
+	return cmd.Run(c)
+}
+
+// RunCommandWithClearEnvironment runs the user specified command inside the container
+// and waits for it to exit. It clears all environment variables before running.
+// stdinfd: fd to read input from
+// stdoutfd: fd to write output to
+// stderrfd: fd to write error output to
+func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd uintptr, args ...string) (bool, error) {
+	cmd := &Command{
+		Stdinfd: stdinfd,
+		Stdoutfd: stdoutfd,
+		Stderrfd: stderrfd,
+		Args: args,
+		ClearEnv: true,
+	}
+	return cmd.Run(c)
 }
 
 // Interfaces returns the names of the network interfaces.
