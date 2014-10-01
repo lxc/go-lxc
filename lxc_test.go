@@ -63,7 +63,7 @@ func TestSetConfigPath(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	currentPath := c.ConfigPath()
 	if err := c.SetConfigPath("/tmp"); err != nil {
@@ -76,15 +76,15 @@ func TestSetConfigPath(t *testing.T) {
 	}
 }
 
-func TestGetContainer(t *testing.T) {
+func TestAcquire(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
-	GetContainer(c)
-	PutContainer(c)
+	Acquire(c)
+	Release(c)
 }
 
 func TestConcurrentDefined_Negative(t *testing.T) {
@@ -99,7 +99,7 @@ func TestConcurrentDefined_Negative(t *testing.T) {
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer PutContainer(c)
+			defer Release(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
@@ -118,7 +118,7 @@ func TestDefined_Negative(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if c.Defined() {
 		t.Errorf("Defined_Negative failed...")
@@ -134,7 +134,7 @@ func TestExecute(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.Execute("/bin/true"); err != nil {
 		t.Errorf(err.Error())
@@ -146,7 +146,7 @@ func TestSetVerbosity(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	c.SetVerbosity(Quiet)
 }
@@ -156,7 +156,7 @@ func TestCreate(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if unprivileged() {
 		if err := c.CreateAsUser(UnprivilegedContainerType, UnprivilegedRelease, UnprivilegedArch); err != nil {
@@ -174,7 +174,7 @@ func TestClone(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Clone(ContainerCloneName); err != nil {
 		t.Errorf(err.Error())
@@ -190,7 +190,7 @@ func TestCloneUsingOverlayfs(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.CloneUsing(ContainerCloneOverlayName, Overlayfs, CloneSnapshot|CloneKeepName|CloneKeepMACAddr); err != nil {
 		t.Errorf(err.Error())
@@ -210,7 +210,7 @@ func TestCloneUsingAufs(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.CloneUsing(ContainerCloneAufsName, Aufs, CloneSnapshot|CloneKeepName|CloneKeepMACAddr); err != nil {
 		t.Errorf(err.Error())
@@ -222,7 +222,7 @@ func TestCreateSnapshot(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.CreateSnapshot(); err != nil {
 		t.Errorf(err.Error())
@@ -234,7 +234,7 @@ func TestRestoreSnapshot(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	snapshot := Snapshot{Name: SnapshotName}
 	if err := c.RestoreSnapshot(snapshot, ContainerRestoreName); err != nil {
@@ -258,7 +258,7 @@ func TestConcurrentCreate(t *testing.T) {
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer PutContainer(c)
+			defer Release(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
@@ -277,7 +277,7 @@ func TestSnapshots(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.Snapshots(); err != nil {
 		t.Errorf(err.Error())
@@ -300,7 +300,7 @@ func TestConcurrentStart(t *testing.T) {
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer PutContainer(c)
+			defer Release(c)
 
 			if err := c.Start(); err != nil {
 				t.Errorf(err.Error())
@@ -322,7 +322,7 @@ func TestConfigFileName(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if c.ConfigFileName() == "" {
 		t.Errorf("ConfigFileName failed...")
@@ -334,7 +334,7 @@ func TestDefined_Positive(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if !c.Defined() {
 		t.Errorf("Defined_Positive failed...")
@@ -357,7 +357,7 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer PutContainer(c)
+			defer Release(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
@@ -376,7 +376,7 @@ func TestInitPid_Negative(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if c.InitPid() != -1 {
 		t.Errorf("InitPid failed...")
@@ -388,7 +388,7 @@ func TestStart(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Start(); err != nil {
 		t.Errorf(err.Error())
@@ -405,7 +405,7 @@ func TestControllable(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if !c.Controllable() {
 		t.Errorf("Controling the container failed...")
@@ -453,7 +453,7 @@ func TestRunning(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if !c.Running() {
 		t.Errorf("Checking the container failed...")
@@ -465,7 +465,7 @@ func TestWantDaemonize(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.WantDaemonize(false); err != nil || c.Daemonize() {
 		t.Errorf("WantDaemonize failed...")
@@ -477,7 +477,7 @@ func TestWantCloseAllFds(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.WantCloseAllFds(true); err != nil {
 		t.Errorf("WantCloseAllFds failed...")
@@ -489,7 +489,7 @@ func TestSetLogLevel(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.SetLogLevel(WARN); err != nil || c.LogLevel() != WARN {
 		t.Errorf("SetLogLevel( failed...")
@@ -501,7 +501,7 @@ func TestSetLogFile(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.SetLogFile("/tmp/" + ContainerName); err != nil || c.LogFile() != "/tmp/"+ContainerName {
 		t.Errorf("SetLogFile failed...")
@@ -513,7 +513,7 @@ func TestInitPid_Positive(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if c.InitPid() == -1 {
 		t.Errorf("InitPid failed...")
@@ -525,7 +525,7 @@ func TestName(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if c.Name() != ContainerName {
 		t.Errorf("Name failed...")
@@ -537,7 +537,7 @@ func TestFreeze(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Freeze(); err != nil {
 		t.Errorf(err.Error())
@@ -554,7 +554,7 @@ func TestUnfreeze(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Unfreeze(); err != nil {
 		t.Errorf(err.Error())
@@ -571,7 +571,7 @@ func TestLoadConfigFile(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.LoadConfigFile(c.ConfigFileName()); err != nil {
 		t.Errorf(err.Error())
@@ -583,7 +583,7 @@ func TestSaveConfigFile(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.SaveConfigFile(c.ConfigFileName()); err != nil {
 		t.Errorf(err.Error())
@@ -595,7 +595,7 @@ func TestConfigItem(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if c.ConfigItem("lxc.utsname")[0] != ContainerName {
 		t.Errorf("ConfigItem failed...")
@@ -607,7 +607,7 @@ func TestSetConfigItem(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.SetConfigItem("lxc.utsname", ContainerName); err != nil {
 		t.Errorf(err.Error())
@@ -623,7 +623,7 @@ func TestRunningConfigItem(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if c.RunningConfigItem("lxc.network.0.type") == nil {
 		t.Errorf("RunningConfigItem failed...")
@@ -635,7 +635,7 @@ func TestSetCgroupItem(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	maxMem := c.CgroupItem("memory.max_usage_in_bytes")[0]
 	currentMem := c.CgroupItem("memory.limit_in_bytes")[0]
@@ -654,7 +654,7 @@ func TestClearConfigItem(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.ClearConfigItem("lxc.cap.drop"); err != nil {
 		t.Errorf(err.Error())
@@ -669,7 +669,7 @@ func TestConfigKeys(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	keys := strings.Join(c.ConfigKeys("lxc.network.0"), " ")
 	if !strings.Contains(keys, "mtu") {
@@ -682,7 +682,7 @@ func TestInterfaces(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.Interfaces(); err != nil {
 		t.Errorf(err.Error())
@@ -694,7 +694,7 @@ func TestMemoryUsage(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.MemoryUsage(); err != nil {
 		t.Errorf(err.Error())
@@ -706,7 +706,7 @@ func TestKernelMemoryUsage(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.KernelMemoryUsage(); err != nil {
 		t.Errorf(err.Error())
@@ -718,7 +718,7 @@ func TestMemorySwapUsage(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.MemorySwapUsage(); err != nil {
 		t.Errorf(err.Error())
@@ -730,7 +730,7 @@ func TestBlkioUsage(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.BlkioUsage(); err != nil {
 		t.Errorf(err.Error())
@@ -742,7 +742,7 @@ func TestMemoryLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.MemoryLimit(); err != nil {
 		t.Errorf(err.Error())
@@ -754,7 +754,7 @@ func TestSoftMemoryLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.SoftMemoryLimit(); err != nil {
 		t.Errorf(err.Error())
@@ -766,7 +766,7 @@ func TestKernelMemoryLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.KernelMemoryLimit(); err != nil {
 		t.Errorf(err.Error())
@@ -778,7 +778,7 @@ func TestMemorySwapLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.MemorySwapLimit(); err != nil {
 		t.Errorf(err.Error())
@@ -790,7 +790,7 @@ func TestSetMemoryLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	oldMemLimit, err := c.MemoryLimit()
 	if err != nil {
@@ -816,7 +816,7 @@ func TestSetSoftMemoryLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	oldMemLimit, err := c.MemoryLimit()
 	if err != nil {
@@ -844,7 +844,7 @@ func TestSetKernelMemoryLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	oldMemLimit, err := c.KernelMemoryLimit()
 	if err != nil {
@@ -869,7 +869,7 @@ func TestSetMemorySwapLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	oldMemorySwapLimit, err := c.MemorySwapLimit()
 	if err != nil {
@@ -894,7 +894,7 @@ func TestCPUTime(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.CPUTime(); err != nil {
 		t.Errorf(err.Error())
@@ -906,7 +906,7 @@ func TestCPUTimePerCPU(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.CPUTimePerCPU(); err != nil {
 		t.Errorf(err.Error())
@@ -918,7 +918,7 @@ func TestCPUStats(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.CPUStats(); err != nil {
 		t.Errorf(err.Error())
@@ -930,7 +930,7 @@ func TestRunCommand(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
 	ok, err := c.RunCommand(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
@@ -956,7 +956,7 @@ func TestRunCommandWithClearEnvironment(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
 	ok, err := c.RunCommandWithClearEnvironment(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), argsThree...)
@@ -982,7 +982,7 @@ func TestConsoleFd(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.ConsoleFd(0); err != nil {
 		t.Errorf(err.Error())
@@ -994,7 +994,7 @@ func TestIPAddress(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if unprivileged() {
 		time.Sleep(3 * time.Second)
@@ -1014,7 +1014,7 @@ func TestAddDeviceNode(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.AddDeviceNode("/dev/network_latency"); err != nil {
 		t.Errorf(err.Error())
@@ -1030,7 +1030,7 @@ func TestRemoveDeviceNode(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.RemoveDeviceNode("/dev/network_latency"); err != nil {
 		t.Errorf(err.Error())
@@ -1044,7 +1044,7 @@ func TestIPv4Addresses(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.IPv4Addresses(); err != nil {
 		t.Errorf(err.Error())
@@ -1058,7 +1058,7 @@ func TestIPv6Addresses(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if _, err := c.IPv6Addresses(); err != nil {
 		t.Errorf(err.Error())
@@ -1070,7 +1070,7 @@ func TestReboot(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Reboot(); err != nil {
 		t.Errorf("Rebooting the container failed...")
@@ -1094,7 +1094,7 @@ func TestConcurrentShutdown(t *testing.T) {
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer PutContainer(c)
+			defer Release(c)
 
 			if err := c.Shutdown(30 * time.Second); err != nil {
 				t.Errorf(err.Error())
@@ -1116,7 +1116,7 @@ func TestShutdown(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Shutdown(30 * time.Second); err != nil {
 		t.Errorf(err.Error())
@@ -1133,7 +1133,7 @@ func TestStop(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Start(); err != nil {
 		t.Errorf(err.Error())
@@ -1154,7 +1154,7 @@ func TestDestroySnapshot(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	snapshot := Snapshot{Name: SnapshotName}
 	if err := c.DestroySnapshot(snapshot); err != nil {
@@ -1168,7 +1168,7 @@ func TestDestroy(t *testing.T) {
 		if err != nil {
 			t.Errorf(err.Error())
 		}
-		defer PutContainer(c)
+		defer Release(c)
 
 		if err := c.Destroy(); err != nil {
 			t.Errorf(err.Error())
@@ -1180,7 +1180,7 @@ func TestDestroy(t *testing.T) {
 		if err != nil {
 			t.Errorf(err.Error())
 		}
-		defer PutContainer(c)
+		defer Release(c)
 
 		if err := c.Destroy(); err != nil {
 			t.Errorf(err.Error())
@@ -1190,7 +1190,7 @@ func TestDestroy(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Destroy(); err != nil {
 		t.Errorf(err.Error())
@@ -1200,7 +1200,7 @@ func TestDestroy(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Destroy(); err != nil {
 		t.Errorf(err.Error())
@@ -1210,7 +1210,7 @@ func TestDestroy(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	if err := c.Destroy(); err != nil {
 		t.Errorf(err.Error())
@@ -1233,7 +1233,7 @@ func TestConcurrentDestroy(t *testing.T) {
 			if err != nil {
 				t.Errorf(err.Error())
 			}
-			defer PutContainer(c)
+			defer Release(c)
 
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))

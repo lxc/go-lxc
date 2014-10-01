@@ -75,7 +75,7 @@ func main() {
 					if err != nil {
 						log.Fatalf("ERROR: %s\n", err.Error())
 					}
-					defer lxc.PutContainer(c)
+					defer lxc.Release(c)
 
 					if mode == "CREATE" && startstop == false {
 						log.Printf("\t\tCreating the container (%d)...\n", i)

@@ -46,7 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.PutContainer(c)
+	defer lxc.Release(c)
 
 	log.Printf("Attaching to container's console...\n")
 	if err := c.Console(-1, os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), 1); err != nil {

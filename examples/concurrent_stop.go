@@ -52,7 +52,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
-			defer lxc.PutContainer(c)
+			defer lxc.Release(c)
 
 			log.Printf("Stoping the container (%d)...\n", i)
 			if err := c.Stop(); err != nil {

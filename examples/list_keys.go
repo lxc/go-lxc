@@ -45,7 +45,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.PutContainer(c)
+	defer lxc.Release(c)
 
 	for _, k := range c.ConfigKeys() {
 		log.Printf("%s -> %s", k, c.ConfigItem(k))
