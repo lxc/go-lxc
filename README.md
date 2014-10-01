@@ -10,11 +10,11 @@ This package requires [LXC 1.x](https://github.com/lxc/lxc/releases) and its dev
 
 To install it, run:
 
-    go get gopkg.in/lxc/go-lxc.v1
+    go get gopkg.in/lxc/go-lxc.v2
 
 ## Documentation
 
-Documentation can be found at [GoDoc](http://godoc.org/gopkg.in/lxc/go-lxc.v1).
+Documentation can be found at [GoDoc](http://godoc.org/gopkg.in/lxc/go-lxc.v2).
 
 ## Stability
 

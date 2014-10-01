@@ -26,7 +26,7 @@ import (
 	"flag"
 	"log"
 
-	"gopkg.in/lxc/go-lxc.v1"
+	"gopkg.in/lxc/go-lxc.v2"
 )
 
 var (
