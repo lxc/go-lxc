@@ -991,28 +991,8 @@ func (c *Container) AttachShellWithClearEnvironment() error {
 // stdinfd: fd to read input from
 // stdoutfd: fd to write output to
 // stderrfd: fd to write error output to
-func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...string) error {
-	if args == nil {
-		return ErrInsufficientNumberOfArguments
-	}
-
-	if err := c.makeSure(isDefined | isRunning); err != nil {
-		return err
-	}
-
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	cargs := makeNullTerminatedArgs(args)
-	if cargs == nil {
-		return ErrAllocationFailed
-	}
-	defer freeNullTerminatedArgs(cargs, len(args))
-
-	if int(C.go_lxc_attach_run_wait(c.container, false, C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs)) < 0 {
-		return ErrAttachFailed
-	}
-	return nil
+func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...string) (bool, error) {
+	return c.runCommand(stdinfd, stdoutfd, stderrfd, false, args...)
 }
 
 // RunCommandWithClearEnvironment runs the user specified command inside the container
@@ -1020,13 +1000,17 @@ func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...stri
 // stdinfd: fd to read input from
 // stdoutfd: fd to write output to
 // stderrfd: fd to write error output to
-func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd uintptr, args ...string) error {
+func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd uintptr, args ...string) (bool, error) {
+	return c.runCommand(stdinfd, stdoutfd, stderrfd, true, args...)
+}
+
+func (c *Container) runCommand(stdinfd, stdoutfd, stderrfd uintptr, clearenv bool, args ...string) (bool, error) {
 	if args == nil {
-		return ErrInsufficientNumberOfArguments
+		return false, ErrInsufficientNumberOfArguments
 	}
 
 	if err := c.makeSure(isDefined | isRunning); err != nil {
-		return err
+		return false, err
 	}
 
 	c.mu.Lock()
@@ -1034,14 +1018,16 @@ func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd u
 
 	cargs := makeNullTerminatedArgs(args)
 	if cargs == nil {
-		return ErrAllocationFailed
+		return false, ErrAllocationFailed
 	}
 	defer freeNullTerminatedArgs(cargs, len(args))
 
-	if int(C.go_lxc_attach_run_wait(c.container, true, C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs)) < 0 {
-		return ErrAttachFailed
+	ret := int(C.go_lxc_attach_run_wait(c.container, C.bool(clearenv), C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs))
+
+	if ret < 0 {
+		return false, ErrAttachFailed
 	}
-	return nil
+	return ret == 0, nil
 }
 
 // Interfaces returns the names of the network interfaces.
