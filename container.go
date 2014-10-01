@@ -4,6 +4,7 @@
 //
 // Authors:
 // S.Çağlar Onur <caglar@10ur.org>
+// David Cramer <dcramer@gmail.com>
 
 // +build linux
 
@@ -394,16 +395,16 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 
 	return output, nil
 	/*
-	   cargs := makeNullTerminatedArgs(args)
-	   if cargs == nil {
-	       return ErrAllocationFailed
-	   }
-	   defer freeNullTerminatedArgs(cargs, len(args))
+		   cargs := makeNullTerminatedArgs(args)
+		   if cargs == nil {
+			   return ErrAllocationFailed
+		   }
+		   defer freeNullTerminatedArgs(cargs, len(args))
 
-	   if !bool(C.go_lxc_start(c.container, 1, cargs)) {
-	       return ErrExecuteFailed
-	   }
-	   return nil
+		   if !bool(C.go_lxc_start(c.container, 1, cargs)) {
+			   return ErrExecuteFailed
+		   }
+		   return nil
 	*/
 }
 
@@ -987,25 +988,11 @@ func (c *Container) AttachShellWithClearEnvironment() error {
 	return nil
 }
 
-// RunCommand runs the user specified command inside the container and waits for it to exit.
-// stdinfd: fd to read input from
-// stdoutfd: fd to write output to
-// stderrfd: fd to write error output to
-func (c *Container) RunCommand(stdinfd, stdoutfd, stderrfd uintptr, args ...string) (bool, error) {
-	return c.runCommand(stdinfd, stdoutfd, stderrfd, false, args...)
-}
-
-// RunCommandWithClearEnvironment runs the user specified command inside the container
-// and waits for it to exit. It clears all environment variables before running.
-// stdinfd: fd to read input from
-// stdoutfd: fd to write output to
-// stderrfd: fd to write error output to
-func (c *Container) RunCommandWithClearEnvironment(stdinfd, stdoutfd, stderrfd uintptr, args ...string) (bool, error) {
-	return c.runCommand(stdinfd, stdoutfd, stderrfd, true, args...)
-}
-
-func (c *Container) runCommand(stdinfd, stdoutfd, stderrfd uintptr, clearenv bool, args ...string) (bool, error) {
-	if args == nil {
+// RunCommand attachs a shell and runs the command within the container.
+// The process will wait for the command to finish and return a success status. An error
+// is returned only when invocation of the command completely fails.
+func (c *Container) RunCommand(args []string, options *AttachOptions) (bool, error) {
+	if len(args) == 0 {
 		return false, ErrInsufficientNumberOfArguments
 	}
 
@@ -1022,7 +1009,25 @@ func (c *Container) runCommand(stdinfd, stdoutfd, stderrfd uintptr, clearenv boo
 	}
 	defer freeNullTerminatedArgs(cargs, len(args))
 
-	ret := int(C.go_lxc_attach_run_wait(c.container, C.bool(clearenv), C.int(stdinfd), C.int(stdoutfd), C.int(stderrfd), cargs))
+	cenv := makeNullTerminatedArgs(options.Env)
+	if cenv == nil {
+		return false, ErrAllocationFailed
+	}
+	defer freeNullTerminatedArgs(cenv, len(options.Env))
+
+	cwd := C.CString(options.Cwd)
+	defer C.free(unsafe.Pointer(cwd))
+
+	ret := int(C.go_lxc_attach_run_wait(
+		c.container,
+		C.bool(options.ClearEnv),
+		C.int(options.Stdinfd),
+		C.int(options.Stdoutfd),
+		C.int(options.Stderrfd),
+		cwd,
+		cenv,
+		cargs,
+	))
 
 	if ret < 0 {
 		return false, ErrAttachFailed

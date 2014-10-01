@@ -4,6 +4,7 @@
 //
 // Authors:
 // S.Çağlar Onur <caglar@10ur.org>
+// David Cramer <dcramer@gmail.com>
 
 // +build linux
 
@@ -183,13 +184,13 @@ char** go_lxc_get_ips(struct lxc_container *c, const char *interface, const char
 int go_lxc_attach(struct lxc_container *c, bool clear_env) {
 	int ret;
 	pid_t pid;
+
 	lxc_attach_options_t attach_options = LXC_ATTACH_OPTIONS_DEFAULT;
 
 	attach_options.env_policy = LXC_ATTACH_KEEP_ENV;
 	if (clear_env) {
 		attach_options.env_policy = LXC_ATTACH_CLEAR_ENV;
 	}
-
 	/*
 	   remount_sys_proc
 	   When using -s and the mount namespace is not included, this flag will cause lxc-attach to remount /proc and /sys to reflect the current other namespace contexts.
@@ -228,8 +229,9 @@ int go_lxc_attach(struct lxc_container *c, bool clear_env) {
 	return -1;
 }
 
-int go_lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd, int stdoutfd, int stderrfd, const char * const argv[]) {
+int go_lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd, int stdoutfd, int stderrfd, char *initial_cwd, char **extra_env_vars, const char * const argv[]) {
 	int ret;
+
 	lxc_attach_options_t attach_options = LXC_ATTACH_OPTIONS_DEFAULT;
 
 	attach_options.env_policy = LXC_ATTACH_KEEP_ENV;
@@ -239,6 +241,8 @@ int go_lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd,
 	attach_options.stdin_fd = stdinfd;
 	attach_options.stdout_fd = stdoutfd;
 	attach_options.stderr_fd = stderrfd;
+	attach_options.initial_cwd = initial_cwd;
+	attach_options.extra_env_vars = extra_env_vars;
 
 	ret = c->attach_run_wait(c, &attach_options, argv[0], argv);
 	if (WIFEXITED(ret) && WEXITSTATUS(ret) == 255)
