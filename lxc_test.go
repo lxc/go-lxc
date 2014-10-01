@@ -306,7 +306,7 @@ func TestConcurrentStart(t *testing.T) {
 				t.Errorf(err.Error())
 			}
 
-			c.Wait(RUNNING, 30)
+			c.Wait(RUNNING, 30*time.Second)
 			if !c.Running() {
 				t.Errorf("Starting the container failed...")
 			}
@@ -394,7 +394,7 @@ func TestStart(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	c.Wait(RUNNING, 30)
+	c.Wait(RUNNING, 30*time.Second)
 	if !c.Running() {
 		t.Errorf("Starting the container failed...")
 	}
@@ -543,7 +543,7 @@ func TestFreeze(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	c.Wait(FROZEN, 30)
+	c.Wait(FROZEN, 30*time.Second)
 	if c.State() != FROZEN {
 		t.Errorf("Freezing the container failed...")
 	}
@@ -560,7 +560,7 @@ func TestUnfreeze(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	c.Wait(RUNNING, 30)
+	c.Wait(RUNNING, 30*time.Second)
 	if !c.Running() {
 		t.Errorf("Unfreezing the container failed...")
 	}
@@ -971,7 +971,7 @@ func TestIPAddress(t *testing.T) {
 	defer PutContainer(c)
 
 	if unprivileged() {
-		time.Sleep(time.Second * 3)
+		time.Sleep(3 * time.Second)
 	}
 
 	if _, err := c.IPAddress("lo"); err != nil {
@@ -1049,7 +1049,7 @@ func TestReboot(t *testing.T) {
 	if err := c.Reboot(); err != nil {
 		t.Errorf("Rebooting the container failed...")
 	}
-	c.Wait(RUNNING, 30)
+	c.Wait(RUNNING, 30*time.Second)
 }
 
 func TestConcurrentShutdown(t *testing.T) {
@@ -1070,11 +1070,11 @@ func TestConcurrentShutdown(t *testing.T) {
 			}
 			defer PutContainer(c)
 
-			if err := c.Shutdown(30); err != nil {
+			if err := c.Shutdown(30 * time.Second); err != nil {
 				t.Errorf(err.Error())
 			}
 
-			c.Wait(STOPPED, 30)
+			c.Wait(STOPPED, 30*time.Second)
 			if c.Running() {
 				t.Errorf("Shutting down the container failed...")
 			}
@@ -1092,11 +1092,11 @@ func TestShutdown(t *testing.T) {
 	}
 	defer PutContainer(c)
 
-	if err := c.Shutdown(30); err != nil {
+	if err := c.Shutdown(30 * time.Second); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	c.Wait(STOPPED, 30)
+	c.Wait(STOPPED, 30*time.Second)
 	if c.Running() {
 		t.Errorf("Shutting down the container failed...")
 	}
@@ -1117,7 +1117,7 @@ func TestStop(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	c.Wait(STOPPED, 30)
+	c.Wait(STOPPED, 30*time.Second)
 	if c.Running() {
 		t.Errorf("Stopping the container failed...")
 	}

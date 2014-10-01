@@ -25,6 +25,7 @@ package main
 import (
 	"flag"
 	"log"
+	"time"
 
 	"gopkg.in/lxc/go-lxc.v1"
 )
@@ -48,7 +49,7 @@ func main() {
 	defer lxc.PutContainer(c)
 
 	log.Printf("Shutting down the container...\n")
-	if err := c.Shutdown(30); err != nil {
+	if err := c.Shutdown(30 * time.Second); err != nil {
 		if err = c.Stop(); err != nil {
 			log.Fatalf("ERROR: %s\n", err.Error())
 		}

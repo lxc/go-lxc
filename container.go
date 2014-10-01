@@ -438,15 +438,14 @@ func (c *Container) Reboot() error {
 }
 
 // Shutdown shuts down the container.
-func (c *Container) Shutdown(timeout int) error {
+func (c *Container) Shutdown(timeout time.Duration) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
 	}
-
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if !bool(C.go_lxc_shutdown(c.container, C.int(timeout))) {
+	if !bool(C.go_lxc_shutdown(c.container, C.int(timeout.Seconds()))) {
 		return ErrShutdownFailed
 	}
 	return nil
@@ -529,14 +528,14 @@ func (c *Container) Rename(name string) error {
 }
 
 // Wait waits for container to reach a particular state.
-func (c *Container) Wait(state State, timeout int) bool {
+func (c *Container) Wait(state State, timeout time.Duration) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	cstate := C.CString(state.String())
 	defer C.free(unsafe.Pointer(cstate))
 
-	return bool(C.go_lxc_wait(c.container, cstate, C.int(timeout)))
+	return bool(C.go_lxc_wait(c.container, cstate, C.int(timeout.Seconds())))
 }
 
 // ConfigFileName returns the container's configuration file's name.
