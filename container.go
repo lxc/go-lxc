@@ -1117,6 +1117,22 @@ func (c *Container) IPAddress(interfaceName string) ([]string, error) {
 	return convertArgs(result), nil
 }
 
+// WaitIPAddresses waits until IPAddresses call returns something or time outs
+func (c *Container) WaitIPAddresses(timeout time.Duration) ([]string, error) {
+	now := time.Now()
+	for {
+		if result, err := c.IPAddresses(); err == nil && len(result) > 0 {
+			return result, nil
+		}
+		// Python API sleeps 1 second as well
+		time.Sleep(1 * time.Second)
+
+		if time.Since(now) >= timeout {
+			return nil, ErrIPAddresses
+		}
+	}
+}
+
 // IPAddresses returns all IP addresses.
 func (c *Container) IPAddresses() ([]string, error) {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
