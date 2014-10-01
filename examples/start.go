@@ -25,6 +25,7 @@ package main
 import (
 	"flag"
 	"log"
+	"time"
 
 	"gopkg.in/lxc/go-lxc.v2"
 )
@@ -52,6 +53,11 @@ func main() {
 
 	log.Printf("Starting the container...\n")
 	if err := c.Start(); err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
+
+	log.Printf("Waiting container to startup networking...\n")
+	if _, err := c.WaitIPAddresses(5 * time.Second); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }
