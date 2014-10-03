@@ -985,7 +985,7 @@ func TestCommandWithCwd(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	defer PutContainer(c)
+	defer Release(c)
 
 	args := []string{"/bin/sh", "-c", "test `pwd` = /tmp"}
 	ok, err := c.RunCommand(args, &AttachOptions{
