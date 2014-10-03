@@ -39,7 +39,13 @@ func main() {
 		}
 
 		log.Printf("RunCommandWithClearEnvironment\n")
-		if _, err := c.RunCommandWithClearEnvironment(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), "uname", "-a"); err != nil {
+		_, err := c.RunCommand([]string{"uname", "-a"}, &AttachOptions{
+			ClearEnv: true,
+			Stdinfd:  os.Stdin.Fd(),
+			Stdoutfd: os.Stdout.Fd(),
+			Stderrfd: os.Stderr.Fd(),
+		})
+		if err != nil {
 			log.Fatalf("ERROR: %s\n", err.Error())
 		}
 
@@ -50,7 +56,13 @@ func main() {
 		}
 
 		log.Printf("RunCommand\n")
-		if _, err := c.RunCommand(os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(), "uname", "-a"); err != nil {
+		_, err := c.RunCommand([]string{"uname", "-a"}, &AttachOptions{
+			ClearEnv: false,
+			Stdinfd:  os.Stdin.Fd(),
+			Stdoutfd: os.Stdout.Fd(),
+			Stderrfd: os.Stderr.Fd(),
+		})
+		if err != nil {
 			log.Fatalf("ERROR: %s\n", err.Error())
 		}
 	}
