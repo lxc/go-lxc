@@ -1,10 +1,6 @@
-// Copyright © 2013, 2014, S.Çağlar Onur
+// Copyright © 2013, 2014, The Go-LXC Authors. All rights reserved.
 // Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
-//
-// Authors:
-// S.Çağlar Onur <caglar@10ur.org>
-// Fatih Arslan <ftharsln@gmail.com>
 
 // +build linux
 

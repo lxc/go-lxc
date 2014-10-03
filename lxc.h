@@ -1,10 +1,6 @@
-// Copyright © 2013, S.Çağlar Onur
-// Use of this source code is governed by a LGPLv2.1 licence
+// Copyright © 2013, 2014, The Go-LXC Authors. All rights reserved.
+// Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
-//
-// Authors:
-// S.Çağlar Onur <caglar@10ur.org>
-// David Cramer <dcramer@gmail.com>
 
 extern bool go_lxc_add_device_node(struct lxc_container *c, const char *src_path, const char *dest_path);
 extern void go_lxc_clear_config(struct lxc_container *c);
