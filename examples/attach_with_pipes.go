@@ -68,7 +68,7 @@ func main() {
 		}
 
 		log.Printf("RunCommandWithClearEnvironment\n")
-		_, err := c.RunCommand([]string{"uname", "-a"}, &AttachOptions{
+		_, err := c.RunCommand([]string{"uname", "-a"}, &lxc.AttachOptions{
 			ClearEnv: true,
 			Stdinfd:  os.Stdin.Fd(),
 			Stdoutfd: stdoutWriter.Fd(),
@@ -84,7 +84,7 @@ func main() {
 		}
 
 		log.Printf("RunCommand\n")
-		_, err := c.RunCommand([]string{"uname", "-a"}, &AttachOptions{
+		_, err := c.RunCommand([]string{"uname", "-a"}, &lxc.AttachOptions{
 			ClearEnv: false,
 			Stdinfd:  os.Stdin.Fd(),
 			Stdoutfd: stdoutWriter.Fd(),
