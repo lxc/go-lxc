@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.PutContainer(c)
+	defer lxc.Release(c)
 
 	if err := c.AddDeviceNode("/dev/network_latency"); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())

@@ -27,7 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.PutContainer(c)
+	defer lxc.Release(c)
 
 	c.LoadConfigFile(lxc.DefaultConfigPath())
 	if output, err := c.Execute("uname", "-a"); err != nil {

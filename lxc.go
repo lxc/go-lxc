@@ -36,13 +36,13 @@ func NewContainer(name string, lxcpath ...string) (*Container, error) {
 	return &Container{container: container, verbosity: Quiet}, nil
 }
 
-// GetContainer increments the reference counter of the container object.
-func GetContainer(c *Container) bool {
+// Acquire increments the reference counter of the container object.
+func Acquire(c *Container) bool {
 	return C.lxc_container_get(c.container) == 1
 }
 
-// PutContainer decrements the reference counter of the container object.
-func PutContainer(c *Container) bool {
+// Release decrements the reference counter of the container object.
+func Release(c *Container) bool {
 	return C.lxc_container_put(c.container) == 1
 }
 

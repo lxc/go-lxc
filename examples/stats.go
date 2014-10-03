@@ -27,7 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.PutContainer(c)
+	defer lxc.Release(c)
 
 	// mem
 	memUsed, err := c.MemoryUsage()
