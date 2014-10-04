@@ -7,7 +7,6 @@
 package lxc
 
 // #include <lxc/lxccontainer.h>
-// #include <sys/personality.h>
 import "C"
 
 import (
@@ -251,6 +250,6 @@ const (
 type Personality int64
 
 const (
-	X86    = C.PER_LINUX32
-	X86_64 = C.PER_LINUX
+	X86    = 0x0008
+	X86_64 = 0x0000
 )
