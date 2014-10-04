@@ -1010,6 +1010,26 @@ func TestCommandWithUidGid(t *testing.T) {
 	}
 }
 
+func TestCommandWithArch(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer Release(c)
+
+	options := DefaultAttachOptions
+	options.Arch = X86
+
+	args := []string{"/bin/sh", "-c", "test `uname -m` = i686"}
+	ok, err := c.RunCommand(args, options)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+}
+
 func TestConsoleFd(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
