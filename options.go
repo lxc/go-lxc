@@ -22,11 +22,11 @@ type AttachOptions struct {
 	// Cwd specifies the working directory of the command.
 	Cwd string
 
-	// Uid specifies the user id to run as.
-	Uid int
+	// UID specifies the user id to run as.
+	UID int
 
-	// Gid specifies the group id to run as.
-	Gid int
+	// GID specifies the group id to run as.
+	GID int
 
 	// If ClearEnv is true the environment is cleared before running the command.
 	ClearEnv bool
@@ -52,8 +52,8 @@ var DefaultAttachOptions = &AttachOptions{
 	Namespaces: -1,
 	Arch:       -1,
 	Cwd:        "/",
-	Uid:        -1,
-	Gid:        -1,
+	UID:        -1,
+	GID:        -1,
 	ClearEnv:   false,
 	Env:        nil,
 	EnvToKeep:  nil,

@@ -80,8 +80,8 @@ func main() {
 		options.Arch = lxc.X86
 	}
 	if regular {
-		options.Uid = 1000
-		options.Gid = 1000
+		options.UID = 1000
+		options.GID = 1000
 	}
 	log.Printf("AttachShell\n")
 	if err := c.AttachShell(options); err != nil {
