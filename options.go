@@ -37,13 +37,13 @@ type AttachOptions struct {
 	// EnvToKeep specifies the environment of the process when ClearEnv is true.
 	EnvToKeep []string
 
-	// Stdinfd specifies the fd to read input from.
+	// StdinFd specifies the fd to read input from.
 	StdinFd uintptr
 
-	// Stdoutfd specifies the fd to write output to.
+	// StdoutFd specifies the fd to write output to.
 	StdoutFd uintptr
 
-	// Stderrfd specifies the fd to write error output to.
+	// StderrFd specifies the fd to write error output to.
 	StderrFd uintptr
 }
 
