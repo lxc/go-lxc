@@ -61,3 +61,65 @@ var DefaultAttachOptions = &AttachOptions{
 	StdoutFd:   os.Stdout.Fd(),
 	StderrFd:   os.Stderr.Fd(),
 }
+
+type TemplateOptions struct {
+	// Template specifies the name of the template
+	Template string
+
+	// Backend specifies the type of the backend
+	Backend BackendStore
+
+	// Distro specifies the name of the distribution
+	Distro string
+
+	// Release specifies the name/version of the distribution
+	Release string
+
+	// Arch specified the architecture of the container
+	Arch string
+
+	// Variant specifies the variant of the image (default: "default")
+	Variant string
+
+	// Image server (default: "images.linuxcontainers.org")
+	Server string
+
+	// GPG keyid (default: 0x...)
+	KeyID string
+
+	// GPG keyserver to use
+	KeyServer string
+
+	// Disable GPG validation (not recommended)
+	DisableGPGValidation bool
+
+	// Flush the local copy (if present)
+	FlushCache bool
+
+	// Force the use of the local copy even if expired
+	ForceCache bool
+
+	// ExtraArgs provides a way to specify template specific args
+	ExtraArgs []string
+}
+
+var DownloadTemplateOptions = &TemplateOptions{
+	Template:  "download",
+	Distro:    "ubuntu",
+	Release:   "trusty",
+	Arch:      "amd64",
+	Backend:   Directory,
+	ExtraArgs: nil,
+}
+
+var BusyboxTemplateOptions = &TemplateOptions{
+	Template:  "busybox",
+	Backend:   Directory,
+	ExtraArgs: nil,
+}
+
+var UbuntuTemplateOptions = &TemplateOptions{
+	Template:  "ubuntu",
+	Backend:   Directory,
+	ExtraArgs: nil,
+}

@@ -155,14 +155,12 @@ func TestCreate(t *testing.T) {
 	}
 	defer Release(c)
 
-	if unprivileged() {
-		if err := c.CreateAsUser(UnprivilegedContainerType, UnprivilegedRelease, UnprivilegedArch); err != nil {
-			t.Errorf("ERROR: %s\n", err.Error())
-		}
-	} else {
-		if err := c.Create(ContainerType); err != nil {
-			t.Errorf(err.Error())
-		}
+	options := DownloadTemplateOptions
+	if !unprivileged() {
+		options = BusyboxTemplateOptions
+	}
+	if err := c.Create(options); err != nil {
+		t.Errorf(err.Error())
 	}
 }
 
@@ -248,6 +246,7 @@ func TestConcurrentCreate(t *testing.T) {
 
 	var wg sync.WaitGroup
 
+	options := BusyboxTemplateOptions
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
@@ -260,7 +259,7 @@ func TestConcurrentCreate(t *testing.T) {
 			// sleep for a while to simulate some dummy work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
-			if err := c.Create(ContainerType); err != nil {
+			if err := c.Create(options); err != nil {
 				t.Errorf(err.Error())
 			}
 			wg.Done()

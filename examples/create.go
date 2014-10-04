@@ -45,13 +45,19 @@ func main() {
 		c.SetVerbosity(lxc.Verbose)
 	}
 
+	options := lxc.BusyboxTemplateOptions
 	if os.Geteuid() != 0 {
-		if err := c.CreateAsUser(distro, release, arch); err != nil {
-			log.Printf("ERROR: %s\n", err.Error())
-		}
+		options = lxc.DownloadTemplateOptions
+		options.Release = release
+		options.Distro = distro
+		options.Arch = arch
 	} else {
-		if err := c.Create(template, "-a", arch, "-r", release); err != nil {
-			log.Printf("ERROR: %s\n", err.Error())
-		}
+		options = lxc.UbuntuTemplateOptions
+		options.Release = release
+		options.Arch = arch
+	}
+
+	if err := c.Create(options); err != nil {
+		log.Printf("ERROR: %s\n", err.Error())
 	}
 }
