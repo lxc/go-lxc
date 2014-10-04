@@ -53,6 +53,7 @@ func main() {
 		options.Arch = arch
 	} else {
 		options = lxc.UbuntuTemplateOptions
+		options.Template = template
 		options.Release = release
 		options.Arch = arch
 	}
