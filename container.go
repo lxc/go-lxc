@@ -954,23 +954,8 @@ func (c *Container) Console(ttynum int, stdinfd, stdoutfd, stderrfd uintptr, esc
 }
 
 // AttachShell attaches a shell to the container.
-func (c *Container) AttachShell() error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
-		return err
-	}
-
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	if int(C.go_lxc_attach(c.container, false)) < 0 {
-		return ErrAttachFailed
-	}
-	return nil
-}
-
-// AttachShellWithClearEnvironment attaches a shell to the container.
 // It clears all environment variables before attaching.
-func (c *Container) AttachShellWithClearEnvironment() error {
+func (c *Container) AttachShell(options *AttachOptions) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
 	}
@@ -978,7 +963,35 @@ func (c *Container) AttachShellWithClearEnvironment() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if int(C.go_lxc_attach(c.container, true)) < 0 {
+	cenv := makeNullTerminatedArgs(options.Env)
+	if cenv == nil {
+		return ErrAllocationFailed
+	}
+	defer freeNullTerminatedArgs(cenv, len(options.Env))
+
+	cenvToKeep := makeNullTerminatedArgs(options.EnvToKeep)
+	if cenvToKeep == nil {
+		return ErrAllocationFailed
+	}
+	defer freeNullTerminatedArgs(cenvToKeep, len(options.EnvToKeep))
+
+	cwd := C.CString(options.Cwd)
+	defer C.free(unsafe.Pointer(cwd))
+
+	ret := int(C.go_lxc_attach(c.container,
+		C.bool(options.ClearEnv),
+		C.int(options.Namespaces),
+		C.long(options.Arch),
+		C.uid_t(options.Uid),
+		C.gid_t(options.Gid),
+		C.int(options.StdinFd),
+		C.int(options.StdoutFd),
+		C.int(options.StderrFd),
+		cwd,
+		cenv,
+		cenvToKeep,
+	))
+	if ret < 0 {
 		return ErrAttachFailed
 	}
 	return nil
@@ -1011,17 +1024,28 @@ func (c *Container) RunCommand(args []string, options *AttachOptions) (bool, err
 	}
 	defer freeNullTerminatedArgs(cenv, len(options.Env))
 
+	cenvToKeep := makeNullTerminatedArgs(options.EnvToKeep)
+	if cenvToKeep == nil {
+		return false, ErrAllocationFailed
+	}
+	defer freeNullTerminatedArgs(cenvToKeep, len(options.EnvToKeep))
+
 	cwd := C.CString(options.Cwd)
 	defer C.free(unsafe.Pointer(cwd))
 
 	ret := int(C.go_lxc_attach_run_wait(
 		c.container,
 		C.bool(options.ClearEnv),
-		C.int(options.Stdinfd),
-		C.int(options.Stdoutfd),
-		C.int(options.Stderrfd),
+		C.int(options.Namespaces),
+		C.long(options.Arch),
+		C.uid_t(options.Uid),
+		C.gid_t(options.Gid),
+		C.int(options.StdinFd),
+		C.int(options.StdoutFd),
+		C.int(options.StderrFd),
 		cwd,
 		cenv,
+		cenvToKeep,
 		cargs,
 	))
 

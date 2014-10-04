@@ -7,7 +7,6 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
 
 	"gopkg.in/lxc/go-lxc.v2"
 )
@@ -16,12 +15,16 @@ var (
 	lxcpath string
 	name    string
 	clear   bool
+	x86     bool
+	regular bool
 )
 
 func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
 	flag.StringVar(&name, "name", "rubik", "Name of the original container")
 	flag.BoolVar(&clear, "clear", false, "Attach with clear environment")
+	flag.BoolVar(&x86, "x86", false, "Attach using x86 personality")
+	flag.BoolVar(&regular, "regular", false, "Attach using a regular user")
 	flag.Parse()
 }
 
@@ -32,38 +35,27 @@ func main() {
 	}
 	defer lxc.Release(c)
 
+	options := lxc.DefaultAttachOptions
+	options.ClearEnv = false
 	if clear {
-		log.Printf("AttachShellWithClearEnvironment\n")
-		if err := c.AttachShellWithClearEnvironment(); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
+		options.ClearEnv = true
+	}
+	if x86 {
+		options.Arch = lxc.X86
+	}
+	if regular {
+		options.Uid = 1000
+		options.Gid = 1000
+	}
+	log.Printf("AttachShell\n")
+	err = c.AttachShell(options)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
 
-		log.Printf("RunCommandWithClearEnvironment\n")
-		_, err := c.RunCommand([]string{"uname", "-a"}, &lxc.AttachOptions{
-			ClearEnv: true,
-			Stdinfd:  os.Stdin.Fd(),
-			Stdoutfd: os.Stdout.Fd(),
-			Stderrfd: os.Stderr.Fd(),
-		})
-		if err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-
-	} else {
-		log.Printf("AttachShell\n")
-		if err := c.AttachShell(); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-
-		log.Printf("RunCommand\n")
-		_, err := c.RunCommand([]string{"uname", "-a"}, &lxc.AttachOptions{
-			ClearEnv: false,
-			Stdinfd:  os.Stdin.Fd(),
-			Stdoutfd: os.Stdout.Fd(),
-			Stderrfd: os.Stderr.Fd(),
-		})
-		if err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
+	log.Printf("RunCommand\n")
+	_, err = c.RunCommand([]string{"id"}, options)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 }

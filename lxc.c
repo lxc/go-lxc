@@ -177,7 +177,15 @@ char** go_lxc_get_ips(struct lxc_container *c, const char *interface, const char
 	return c->get_ips(c, interface, family, scope);
 }
 
-int go_lxc_attach(struct lxc_container *c, bool clear_env) {
+int go_lxc_attach(struct lxc_container *c,
+		bool clear_env,
+		int namespaces,
+		long personality,
+		uid_t uid, gid_t gid,
+		int stdinfd, int stdoutfd, int stderrfd,
+		char *initial_cwd,
+		char **extra_env_vars,
+		char **extra_keep_env) {
 	int ret;
 	pid_t pid;
 
@@ -187,6 +195,21 @@ int go_lxc_attach(struct lxc_container *c, bool clear_env) {
 	if (clear_env) {
 		attach_options.env_policy = LXC_ATTACH_CLEAR_ENV;
 	}
+
+	attach_options.namespaces = namespaces;
+	attach_options.personality = personality;
+
+	attach_options.uid = uid;
+	attach_options.gid = gid;
+
+	attach_options.stdin_fd = stdinfd;
+	attach_options.stdout_fd = stdoutfd;
+	attach_options.stderr_fd = stderrfd;
+
+	attach_options.initial_cwd = initial_cwd;
+	attach_options.extra_env_vars = extra_env_vars;
+	attach_options.extra_keep_env = extra_keep_env;
+
 	/*
 	   remount_sys_proc
 	   When using -s and the mount namespace is not included, this flag will cause lxc-attach to remount /proc and /sys to reflect the current other namespace contexts.
@@ -195,20 +218,6 @@ int go_lxc_attach(struct lxc_container *c, bool clear_env) {
 	   elevated_privileges
 	   Do  not  drop privileges when running command inside the container. If this option is specified, the new process will not be added to the container's cgroup(s) and it will not drop its capabilities before executing.
 	   default_options.attach_flags &= ~(LXC_ATTACH_MOVE_TO_CGROUP | LXC_ATTACH_DROP_CAPABILITIES | LXC_ATTACH_APPARMOR);
-
-	   Specify the namespaces to attach to, as a pipe-separated list, e.g. NETWORK|IPC. Allowed values are MOUNT, PID, UTSNAME, IPC, USER and NETWORK.
-	   default_options.namespaces = namespace_flags; // lxc_fill_namespace_flags(arg, &namespace_flags);
-
-	   Specify the architecture which the kernel should appear to be running as to the command executed.
-	   default_options.personality = new_personality; // lxc_config_parse_arch(arg);
-
-	   Keep the current environment for attached programs.
-	   Clear the environment before attaching, so no undesired environment variables leak into the container.
-
-	   default_options.env_policy = env_policy; // LXC_ATTACH_KEEP_ENV or LXC_ATTACH_CLEAR_ENV
-
-	   default_options.extra_env_vars = extra_env;
-	   default_options.extra_keep_env = extra_keep;
 	*/
 
 	ret = c->attach(c, lxc_attach_run_shell, NULL, &attach_options, &pid);
@@ -225,7 +234,16 @@ int go_lxc_attach(struct lxc_container *c, bool clear_env) {
 	return -1;
 }
 
-int go_lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd, int stdoutfd, int stderrfd, char *initial_cwd, char **extra_env_vars, const char * const argv[]) {
+int go_lxc_attach_run_wait(struct lxc_container *c,
+		bool clear_env,
+		int namespaces,
+		long personality,
+		uid_t uid, gid_t gid,
+		int stdinfd, int stdoutfd, int stderrfd,
+		char *initial_cwd,
+		char **extra_env_vars,
+		char **extra_keep_env,
+		const char * const argv[]) {
 	int ret;
 
 	lxc_attach_options_t attach_options = LXC_ATTACH_OPTIONS_DEFAULT;
@@ -234,11 +252,20 @@ int go_lxc_attach_run_wait(struct lxc_container *c, bool clear_env, int stdinfd,
 	if (clear_env) {
 		attach_options.env_policy = LXC_ATTACH_CLEAR_ENV;
 	}
+
+	attach_options.namespaces = namespaces;
+	attach_options.personality = personality;
+
+	attach_options.uid = uid;
+	attach_options.gid = gid;
+
 	attach_options.stdin_fd = stdinfd;
 	attach_options.stdout_fd = stdoutfd;
 	attach_options.stderr_fd = stderrfd;
+
 	attach_options.initial_cwd = initial_cwd;
 	attach_options.extra_env_vars = extra_env_vars;
+	attach_options.extra_keep_env = extra_keep_env;
 
 	ret = c->attach_run_wait(c, &attach_options, argv[0], argv);
 	if (WIFEXITED(ret) && WEXITSTATUS(ret) == 255)

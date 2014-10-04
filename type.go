@@ -7,6 +7,7 @@
 package lxc
 
 // #include <lxc/lxccontainer.h>
+// #include <sys/personality.h>
 import "C"
 
 import (
@@ -245,4 +246,11 @@ const (
 	CloneKeepBdevType
 	// CloneMaybeSnapshot means snapshot only if bdev supports it, else copy
 	CloneMaybeSnapshot
+)
+
+type Personality int64
+
+const (
+	X86    = C.PER_LINUX32
+	X86_64 = C.PER_LINUX
 )
