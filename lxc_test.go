@@ -989,6 +989,27 @@ func TestCommandWithCwd(t *testing.T) {
 	}
 }
 
+func TestCommandWithUidGid(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer Release(c)
+
+	options := DefaultAttachOptions
+	options.Uid = 1000
+	options.Gid = 1000
+
+	args := []string{"/bin/sh", "-c", "test `id -u` = 1000 && test `id -g` = 1000"}
+	ok, err := c.RunCommand(args, options)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+}
+
 func TestConsoleFd(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
