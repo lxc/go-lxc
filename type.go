@@ -250,6 +250,6 @@ const (
 type Personality int64
 
 const (
-	X86    = 0x0008
-	X86_64 = 0x0000
+	X86    Personality = 0x0008
+	X86_64             = 0x0000
 )
