@@ -929,7 +929,7 @@ func TestRunCommand(t *testing.T) {
 	}
 	defer Release(c)
 
-	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
+	argsThree := []string{"/bin/sh", "-c", "exit 0"}
 	ok, err := c.RunCommand(argsThree, DefaultAttachOptions)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -948,7 +948,7 @@ func TestRunCommand(t *testing.T) {
 	}
 }
 
-func TestCommandWithEnvVars(t *testing.T) {
+func TestCommandWithEnv(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -960,6 +960,27 @@ func TestCommandWithEnvVars(t *testing.T) {
 	options.ClearEnv = true
 
 	args := []string{"/bin/sh", "-c", "test $FOO = 'BAR'"}
+	ok, err := c.RunCommand(args, DefaultAttachOptions)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+}
+
+func TestCommandWithEnvToKeep(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer Release(c)
+
+	options := DefaultAttachOptions
+	options.ClearEnv = true
+	options.EnvToKeep = []string{"TERM"}
+
+	args := []string{"/bin/sh", "-c", "test $TERM = 'xterm-256color'"}
 	ok, err := c.RunCommand(args, DefaultAttachOptions)
 	if err != nil {
 		t.Errorf(err.Error())
