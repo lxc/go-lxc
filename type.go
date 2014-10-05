@@ -246,3 +246,10 @@ const (
 	// CloneMaybeSnapshot means snapshot only if bdev supports it, else copy
 	CloneMaybeSnapshot
 )
+
+type Personality int64
+
+const (
+	X86    Personality = 0x0008
+	X86_64             = 0x0000
+)

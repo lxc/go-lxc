@@ -4,7 +4,6 @@
 
 // +build linux
 
-// Package lxc provides Go Bindings for LXC (Linux Containers) C API.
 package lxc
 
 // #cgo pkg-config: lxc

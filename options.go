@@ -6,23 +6,58 @@
 
 package lxc
 
+import (
+	"os"
+)
+
+// AttachOptions type is used for defining various attach options
 type AttachOptions struct {
-	// Stdinfd specifies the fd to read input from
-	Stdinfd uintptr
 
-	// Stdoutfd specifies the fd to write output to
-	Stdoutfd uintptr
+	// Specify the namespaces to attach to, as OR'ed list of clone flags (syscall.CLONE_NEWNS | syscall.CLONE_NEWUTS ...)
+	Namespaces int
 
-	// Stderrfd specifies the fd to write error output to
-	Stderrfd uintptr
-
-	// Env specifies the environment of the process.
-	Env []string
+	// Specify the architecture which the kernel should appear to be running as to the command executed.
+	Arch Personality
 
 	// Cwd specifies the working directory of the command.
 	Cwd string
 
-	// If ClearEnv is true the environment is cleared before
-	// running the command.
+	// UID specifies the user id to run as.
+	UID int
+
+	// GID specifies the group id to run as.
+	GID int
+
+	// If ClearEnv is true the environment is cleared before running the command.
 	ClearEnv bool
+
+	// Env specifies the environment of the process.
+	Env []string
+
+	// EnvToKeep specifies the environment of the process when ClearEnv is true.
+	EnvToKeep []string
+
+	// StdinFd specifies the fd to read input from.
+	StdinFd uintptr
+
+	// StdoutFd specifies the fd to write output to.
+	StdoutFd uintptr
+
+	// StderrFd specifies the fd to write error output to.
+	StderrFd uintptr
+}
+
+// DefaultAttachOptions is a convenient set of options to be used
+var DefaultAttachOptions = &AttachOptions{
+	Namespaces: -1,
+	Arch:       -1,
+	Cwd:        "/",
+	UID:        -1,
+	GID:        -1,
+	ClearEnv:   false,
+	Env:        nil,
+	EnvToKeep:  nil,
+	StdinFd:    os.Stdin.Fd(),
+	StdoutFd:   os.Stdout.Fd(),
+	StderrFd:   os.Stderr.Fd(),
 }

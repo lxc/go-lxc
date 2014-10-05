@@ -18,6 +18,8 @@ var (
 	lxcpath string
 	name    string
 	clear   bool
+	x86     bool
+	regular bool
 	wg      sync.WaitGroup
 )
 
@@ -25,6 +27,8 @@ func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
 	flag.StringVar(&name, "name", "rubik", "Name of the original container")
 	flag.BoolVar(&clear, "clear", false, "Attach with clear environment")
+	flag.BoolVar(&x86, "x86", false, "Attach using x86 personality")
+	flag.BoolVar(&regular, "regular", false, "Attach using a regular user")
 	flag.Parse()
 }
 
@@ -61,44 +65,39 @@ func main() {
 		}
 	}()
 
+	options := lxc.DefaultAttachOptions
+
+	options.StdinFd = os.Stdin.Fd()
+	options.StdoutFd = stdoutWriter.Fd()
+	options.StderrFd = stderrWriter.Fd()
+
+	options.ClearEnv = false
 	if clear {
-		log.Printf("AttachShellWithClearEnvironment\n")
-		if err := c.AttachShellWithClearEnvironment(); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-
-		log.Printf("RunCommandWithClearEnvironment\n")
-		_, err := c.RunCommand([]string{"uname", "-a"}, &lxc.AttachOptions{
-			ClearEnv: true,
-			Stdinfd:  os.Stdin.Fd(),
-			Stdoutfd: stdoutWriter.Fd(),
-			Stderrfd: stderrWriter.Fd(),
-		})
-		if err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-	} else {
-		log.Printf("AttachShell\n")
-		if err := c.AttachShell(); err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
-
-		log.Printf("RunCommand\n")
-		_, err := c.RunCommand([]string{"uname", "-a"}, &lxc.AttachOptions{
-			ClearEnv: false,
-			Stdinfd:  os.Stdin.Fd(),
-			Stdoutfd: stdoutWriter.Fd(),
-			Stderrfd: stderrWriter.Fd(),
-		})
-		if err != nil {
-			log.Fatalf("ERROR: %s\n", err.Error())
-		}
+		options.ClearEnv = true
 	}
 
-	if err := stdoutWriter.Close(); err != nil {
+	if x86 {
+		options.Arch = lxc.X86
+	}
+	if regular {
+		options.UID = 1000
+		options.GID = 1000
+	}
+	log.Printf("AttachShell\n")
+	if err := c.AttachShell(options); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	if err := stderrWriter.Close(); err != nil {
+
+	log.Printf("RunCommand\n")
+	_, err = c.RunCommand([]string{"uname", "-a"}, options)
+	if err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
+
+	if err = stdoutWriter.Close(); err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
+	if err = stderrWriter.Close(); err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 

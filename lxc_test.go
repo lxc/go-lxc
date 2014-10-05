@@ -929,12 +929,8 @@ func TestRunCommand(t *testing.T) {
 	}
 	defer Release(c)
 
-	argsThree := []string{"/bin/sh", "-c", "/bin/ls -al > /dev/null"}
-	ok, err := c.RunCommand(argsThree, &AttachOptions{
-		Stdinfd:  os.Stdin.Fd(),
-		Stdoutfd: os.Stdout.Fd(),
-		Stderrfd: os.Stderr.Fd(),
-	})
+	argsThree := []string{"/bin/sh", "-c", "exit 0"}
+	ok, err := c.RunCommand(argsThree, DefaultAttachOptions)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -943,11 +939,7 @@ func TestRunCommand(t *testing.T) {
 	}
 
 	argsThree = []string{"/bin/sh", "-c", "exit 1"}
-	ok, err = c.RunCommand(argsThree, &AttachOptions{
-		Stdinfd:  os.Stdin.Fd(),
-		Stdoutfd: os.Stdout.Fd(),
-		Stderrfd: os.Stderr.Fd(),
-	})
+	ok, err = c.RunCommand(argsThree, DefaultAttachOptions)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -956,22 +948,40 @@ func TestRunCommand(t *testing.T) {
 	}
 }
 
-func TestCommandWithEnvVars(t *testing.T) {
+func TestCommandWithEnv(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 	defer Release(c)
 
-	args := []string{"/bin/sh", "-c", "test $FOO = 'BAR'"}
-	ok, err := c.RunCommand(args, &AttachOptions{
-		Env:      []string{"FOO=BAR"},
-		ClearEnv: true,
-		Stdinfd:  os.Stdin.Fd(),
-		Stdoutfd: os.Stdout.Fd(),
-		Stderrfd: os.Stderr.Fd(),
-	})
+	options := DefaultAttachOptions
+	options.Env = []string{"FOO=BAR"}
+	options.ClearEnv = true
 
+	args := []string{"/bin/sh", "-c", "test $FOO = 'BAR'"}
+	ok, err := c.RunCommand(args, DefaultAttachOptions)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+}
+
+func TestCommandWithEnvToKeep(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer Release(c)
+
+	options := DefaultAttachOptions
+	options.ClearEnv = true
+	options.EnvToKeep = []string{"TERM"}
+
+	args := []string{"/bin/sh", "-c", "test $TERM = 'xterm-256color'"}
+	ok, err := c.RunCommand(args, DefaultAttachOptions)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -987,14 +997,52 @@ func TestCommandWithCwd(t *testing.T) {
 	}
 	defer Release(c)
 
-	args := []string{"/bin/sh", "-c", "test `pwd` = /tmp"}
-	ok, err := c.RunCommand(args, &AttachOptions{
-		Stdinfd:  os.Stdin.Fd(),
-		Stdoutfd: os.Stdout.Fd(),
-		Stderrfd: os.Stderr.Fd(),
-		Cwd:      "/tmp",
-	})
+	options := DefaultAttachOptions
+	options.Cwd = "/tmp"
 
+	args := []string{"/bin/sh", "-c", "test `pwd` = /tmp"}
+	ok, err := c.RunCommand(args, options)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+}
+
+func TestCommandWithUIDGID(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer Release(c)
+
+	options := DefaultAttachOptions
+	options.UID = 1000
+	options.GID = 1000
+
+	args := []string{"/bin/sh", "-c", "test `id -u` = 1000 && test `id -g` = 1000"}
+	ok, err := c.RunCommand(args, options)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if ok != true {
+		t.Errorf("Expected success")
+	}
+}
+
+func TestCommandWithArch(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	defer Release(c)
+
+	options := DefaultAttachOptions
+	options.Arch = X86
+
+	args := []string{"/bin/sh", "-c", "test `uname -m` = i686"}
+	ok, err := c.RunCommand(args, options)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
