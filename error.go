@@ -38,6 +38,7 @@ var (
 	ErrNewFailed                     = NewError("allocating the container failed")
 	ErrNoSnapshot                    = NewError("container has no snapshot")
 	ErrNotDefined                    = NewError("container is not defined")
+	ErrTemplateNotAllowed            = NewError("unprivileged users only allowed to use \"download\" template")
 	ErrNotFrozen                     = NewError("container is not frozen")
 	ErrNotRunning                    = NewError("container is not running")
 	ErrRebootFailed                  = NewError("rebooting the container failed")

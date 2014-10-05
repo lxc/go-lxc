@@ -13,6 +13,7 @@ import "C"
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"reflect"
 	"strconv"
@@ -313,9 +314,19 @@ func (c *Container) Create(options *TemplateOptions) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	// required parameter
+	// use download template if not set
 	if options.Template == "" {
-		return ErrInsufficientNumberOfArguments
+		options.Template = "download"
+	}
+
+	// use Directory backend if not set
+	if options.Backend == 0 {
+		options.Backend = Directory
+	}
+
+	// unprivileged users are only allowed to use "download" template
+	if os.Geteuid() != 0 && options.Template != "download" {
+		return ErrTemplateNotAllowed
 	}
 
 	var args []string
@@ -372,7 +383,7 @@ func (c *Container) Create(options *TemplateOptions) error {
 	defer C.free(unsafe.Pointer(cbackend))
 
 	ret := false
-	if len(args) != 0 {
+	if args != nil {
 		cargs := makeNullTerminatedArgs(args)
 		if cargs == nil {
 			return ErrAllocationFailed

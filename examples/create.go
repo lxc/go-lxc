@@ -9,7 +9,6 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
 
 	"gopkg.in/lxc/go-lxc.v2"
 )
@@ -22,16 +21,18 @@ var (
 	arch     string
 	name     string
 	verbose  bool
+	flush    bool
 )
 
 func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
-	flag.StringVar(&template, "template", "ubuntu", "Template to use")
+	flag.StringVar(&template, "template", "download", "Template to use")
 	flag.StringVar(&distro, "distro", "ubuntu", "Template to use")
 	flag.StringVar(&release, "release", "trusty", "Template to use")
 	flag.StringVar(&arch, "arch", "amd64", "Template to use")
 	flag.StringVar(&name, "name", "rubik", "Name of the container")
 	flag.BoolVar(&verbose, "verbose", false, "Verbose output")
+	flag.BoolVar(&flush, "flush", false, "Flush the cache")
 	flag.Parse()
 }
 
@@ -47,17 +48,12 @@ func main() {
 		c.SetVerbosity(lxc.Verbose)
 	}
 
-	options := lxc.BusyboxTemplateOptions
-	if os.Geteuid() != 0 {
-		options = lxc.DownloadTemplateOptions
-		options.Release = release
-		options.Distro = distro
-		options.Arch = arch
-	} else {
-		options = lxc.UbuntuTemplateOptions
-		options.Template = template
-		options.Release = release
-		options.Arch = arch
+    options := &lxc.TemplateOptions{
+		Template:   template,
+		Distro:     distro,
+		Release:    release,
+		Arch:       arch,
+		FlushCache: flush,
 	}
 
 	if err := c.Create(options); err != nil {

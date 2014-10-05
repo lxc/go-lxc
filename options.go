@@ -106,24 +106,18 @@ type TemplateOptions struct {
 
 // DownloadTemplateOptions is a convenient set of options for "download" template.
 var DownloadTemplateOptions = &TemplateOptions{
-	Template:  "download",
-	Distro:    "ubuntu",
-	Release:   "trusty",
-	Arch:      "amd64",
-	Backend:   Directory,
-	ExtraArgs: nil,
+	Template: "download",
+	Distro:   "ubuntu",
+	Release:  "trusty",
+	Arch:     "amd64",
 }
 
 // BusyboxTemplateOptions is a convenient set of options for "busybox" template.
 var BusyboxTemplateOptions = &TemplateOptions{
-	Template:  "busybox",
-	Backend:   Directory,
-	ExtraArgs: nil,
+	Template: "busybox",
 }
 
 // UbuntuTemplateOptions is a convenient set of options for "ubuntu" template.
 var UbuntuTemplateOptions = &TemplateOptions{
-	Template:  "ubuntu",
-	Backend:   Directory,
-	ExtraArgs: nil,
+	Template: "ubuntu",
 }
