@@ -121,3 +121,31 @@ var BusyboxTemplateOptions = &TemplateOptions{
 var UbuntuTemplateOptions = &TemplateOptions{
 	Template: "ubuntu",
 }
+
+// ConsoleOptions type is used for defining various console options.
+type ConsoleOptions struct {
+
+	// Tty number to attempt to allocate, -1 to allocate the first available tty, or 0 to allocate the console.
+	Tty int
+
+	// StdinFd specifies the fd to read input from.
+	StdinFd uintptr
+
+	// StdoutFd specifies the fd to write output to.
+	StdoutFd uintptr
+
+	// StderrFd specifies the fd to write error output to.
+	StderrFd uintptr
+
+	// EscapeCharacter (a means <Ctrl a>, b maens <Ctrl b>).
+	EscapeCharacter rune
+}
+
+// DefailtConsoleOptions is a convenient set of options to be used.
+var DefaultConsoleOptions = &ConsoleOptions{
+	Tty:             -1,
+	StdinFd:         os.Stdin.Fd(),
+	StdoutFd:        os.Stdout.Fd(),
+	StderrFd:        os.Stderr.Fd(),
+	EscapeCharacter: 'a',
+}
