@@ -1003,7 +1003,7 @@ func (c *Container) Console(ttynum int, stdinfd, stdoutfd, stderrfd uintptr, esc
 
 // AttachShell attaches a shell to the container.
 // It clears all environment variables before attaching.
-func (c *Container) AttachShell(options *AttachOptions) error {
+func (c *Container) AttachShell(options AttachOptions) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
 	}
@@ -1048,7 +1048,7 @@ func (c *Container) AttachShell(options *AttachOptions) error {
 // RunCommand attachs a shell and runs the command within the container.
 // The process will wait for the command to finish and return a success status. An error
 // is returned only when invocation of the command completely fails.
-func (c *Container) RunCommand(args []string, options *AttachOptions) (bool, error) {
+func (c *Container) RunCommand(args []string, options AttachOptions) (bool, error) {
 	if len(args) == 0 {
 		return false, ErrInsufficientNumberOfArguments
 	}
