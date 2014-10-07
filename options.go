@@ -142,7 +142,7 @@ type ConsoleOptions struct {
 }
 
 // DefailtConsoleOptions is a convenient set of options to be used.
-var DefaultConsoleOptions = &ConsoleOptions{
+var DefaultConsoleOptions = ConsoleOptions{
 	Tty:             -1,
 	StdinFd:         os.Stdin.Fd(),
 	StdoutFd:        os.Stdout.Fd(),

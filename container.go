@@ -980,7 +980,7 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 // Console allocates and runs a console tty from container
 //
 // This function will not return until the console has been exited by the user.
-func (c *Container) Console(options *ConsoleOptions) error {
+func (c *Container) Console(options ConsoleOptions) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
 	}
