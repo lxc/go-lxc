@@ -960,7 +960,7 @@ func TestCommandWithEnv(t *testing.T) {
 	options.ClearEnv = true
 
 	args := []string{"/bin/sh", "-c", "test $FOO = 'BAR'"}
-	ok, err := c.RunCommand(args, DefaultAttachOptions)
+	ok, err := c.RunCommand(args, options)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
