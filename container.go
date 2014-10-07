@@ -978,15 +978,9 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 }
 
 // Console allocates and runs a console tty from container
-// ttynum: tty number to attempt to allocate, -1 to allocate the first available tty, or 0 to allocate the console
-// stdinfd: fd to read input from
-// stdoutfd: fd to write output to
-// stderrfd: fd to write error output to
-// escape: the escape character (1 == 'a', 2 == 'b', ...)
 //
 // This function will not return until the console has been exited by the user.
-func (c *Container) Console(ttynum int, stdinfd, stdoutfd, stderrfd uintptr, escape int) error {
-	// FIXME: Make idiomatic
+func (c *Container) Console(options ConsoleOptions) error {
 	if err := c.makeSure(isDefined | isRunning); err != nil {
 		return err
 	}
@@ -994,8 +988,14 @@ func (c *Container) Console(ttynum int, stdinfd, stdoutfd, stderrfd uintptr, esc
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if !bool(C.go_lxc_console(c.container, C.int(ttynum), C.int(stdinfd),
-		C.int(stdoutfd), C.int(stderrfd), C.int(escape))) {
+	ret := bool(C.go_lxc_console(c.container,
+		C.int(options.Tty),
+		C.int(options.StdinFd),
+		C.int(options.StdoutFd),
+		C.int(options.StderrFd),
+		C.int(options.EscapeCharacter)))
+
+	if !ret {
 		return ErrAttachFailed
 	}
 	return nil
