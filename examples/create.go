@@ -48,7 +48,7 @@ func main() {
 		c.SetVerbosity(lxc.Verbose)
 	}
 
-	options := &lxc.TemplateOptions{
+    options := lxc.TemplateOptions{
 		Template:   template,
 		Distro:     distro,
 		Release:    release,

@@ -48,7 +48,7 @@ type AttachOptions struct {
 }
 
 // DefaultAttachOptions is a convenient set of options to be used.
-var DefaultAttachOptions = &AttachOptions{
+var DefaultAttachOptions = AttachOptions{
 	Namespaces: -1,
 	Arch:       -1,
 	Cwd:        "/",
@@ -105,7 +105,7 @@ type TemplateOptions struct {
 }
 
 // DownloadTemplateOptions is a convenient set of options for "download" template.
-var DownloadTemplateOptions = &TemplateOptions{
+var DownloadTemplateOptions = TemplateOptions{
 	Template: "download",
 	Distro:   "ubuntu",
 	Release:  "trusty",
@@ -113,12 +113,12 @@ var DownloadTemplateOptions = &TemplateOptions{
 }
 
 // BusyboxTemplateOptions is a convenient set of options for "busybox" template.
-var BusyboxTemplateOptions = &TemplateOptions{
+var BusyboxTemplateOptions = TemplateOptions{
 	Template: "busybox",
 }
 
 // UbuntuTemplateOptions is a convenient set of options for "ubuntu" template.
-var UbuntuTemplateOptions = &TemplateOptions{
+var UbuntuTemplateOptions = TemplateOptions{
 	Template: "ubuntu",
 }
 
