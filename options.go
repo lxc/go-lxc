@@ -10,10 +10,10 @@ import (
 	"os"
 )
 
-// AttachOptions type is used for defining various attach options
+// AttachOptions type is used for defining various attach options.
 type AttachOptions struct {
 
-	// Specify the namespaces to attach to, as OR'ed list of clone flags (syscall.CLONE_NEWNS | syscall.CLONE_NEWUTS ...)
+	// Specify the namespaces to attach to, as OR'ed list of clone flags (syscall.CLONE_NEWNS | syscall.CLONE_NEWUTS ...).
 	Namespaces int
 
 	// Specify the architecture which the kernel should appear to be running as to the command executed.
@@ -47,7 +47,7 @@ type AttachOptions struct {
 	StderrFd uintptr
 }
 
-// DefaultAttachOptions is a convenient set of options to be used
+// DefaultAttachOptions is a convenient set of options to be used.
 var DefaultAttachOptions = AttachOptions{
 	Namespaces: -1,
 	Arch:       -1,
@@ -60,4 +60,64 @@ var DefaultAttachOptions = AttachOptions{
 	StdinFd:    os.Stdin.Fd(),
 	StdoutFd:   os.Stdout.Fd(),
 	StderrFd:   os.Stderr.Fd(),
+}
+
+// TemplateOptions type is used for defining various template options.
+type TemplateOptions struct {
+	// Template specifies the name of the template.
+	Template string
+
+	// Backend specifies the type of the backend.
+	Backend BackendStore
+
+	// Distro specifies the name of the distribution.
+	Distro string
+
+	// Release specifies the name/version of the distribution.
+	Release string
+
+	// Arch specified the architecture of the container.
+	Arch string
+
+	// Variant specifies the variant of the image (default: "default").
+	Variant string
+
+	// Image server (default: "images.linuxcontainers.org").
+	Server string
+
+	// GPG keyid (default: 0x...).
+	KeyID string
+
+	// GPG keyserver to use.
+	KeyServer string
+
+	// Disable GPG validation (not recommended).
+	DisableGPGValidation bool
+
+	// Flush the local copy (if present).
+	FlushCache bool
+
+	// Force the use of the local copy even if expired.
+	ForceCache bool
+
+	// ExtraArgs provides a way to specify template specific args.
+	ExtraArgs []string
+}
+
+// DownloadTemplateOptions is a convenient set of options for "download" template.
+var DownloadTemplateOptions = TemplateOptions{
+	Template: "download",
+	Distro:   "ubuntu",
+	Release:  "trusty",
+	Arch:     "amd64",
+}
+
+// BusyboxTemplateOptions is a convenient set of options for "busybox" template.
+var BusyboxTemplateOptions = TemplateOptions{
+	Template: "busybox",
+}
+
+// UbuntuTemplateOptions is a convenient set of options for "ubuntu" template.
+var UbuntuTemplateOptions = TemplateOptions{
+	Template: "ubuntu",
 }

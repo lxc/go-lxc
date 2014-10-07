@@ -2,6 +2,8 @@
 // Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
 
+// +build linux
+
 package main
 
 import (
@@ -46,6 +48,9 @@ func main() {
 
 	var wg sync.WaitGroup
 
+	options := lxc.BusyboxTemplateOptions
+	options.Template = template
+
 	for i := 0; i < iteration; i++ {
 		log.Printf("-- ITERATION %d --\n", i+1)
 		for _, mode := range []string{"CREATE", "START", "STOP", "DESTROY"} {
@@ -61,7 +66,7 @@ func main() {
 
 					if mode == "CREATE" && startstop == false {
 						log.Printf("\t\tCreating the container (%d)...\n", i)
-						if err := c.Create(template); err != nil {
+						if err := c.Create(options); err != nil {
 							log.Fatalf("\t\t\tERROR: %s\n", err.Error())
 						}
 					} else if mode == "START" && createdestroy == false {

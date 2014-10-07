@@ -2,12 +2,13 @@
 // Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
 
+// +build linux
+
 package main
 
 import (
 	"flag"
 	"log"
-	"os"
 
 	"gopkg.in/lxc/go-lxc.v2"
 )
@@ -20,16 +21,18 @@ var (
 	arch     string
 	name     string
 	verbose  bool
+	flush    bool
 )
 
 func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
-	flag.StringVar(&template, "template", "ubuntu", "Template to use")
+	flag.StringVar(&template, "template", "download", "Template to use")
 	flag.StringVar(&distro, "distro", "ubuntu", "Template to use")
 	flag.StringVar(&release, "release", "trusty", "Template to use")
 	flag.StringVar(&arch, "arch", "amd64", "Template to use")
 	flag.StringVar(&name, "name", "rubik", "Name of the container")
 	flag.BoolVar(&verbose, "verbose", false, "Verbose output")
+	flag.BoolVar(&flush, "flush", false, "Flush the cache")
 	flag.Parse()
 }
 
@@ -45,13 +48,15 @@ func main() {
 		c.SetVerbosity(lxc.Verbose)
 	}
 
-	if os.Geteuid() != 0 {
-		if err := c.CreateAsUser(distro, release, arch); err != nil {
-			log.Printf("ERROR: %s\n", err.Error())
-		}
-	} else {
-		if err := c.Create(template, "-a", arch, "-r", release); err != nil {
-			log.Printf("ERROR: %s\n", err.Error())
-		}
+    options := lxc.TemplateOptions{
+		Template:   template,
+		Distro:     distro,
+		Release:    release,
+		Arch:       arch,
+		FlushCache: flush,
+	}
+
+	if err := c.Create(options); err != nil {
+		log.Printf("ERROR: %s\n", err.Error())
 	}
 }

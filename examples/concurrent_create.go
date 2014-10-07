@@ -2,6 +2,8 @@
 // Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
 
+// +build linux
+
 package main
 
 import (
@@ -27,6 +29,7 @@ func init() {
 func main() {
 	var wg sync.WaitGroup
 
+	options := lxc.BusyboxTemplateOptions
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
@@ -37,7 +40,7 @@ func main() {
 			defer lxc.Release(c)
 
 			log.Printf("Creating the container (%d)...\n", i)
-			if err := c.Create("busybox"); err != nil {
+			if err := c.Create(options); err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
 			wg.Done()

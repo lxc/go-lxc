@@ -13,6 +13,7 @@ import "C"
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"reflect"
 	"strconv"
@@ -293,8 +294,8 @@ func (c *Container) Unfreeze() error {
 	return nil
 }
 
-// CreateUsing creates the container using given arguments with specified backend.
-func (c *Container) CreateUsing(template string, backend BackendStore, args ...string) error {
+// Create creates the container using given TemplateOptions
+func (c *Container) Create(options TemplateOptions) error {
 	// FIXME: Support bdevtype and bdev_specs
 	// bdevtypes:
 	// "btrfs", "zfs", "lvm", "dir"
@@ -313,10 +314,72 @@ func (c *Container) CreateUsing(template string, backend BackendStore, args ...s
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	ctemplate := C.CString(template)
+	// use download template if not set
+	if options.Template == "" {
+		options.Template = "download"
+	}
+
+	// use Directory backend if not set
+	if options.Backend == 0 {
+		options.Backend = Directory
+	}
+
+	// unprivileged users are only allowed to use "download" template
+	if os.Geteuid() != 0 && options.Template != "download" {
+		return ErrTemplateNotAllowed
+	}
+
+	var args []string
+	if options.Template == "download" {
+		// required parameters
+		if options.Distro == "" || options.Release == "" || options.Arch == "" {
+			return ErrInsufficientNumberOfArguments
+		}
+		args = append(args, "--dist", options.Distro, "--release", options.Release, "--arch", options.Arch)
+
+		// optional arguments
+		if options.Variant != "" {
+			args = append(args, "--variant", options.Variant)
+		}
+		if options.Server != "" {
+			args = append(args, "--server", options.Server)
+		}
+		if options.KeyID != "" {
+			args = append(args, "--keyid", options.KeyID)
+		}
+		if options.KeyServer != "" {
+			args = append(args, "--keyserver", options.KeyServer)
+		}
+		if options.DisableGPGValidation {
+			args = append(args, "--no-validate")
+		}
+		if options.FlushCache {
+			args = append(args, "--flush-cache")
+		}
+		if options.ForceCache {
+			args = append(args, "--force-cache")
+		}
+	} else {
+		// optional arguments
+		if options.Release != "" {
+			args = append(args, "--release", options.Release)
+		}
+		if options.Arch != "" {
+			args = append(args, "--arch", options.Arch)
+		}
+		if options.FlushCache {
+			args = append(args, "--flush-cache")
+		}
+	}
+
+	if options.ExtraArgs != nil {
+		args = append(args, options.ExtraArgs...)
+	}
+
+	ctemplate := C.CString(options.Template)
 	defer C.free(unsafe.Pointer(ctemplate))
 
-	cbackend := C.CString(backend.String())
+	cbackend := C.CString(options.Backend.String())
 	defer C.free(unsafe.Pointer(cbackend))
 
 	ret := false
@@ -336,21 +399,6 @@ func (c *Container) CreateUsing(template string, backend BackendStore, args ...s
 		return ErrCreateFailed
 	}
 	return nil
-}
-
-// Create creates the container using the Directory backendstore.
-func (c *Container) Create(template string, args ...string) error {
-	return c.CreateUsing(template, Directory, args...)
-}
-
-// CreateAsUser creates the container as "unprivileged user" using the Directory backendstore.
-func (c *Container) CreateAsUser(distro string, release string, arch string, args ...string) error {
-	// required parameters
-	nargs := []string{"-d", distro, "-r", release, "-a", arch}
-	// optional arguments
-	nargs = append(nargs, args...)
-
-	return c.CreateUsing("download", Directory, nargs...)
 }
 
 // Start starts the container.
