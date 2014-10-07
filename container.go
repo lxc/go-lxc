@@ -295,7 +295,7 @@ func (c *Container) Unfreeze() error {
 }
 
 // Create creates the container using given TemplateOptions
-func (c *Container) Create(options *TemplateOptions) error {
+func (c *Container) Create(options TemplateOptions) error {
 	// FIXME: Support bdevtype and bdev_specs
 	// bdevtypes:
 	// "btrfs", "zfs", "lvm", "dir"
