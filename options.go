@@ -48,7 +48,7 @@ type AttachOptions struct {
 }
 
 // DefaultAttachOptions is a convenient set of options to be used
-var DefaultAttachOptions = &AttachOptions{
+var DefaultAttachOptions = AttachOptions{
 	Namespaces: -1,
 	Arch:       -1,
 	Cwd:        "/",
