@@ -18,17 +18,12 @@ import (
 )
 
 const (
-	ContainerType             = "busybox"
 	ContainerName             = "lorem"
 	SnapshotName              = "snap0"
 	ContainerRestoreName      = "ipsum"
 	ContainerCloneName        = "consectetur"
 	ContainerCloneOverlayName = "adipiscing"
 	ContainerCloneAufsName    = "pellentesque"
-	// used by unprivileged test cases
-	UnprivilegedContainerType = "ubuntu"
-	UnprivilegedRelease       = "trusty"
-	UnprivilegedArch          = "amd64"
 )
 
 func unprivileged() bool {
@@ -393,6 +388,21 @@ func TestStart(t *testing.T) {
 	c.Wait(RUNNING, 30*time.Second)
 	if !c.Running() {
 		t.Errorf("Starting the container failed...")
+	}
+}
+
+func TestWaitIPAddresses(t *testing.T) {
+	if !unprivileged() {
+		t.Skip("skipping test in privileged mode.")
+	}
+
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if _, err := c.WaitIPAddresses(30 * time.Second); err != nil {
+		t.Errorf(err.Error())
 	}
 }
 
@@ -1111,7 +1121,9 @@ func TestRemoveDeviceNode(t *testing.T) {
 }
 
 func TestIPv4Addresses(t *testing.T) {
-	t.Skip("skipping test")
+	if !unprivileged() {
+		t.Skip("skipping test in privileged mode.")
+	}
 
 	c, err := NewContainer(ContainerName)
 	if err != nil {
