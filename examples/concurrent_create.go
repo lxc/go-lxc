@@ -37,7 +37,6 @@ func main() {
 			if err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
-			defer lxc.Release(c)
 
 			log.Printf("Creating the container (%d)...\n", i)
 			if err := c.Create(options); err != nil {

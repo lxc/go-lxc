@@ -36,7 +36,6 @@ func main() {
 			if err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
-			defer lxc.Release(c)
 
 			log.Printf("Destroying the container (%d)...\n", i)
 			if err := c.Destroy(); err != nil {
