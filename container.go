@@ -39,6 +39,13 @@ type Snapshot struct {
 	Path        string
 }
 
+const (
+	isDefined = 1 << iota
+	isNotDefined
+	isRunning
+	isNotRunning
+)
+
 func (c *Container) makeSure(flags int) error {
 	if flags&isDefined != 0 && !c.Defined() {
 		return ErrNotDefined
@@ -296,11 +303,7 @@ func (c *Container) Unfreeze() error {
 
 // Create creates the container using given TemplateOptions
 func (c *Container) Create(options TemplateOptions) error {
-	// FIXME: Support bdevtype and bdev_specs
-	// bdevtypes:
-	// "btrfs", "zfs", "lvm", "dir"
-	//
-	// best tries to find the best backing store type
+	// FIXME: Support bdev_specs
 	//
 	// bdev_specs:
 	// zfs requires zfsroot
@@ -428,10 +431,8 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	/*
-	 * FIXME: Go runtime and src/lxc/start.c signal_handler are not playing nice together so use lxc-execute for now
-	 * go-nuts thread: https://groups.google.com/forum/#!msg/golang-nuts/h9GbvfYv83w/5Ly_jvOr86wJ
-	 */
+	// FIXME: Go runtime and src/lxc/start.c signal_handler are not playing nice together so use lxc-execute for now
+	// go-nuts thread: https://groups.google.com/forum/#!msg/golang-nuts/h9GbvfYv83w/5Ly_jvOr86wJ
 	output, err := exec.Command(cargs[0], cargs[1:]...).CombinedOutput()
 	if err != nil {
 		return nil, ErrExecuteFailed
@@ -439,16 +440,16 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 
 	return output, nil
 	/*
-		   cargs := makeNullTerminatedArgs(args)
-		   if cargs == nil {
-			   return ErrAllocationFailed
-		   }
-		   defer freeNullTerminatedArgs(cargs, len(args))
+		cargs := makeNullTerminatedArgs(args)
+		if cargs == nil {
+			return ErrAllocationFailed
+		}
+		defer freeNullTerminatedArgs(cargs, len(args))
 
-		   if !bool(C.go_lxc_start(c.container, 1, cargs)) {
-			   return ErrExecuteFailed
-		   }
-		   return nil
+		if !bool(C.go_lxc_start(c.container, 1, cargs)) {
+			return ErrExecuteFailed
+		}
+		return nil
 	*/
 }
 
@@ -511,15 +512,9 @@ func (c *Container) Destroy() error {
 	return nil
 }
 
-// CloneUsing clones the container using given arguments with specified backend.
-//
-// Additional flags to change the cloning behaviour:
-// CloneKeepName, CloneKeepMACAddr, CloneSnapshot and CloneMaybeSnapshot
-func (c *Container) CloneUsing(name string, backend BackendStore, flags CloneFlags) error {
-	// FIXME: support lxcpath, bdevtype, bdevdata, newsize and hookargs
-	//
-	// bdevtypes:
-	// "btrfs", "zfs", "lvm", "dir" "overlayfs"
+// Clone clones the container using given arguments with specified backend.
+func (c *Container) Clone(name string, options CloneOptions) error {
+	// FIXME: bdevdata, newsize and hookargs
 	//
 	// bdevdata:
 	// zfs requires zfsroot
@@ -537,21 +532,41 @@ func (c *Container) CloneUsing(name string, backend BackendStore, flags CloneFla
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	// use Directory backend if not set
+	if options.Backend == 0 {
+		options.Backend = Directory
+	}
+
+	var flags int
+	if options.KeepName {
+		flags |= C.LXC_CLONE_KEEPNAME
+	}
+	if options.KeepMAC {
+		flags |= C.LXC_CLONE_KEEPMACADDR
+	}
+	if options.Snapshot {
+		flags |= C.LXC_CLONE_SNAPSHOT
+	}
+
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	cbackend := C.CString(backend.String())
+	cbackend := C.CString(options.Backend.String())
 	defer C.free(unsafe.Pointer(cbackend))
 
-	if !bool(C.go_lxc_clone(c.container, cname, C.int(flags), cbackend)) {
-		return ErrCloneFailed
+	if options.ConfigPath != "" {
+		clxcpath := C.CString(options.ConfigPath)
+		defer C.free(unsafe.Pointer(clxcpath))
+
+		if !bool(C.go_lxc_clone(c.container, cname, clxcpath, C.int(flags), cbackend)) {
+			return ErrCloneFailed
+		}
+	} else {
+		if !bool(C.go_lxc_clone(c.container, cname, nil, C.int(flags), cbackend)) {
+			return ErrCloneFailed
+		}
 	}
 	return nil
-}
-
-// Clone clones the container using the Directory backendstore.
-func (c *Container) Clone(name string) error {
-	return c.CloneUsing(name, Directory, 0)
 }
 
 // Rename renames the container.

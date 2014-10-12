@@ -158,7 +158,7 @@ func TestClone(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if err := c.Clone(ContainerCloneName); err != nil {
+	if err = c.Clone(ContainerCloneName, DefaultCloneOptions); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -173,7 +173,13 @@ func TestCloneUsingOverlayfs(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if err := c.CloneUsing(ContainerCloneOverlayName, Overlayfs, CloneSnapshot|CloneKeepName|CloneKeepMACAddr); err != nil {
+	err = c.Clone(ContainerCloneOverlayName, CloneOptions{
+		Backend:  Overlayfs,
+		KeepName: true,
+		KeepMAC:  true,
+		Snapshot: true,
+	})
+	if err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -192,7 +198,13 @@ func TestCloneUsingAufs(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if err := c.CloneUsing(ContainerCloneAufsName, Aufs, CloneSnapshot|CloneKeepName|CloneKeepMACAddr); err != nil {
+	err = c.Clone(ContainerCloneAufsName, CloneOptions{
+		Backend:  Aufs,
+		KeepName: true,
+		KeepMAC:  true,
+		Snapshot: true,
+	})
+	if err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -1260,7 +1272,7 @@ func TestBackendStore(t *testing.T) {
 		store BackendStore
 	}
 
-	if X.store.String() != "<INVALID>" {
+	if X.store.String() != "" {
 		t.Error("zero value of BackendStore should be invalid")
 	}
 }
@@ -1270,7 +1282,7 @@ func TestState(t *testing.T) {
 		state State
 	}
 
-	if X.state.String() != "<INVALID>" {
+	if X.state.String() != "" {
 		t.Error("zero value of State should be invalid")
 	}
 }
