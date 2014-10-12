@@ -30,7 +30,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.Release(c)
 
 	log.Printf("Freezing the container...\n")
 	if err := c.Freeze(); err != nil {

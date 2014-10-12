@@ -11,7 +11,10 @@ package lxc
 // #include "lxc.h"
 import "C"
 
-import "unsafe"
+import (
+	"runtime"
+	"unsafe"
+)
 
 // NewContainer returns a new container struct.
 func NewContainer(name string, lxcpath ...string) (*Container, error) {
@@ -32,7 +35,11 @@ func NewContainer(name string, lxcpath ...string) (*Container, error) {
 	if container == nil {
 		return nil, ErrNewFailed
 	}
-	return &Container{container: container, verbosity: Quiet}, nil
+	c := &Container{container: container, verbosity: Quiet}
+
+	// http://golang.org/pkg/runtime/#SetFinalizer
+	runtime.SetFinalizer(c, Release)
+	return c, nil
 }
 
 // Acquire increments the reference counter of the container object.
@@ -42,6 +49,9 @@ func Acquire(c *Container) bool {
 
 // Release decrements the reference counter of the container object.
 func Release(c *Container) bool {
+	// http://golang.org/pkg/runtime/#SetFinalizer
+	runtime.SetFinalizer(c, nil)
+
 	return C.lxc_container_put(c.container) == 1
 }
 

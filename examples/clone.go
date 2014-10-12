@@ -29,7 +29,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.Release(c)
 
 	directoryClone := name + "Directory"
 	overlayClone := name + "Overlayfs"

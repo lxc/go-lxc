@@ -35,7 +35,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.Release(c)
 
 	options := lxc.DefaultAttachOptions
 	options.ClearEnv = false

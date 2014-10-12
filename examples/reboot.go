@@ -29,7 +29,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
-	defer lxc.Release(c)
 
 	log.Printf("Rebooting the container...\n")
 	if err := c.Reboot(); err != nil {
