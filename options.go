@@ -149,3 +149,21 @@ var DefaultConsoleOptions = ConsoleOptions{
 	StderrFd:        os.Stderr.Fd(),
 	EscapeCharacter: 'a',
 }
+
+// CloneOptions type is used for defining various clone options.
+type CloneOptions struct {
+	// Backend specifies the type of the backend.
+	Backend BackendStore
+
+	// do not change the container name
+	KeepName bool
+	// do not choose a random new mac address
+	KeepMAC bool
+	// snapshot rather than copy
+	Snapshot bool
+}
+
+// DownloadTemplateOptions is a convenient set of options for "download" template.
+var DefaultCloneOptions = CloneOptions{
+	Backend: Directory,
+}

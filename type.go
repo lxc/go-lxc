@@ -9,9 +9,7 @@ package lxc
 // #include <lxc/lxccontainer.h>
 import "C"
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Verbosity type
 type Verbosity int
@@ -66,6 +64,27 @@ func (t BackendStore) String() string {
 		return "best"
 	}
 	return "<INVALID>"
+}
+
+var backendStoreMap = map[string]BackendStore{
+	"dir":       Directory,
+	"zfs":       ZFS,
+	"btrfs":     Btrfs,
+	"lvm":       LVM,
+	"aufs":      Aufs,
+	"overlayfs": Overlayfs,
+	"loopback":  Loopback,
+	"best":      Best,
+}
+
+// Set is the method to set the flag value, part of the flag.Value interface.
+func (t *BackendStore) Set(value string) error {
+	backend, ok := backendStoreMap[value]
+	if ok {
+		*t = backend
+		return nil
+	}
+	return ErrUnknownBackendStore
 }
 
 // State type specifies possible container states.
@@ -230,22 +249,6 @@ func (l LogLevel) String() string {
 	}
 	return "NOTSET"
 }
-
-// CloneFlags type
-type CloneFlags int
-
-const (
-	// CloneKeepName means do not edit the rootfs to change the hostname
-	CloneKeepName CloneFlags = 1 << iota
-	// CloneKeepMACAddr means do not change the mac address on network interfaces
-	CloneKeepMACAddr
-	// CloneSnapshot means snapshot the original filesystem(s)
-	CloneSnapshot
-	// CloneKeepBdevType means use the same bdev type
-	CloneKeepBdevType
-	// CloneMaybeSnapshot means snapshot only if bdev supports it, else copy
-	CloneMaybeSnapshot
-)
 
 type Personality int64
 

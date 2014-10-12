@@ -57,6 +57,7 @@ var (
 	ErrStartFailed                   = NewError("starting the container failed")
 	ErrStopFailed                    = NewError("stopping the container failed")
 	ErrUnfreezeFailed                = NewError("unfreezing the container failed")
+	ErrUnknownBackendStore           = NewError("unknown backend type")
 )
 
 // Error represents a basic error that implies the error interface.
