@@ -303,11 +303,7 @@ func (c *Container) Unfreeze() error {
 
 // Create creates the container using given TemplateOptions
 func (c *Container) Create(options TemplateOptions) error {
-	// FIXME: Support bdevtype and bdev_specs
-	// bdevtypes:
-	// "btrfs", "zfs", "lvm", "dir"
-	//
-	// best tries to find the best backing store type
+	// FIXME: Support bdev_specs
 	//
 	// bdev_specs:
 	// zfs requires zfsroot
@@ -518,10 +514,7 @@ func (c *Container) Destroy() error {
 
 // Clone clones the container using given arguments with specified backend.
 func (c *Container) Clone(name string, options CloneOptions) error {
-	// FIXME: support lxcpath, bdevtype, bdevdata, newsize and hookargs
-	//
-	// bdevtypes:
-	// "btrfs", "zfs", "lvm", "dir" "overlayfs"
+	// FIXME: bdevdata, newsize and hookargs
 	//
 	// bdevdata:
 	// zfs requires zfsroot
@@ -561,8 +554,17 @@ func (c *Container) Clone(name string, options CloneOptions) error {
 	cbackend := C.CString(options.Backend.String())
 	defer C.free(unsafe.Pointer(cbackend))
 
-	if !bool(C.go_lxc_clone(c.container, cname, C.int(flags), cbackend)) {
-		return ErrCloneFailed
+	if options.ConfigPath != "" {
+		clxcpath := C.CString(options.ConfigPath)
+		defer C.free(unsafe.Pointer(clxcpath))
+
+		if !bool(C.go_lxc_clone(c.container, cname, clxcpath, C.int(flags), cbackend)) {
+			return ErrCloneFailed
+		}
+	} else {
+		if !bool(C.go_lxc_clone(c.container, cname, nil, C.int(flags), cbackend)) {
+			return ErrCloneFailed
+		}
 	}
 	return nil
 }

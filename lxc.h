@@ -5,7 +5,7 @@
 extern bool go_lxc_add_device_node(struct lxc_container *c, const char *src_path, const char *dest_path);
 extern void go_lxc_clear_config(struct lxc_container *c);
 extern bool go_lxc_clear_config_item(struct lxc_container *c, const char *key);
-extern bool go_lxc_clone(struct lxc_container *c, const char *newname, int flags, const char *bdevtype);
+extern bool go_lxc_clone(struct lxc_container *c, const char *newname, const char *lxcpath, int flags, const char *bdevtype);
 extern bool go_lxc_console(struct lxc_container *c, int ttynum, int stdinfd, int stdoutfd, int stderrfd, int escape);
 extern bool go_lxc_create(struct lxc_container *c, const char *t, const char *bdevtype, int flags, char * const argv[]);
 extern bool go_lxc_defined(struct lxc_container *c);

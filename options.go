@@ -64,6 +64,7 @@ var DefaultAttachOptions = AttachOptions{
 
 // TemplateOptions type is used for defining various template options.
 type TemplateOptions struct {
+
 	// Template specifies the name of the template.
 	Template string
 
@@ -152,18 +153,24 @@ var DefaultConsoleOptions = ConsoleOptions{
 
 // CloneOptions type is used for defining various clone options.
 type CloneOptions struct {
+
 	// Backend specifies the type of the backend.
 	Backend BackendStore
 
-	// do not change the container name
+	// lxcpath in which to create the new container. If not set the original container's lxcpath will be used.
+	ConfigPath string
+
+	// Do not change the hostname of the container (in the root filesystem).
 	KeepName bool
-	// do not choose a random new mac address
+
+	// Use the same MAC address as the original container, rather than generating a new random one.
 	KeepMAC bool
-	// snapshot rather than copy
+
+	// Create a snapshot rather than copy.
 	Snapshot bool
 }
 
-// DownloadTemplateOptions is a convenient set of options for "download" template.
+// DefaultCloneOptions is a convenient set of options to be used.
 var DefaultCloneOptions = CloneOptions{
 	Backend: Directory,
 }
