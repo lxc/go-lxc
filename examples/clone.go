@@ -22,7 +22,7 @@ var (
 func init() {
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
 	flag.StringVar(&name, "name", "rubik", "Name of the original container")
-	flag.Var(&backend, "backend", "Backend type")
+	flag.Var(&backend, "backend", "Backend type to use, possible values are [dir, zfs, btrfs, lvm, aufs, overlayfs, loopback, best]")
 	flag.Parse()
 }
 
@@ -32,8 +32,12 @@ func main() {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
+	if backend == 0 {
+		log.Fatalf("ERROR: %s\n", lxc.ErrUnknownBackendStore)
+	}
+
 	log.Printf("Cloning the container using %s backend...\n", backend)
-	err = c.Clone(name+backend.String(), lxc.CloneOptions{
+	err = c.Clone(name+"_"+backend.String(), lxc.CloneOptions{
 		Backend: backend,
 	})
 	if err != nil {

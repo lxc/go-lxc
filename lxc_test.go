@@ -1272,7 +1272,7 @@ func TestBackendStore(t *testing.T) {
 		store BackendStore
 	}
 
-	if X.store.String() != "<INVALID>" {
+	if X.store.String() != "" {
 		t.Error("zero value of BackendStore should be invalid")
 	}
 }
@@ -1282,7 +1282,7 @@ func TestState(t *testing.T) {
 		state State
 	}
 
-	if X.state.String() != "<INVALID>" {
+	if X.state.String() != "" {
 		t.Error("zero value of State should be invalid")
 	}
 }

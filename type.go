@@ -63,7 +63,7 @@ func (t BackendStore) String() string {
 	case Best:
 		return "best"
 	}
-	return "<INVALID>"
+	return ""
 }
 
 var backendStoreMap = map[string]BackendStore{
@@ -140,7 +140,7 @@ func (t State) String() string {
 	case THAWED:
 		return "THAWED"
 	}
-	return "<INVALID>"
+	return ""
 }
 
 // Taken from http://golang.org/doc/effective_go.html#constants
