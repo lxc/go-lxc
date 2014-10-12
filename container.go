@@ -39,6 +39,13 @@ type Snapshot struct {
 	Path        string
 }
 
+const (
+	isDefined = 1 << iota
+	isNotDefined
+	isRunning
+	isNotRunning
+)
+
 func (c *Container) makeSure(flags int) error {
 	if flags&isDefined != 0 && !c.Defined() {
 		return ErrNotDefined
