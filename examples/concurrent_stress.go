@@ -48,7 +48,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	options := lxc.BusyboxTemplateOptions
+	options := lxc.BusyboxTemplateOptions()
 	options.Template = template
 
 	for i := 0; i < iteration; i++ {

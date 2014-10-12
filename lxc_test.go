@@ -143,9 +143,9 @@ func TestCreate(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	options := DownloadTemplateOptions
+	options := DownloadTemplateOptions()
 	if !unprivileged() {
-		options = BusyboxTemplateOptions
+		options = BusyboxTemplateOptions()
 	}
 	if err := c.Create(options); err != nil {
 		t.Errorf(err.Error())
@@ -158,7 +158,7 @@ func TestClone(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if err = c.Clone(ContainerCloneName, DefaultCloneOptions); err != nil {
+	if err = c.Clone(ContainerCloneName, DefaultCloneOptions()); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -241,7 +241,7 @@ func TestConcurrentCreate(t *testing.T) {
 
 	var wg sync.WaitGroup
 
-	options := BusyboxTemplateOptions
+	options := BusyboxTemplateOptions()
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {
@@ -896,7 +896,7 @@ func TestRunCommand(t *testing.T) {
 	}
 
 	argsThree := []string{"/bin/sh", "-c", "exit 0"}
-	ok, err := c.RunCommand(argsThree, DefaultAttachOptions)
+	ok, err := c.RunCommand(argsThree, DefaultAttachOptions())
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -905,7 +905,7 @@ func TestRunCommand(t *testing.T) {
 	}
 
 	argsThree = []string{"/bin/sh", "-c", "exit 1"}
-	ok, err = c.RunCommand(argsThree, DefaultAttachOptions)
+	ok, err = c.RunCommand(argsThree, DefaultAttachOptions())
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -920,7 +920,7 @@ func TestCommandWithEnv(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	options := DefaultAttachOptions
+	options := DefaultAttachOptions()
 	options.Env = []string{"FOO=BAR"}
 	options.ClearEnv = true
 
@@ -940,12 +940,12 @@ func TestCommandWithEnvToKeep(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	options := DefaultAttachOptions
+	options := DefaultAttachOptions()
 	options.ClearEnv = true
 	options.EnvToKeep = []string{"TERM"}
 
 	args := []string{"/bin/sh", "-c", "test $TERM = 'xterm-256color'"}
-	ok, err := c.RunCommand(args, DefaultAttachOptions)
+	ok, err := c.RunCommand(args, DefaultAttachOptions())
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -960,7 +960,7 @@ func TestCommandWithCwd(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	options := DefaultAttachOptions
+	options := DefaultAttachOptions()
 	options.Cwd = "/tmp"
 
 	args := []string{"/bin/sh", "-c", "test `pwd` = /tmp"}
@@ -979,7 +979,7 @@ func TestCommandWithUIDGID(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	options := DefaultAttachOptions
+	options := DefaultAttachOptions()
 	options.UID = 1000
 	options.GID = 1000
 
@@ -999,7 +999,7 @@ func TestCommandWithArch(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	options := DefaultAttachOptions
+	options := DefaultAttachOptions()
 	options.Arch = X86
 
 	args := []string{"/bin/sh", "-c", "test `uname -m` = i686"}
