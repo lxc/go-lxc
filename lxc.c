@@ -304,3 +304,11 @@ bool go_lxc_remove_device_node(struct lxc_container *c, const char *src_path, co
 bool go_lxc_rename(struct lxc_container *c, const char *newname) {
 	return c->rename(c, newname);
 }
+
+bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool verbose) {
+	return c->checkpoint(c, directory, stop, verbose);
+}
+
+bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose) {
+	return c->restore(c, directory, verbose);
+}

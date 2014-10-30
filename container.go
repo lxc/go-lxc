@@ -1353,3 +1353,25 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 	}
 	return nil
 }
+
+func (c *Container) Checkpoint(directory string, stop bool, verbose bool) error {
+	cdirectory := C.CString(directory)
+	cstop := C.bool(stop)
+	cverbose := C.bool(verbose)
+
+	if !C.go_lxc_checkpoint(c.container, cdirectory, cstop, cverbose) {
+		return ErrCheckpointFailed
+	}
+	return nil
+}
+
+func (c *Container) Restore(directory string, verbose bool) error {
+
+	cdirectory := C.CString(directory)
+	cverbose := C.bool(verbose)
+
+	if !C.bool(C.go_lxc_restore(c.container, cdirectory, cverbose)) {
+		return ErrRestoreFailed
+	}
+	return nil
+}
