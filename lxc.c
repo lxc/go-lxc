@@ -8,6 +8,7 @@
 
 #include <lxc/lxccontainer.h>
 #include <lxc/attach_options.h>
+#include <lxc/version.h>
 
 bool go_lxc_defined(struct lxc_container *c) {
 	return c->is_defined(c);
@@ -306,9 +307,17 @@ bool go_lxc_rename(struct lxc_container *c, const char *newname) {
 }
 
 bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool verbose) {
+#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
 	return c->checkpoint(c, directory, stop, verbose);
+#else
+	return false;
+#endif
 }
 
 bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose) {
+#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
 	return c->restore(c, directory, verbose);
+#else
+	return false;
+#endif
 }
