@@ -22,7 +22,7 @@ The package API will remain stable as described in [gopkg.in](https://gopkg.in).
 
 ## Examples
 
-See the [examples](https://github.com/lxc/go-lxc/tree/master/examples) directory for some.
+See the [examples](https://github.com/lxc/go-lxc/tree/v1/examples) directory for some.
 
 ## Contributing
 
