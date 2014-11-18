@@ -175,12 +175,14 @@ var DefaultCloneOptions = CloneOptions{
 	Backend: Directory,
 }
 
+// CheckpointOptions type is used for defining checkpoint options for CRIU
 type CheckpointOptions struct {
 	Directory string
 	Stop      bool
 	Verbose   bool
 }
 
+// RestoreOptions type is used for defining restore options for CRIU
 type RestoreOptions struct {
 	Directory string
 	Verbose   bool
