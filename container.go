@@ -39,6 +39,17 @@ type Snapshot struct {
 	Path        string
 }
 
+type CheckpointOpts struct {
+	Directory   string
+	Stop        bool
+	Verbose     bool
+}
+
+type RestoreOpts struct {
+	Directory   string
+	Verbose     bool
+}
+
 const (
 	isDefined = 1 << iota
 	isNotDefined
@@ -1350,6 +1361,29 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 
 	if !bool(C.go_lxc_remove_device_node(c.container, csource, nil)) {
 		return ErrRemoveDeviceNodeFailed
+	}
+	return nil
+}
+
+func (c *Container) Checkpoint(opts CheckpointOpts) error {
+
+	cdirectory := C.CString(opts.Directory)
+	cstop := C.bool(opts.Stop)
+	cverbose := C.bool(opts.Verbose)
+
+	if !C.go_lxc_checkpoint(c.container, cdirectory, cstop, cverbose) {
+		return ErrCheckpointFailed
+	}
+	return nil
+}
+
+func (c *Container) Restore(opts RestoreOpts) error {
+
+	cdirectory := C.CString(opts.Directory)
+	cverbose := C.bool(opts.Verbose)
+
+	if !C.bool(C.go_lxc_restore(c.container, cdirectory, cverbose)) {
+		return ErrRestoreFailed
 	}
 	return nil
 }
