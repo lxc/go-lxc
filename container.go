@@ -39,17 +39,6 @@ type Snapshot struct {
 	Path        string
 }
 
-type CheckpointOpts struct {
-	Directory   string
-	Stop        bool
-	Verbose     bool
-}
-
-type RestoreOpts struct {
-	Directory   string
-	Verbose     bool
-}
-
 const (
 	isDefined = 1 << iota
 	isNotDefined
@@ -1365,7 +1354,7 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 	return nil
 }
 
-func (c *Container) Checkpoint(opts CheckpointOpts) error {
+func (c *Container) Checkpoint(opts CheckpointOptions) error {
 
 	cdirectory := C.CString(opts.Directory)
 	cstop := C.bool(opts.Stop)
@@ -1377,7 +1366,7 @@ func (c *Container) Checkpoint(opts CheckpointOpts) error {
 	return nil
 }
 
-func (c *Container) Restore(opts RestoreOpts) error {
+func (c *Container) Restore(opts RestoreOptions) error {
 
 	cdirectory := C.CString(opts.Directory)
 	cverbose := C.bool(opts.Verbose)

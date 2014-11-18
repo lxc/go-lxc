@@ -174,3 +174,14 @@ type CloneOptions struct {
 var DefaultCloneOptions = CloneOptions{
 	Backend: Directory,
 }
+
+type CheckpointOptions struct {
+	Directory string
+	Stop      bool
+	Verbose   bool
+}
+
+type RestoreOptions struct {
+	Directory string
+	Verbose   bool
+}
