@@ -9,17 +9,20 @@ package main
 import (
 	"flag"
 	"log"
+
+	"gopkg.in/lxc/go-lxc.v2"
 )
 
 var (
-	lxcpath  string
-	template string
-	distro   string
-	release  string
-	arch     string
-	name     string
-	verbose  bool
-	flush    bool
+	lxcpath    string
+	template   string
+	distro     string
+	release    string
+	arch       string
+	name       string
+	verbose    bool
+	flush      bool
+	validation bool
 )
 
 func init() {
