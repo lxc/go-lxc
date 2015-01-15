@@ -210,7 +210,7 @@ func (c *Container) State() State {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	return stateMap[C.GoString(C.go_lxc_state(c.container))]
+	return StateMap[C.GoString(C.go_lxc_state(c.container))]
 }
 
 // InitPid returns the process ID of the container's init process
@@ -1350,6 +1350,29 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 
 	if !bool(C.go_lxc_remove_device_node(c.container, csource, nil)) {
 		return ErrRemoveDeviceNodeFailed
+	}
+	return nil
+}
+
+func (c *Container) Checkpoint(opts CheckpointOptions) error {
+
+	cdirectory := C.CString(opts.Directory)
+	cstop := C.bool(opts.Stop)
+	cverbose := C.bool(opts.Verbose)
+
+	if !C.go_lxc_checkpoint(c.container, cdirectory, cstop, cverbose) {
+		return ErrCheckpointFailed
+	}
+	return nil
+}
+
+func (c *Container) Restore(opts RestoreOptions) error {
+
+	cdirectory := C.CString(opts.Directory)
+	cverbose := C.bool(opts.Verbose)
+
+	if !C.bool(C.go_lxc_restore(c.container, cdirectory, cverbose)) {
+		return ErrRestoreFailed
 	}
 	return nil
 }

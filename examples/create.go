@@ -14,14 +14,15 @@ import (
 )
 
 var (
-	lxcpath  string
-	template string
-	distro   string
-	release  string
-	arch     string
-	name     string
-	verbose  bool
-	flush    bool
+	lxcpath    string
+	template   string
+	distro     string
+	release    string
+	arch       string
+	name       string
+	verbose    bool
+	flush      bool
+	validation bool
 )
 
 func init() {
@@ -33,6 +34,7 @@ func init() {
 	flag.StringVar(&name, "name", "rubik", "Name of the container")
 	flag.BoolVar(&verbose, "verbose", false, "Verbose output")
 	flag.BoolVar(&flush, "flush", false, "Flush the cache")
+	flag.BoolVar(&validation, "validation", false, "GPG validation")
 	flag.Parse()
 }
 
@@ -48,11 +50,12 @@ func main() {
 	}
 
 	options := lxc.TemplateOptions{
-		Template:   template,
-		Distro:     distro,
-		Release:    release,
-		Arch:       arch,
-		FlushCache: flush,
+		Template:             template,
+		Distro:               distro,
+		Release:              release,
+		Arch:                 arch,
+		FlushCache:           flush,
+		DisableGPGValidation: validation,
 	}
 
 	if err := c.Create(options); err != nil {

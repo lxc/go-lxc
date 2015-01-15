@@ -80,7 +80,7 @@ func DefaultLvmVg() string {
 
 // DefaultZfsRoot returns the name of the default ZFS root.
 func DefaultZfsRoot() string {
-	return GlobalConfigItem("lxc.bdec.zfs.root")
+	return GlobalConfigItem("lxc.bdev.zfs.root")
 }
 
 // ContainerNames returns the names of defined and active containers on the system.
