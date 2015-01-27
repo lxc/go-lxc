@@ -1060,16 +1060,17 @@ func (c *Container) AttachShell(options AttachOptions) error {
 	return nil
 }
 
-// RunCommand attachs a shell and runs the command within the container.
-// The process will wait for the command to finish and return a success status. An error
-// is returned only when invocation of the command completely fails.
-func (c *Container) RunCommand(args []string, options AttachOptions) (bool, error) {
+// RunCommandStatus attachs a shell and runs the command within the container.
+// The process will wait for the command to finish and return the result of
+// waitpid(), i.e. the process' exit status. An error is returned only when
+// invocation of the command completely fails.
+func (c *Container) RunCommandStatus(args []string, options AttachOptions) (int, error) {
 	if len(args) == 0 {
-		return false, ErrInsufficientNumberOfArguments
+		return -1, ErrInsufficientNumberOfArguments
 	}
 
 	if err := c.makeSure(isDefined | isRunning); err != nil {
-		return false, err
+		return -1, err
 	}
 
 	c.mu.Lock()
@@ -1077,19 +1078,19 @@ func (c *Container) RunCommand(args []string, options AttachOptions) (bool, erro
 
 	cargs := makeNullTerminatedArgs(args)
 	if cargs == nil {
-		return false, ErrAllocationFailed
+		return -1, ErrAllocationFailed
 	}
 	defer freeNullTerminatedArgs(cargs, len(args))
 
 	cenv := makeNullTerminatedArgs(options.Env)
 	if cenv == nil {
-		return false, ErrAllocationFailed
+		return -1, ErrAllocationFailed
 	}
 	defer freeNullTerminatedArgs(cenv, len(options.Env))
 
 	cenvToKeep := makeNullTerminatedArgs(options.EnvToKeep)
 	if cenvToKeep == nil {
-		return false, ErrAllocationFailed
+		return -1, ErrAllocationFailed
 	}
 	defer freeNullTerminatedArgs(cenvToKeep, len(options.EnvToKeep))
 
@@ -1112,6 +1113,17 @@ func (c *Container) RunCommand(args []string, options AttachOptions) (bool, erro
 		cargs,
 	))
 
+	return ret, nil
+}
+
+// RunCommand attachs a shell and runs the command within the container.
+// The process will wait for the command to finish and return a success status. An error
+// is returned only when invocation of the command completely fails.
+func (c *Container) RunCommand(args []string, options AttachOptions) (bool, error) {
+	ret, err := c.RunCommandStatus(args, options)
+	if err != nil {
+		return false, err
+	}
 	if ret < 0 {
 		return false, ErrAttachFailed
 	}
