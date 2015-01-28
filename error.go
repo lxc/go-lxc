@@ -37,6 +37,7 @@ var (
 	ErrLoadConfigFailed              = NewError("loading config file for the container failed")
 	ErrMemLimit                      = NewError("your kernel does not support cgroup memory controller")
 	ErrMemorySwapLimit               = NewError("your kernel does not support cgroup swap controller")
+	ErrMethodNotAllowed              = NewError("the requested method is not currently supported with unprivileged containers")
 	ErrNewFailed                     = NewError("allocating the container failed")
 	ErrNoSnapshot                    = NewError("container has no snapshot")
 	ErrNotDefined                    = NewError("container is not defined")

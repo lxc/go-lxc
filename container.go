@@ -45,6 +45,8 @@ const (
 	isNotDefined
 	isRunning
 	isNotRunning
+	isPrivileged
+	isUnprivileged
 )
 
 func (c *Container) makeSure(flags int) error {
@@ -63,6 +65,11 @@ func (c *Container) makeSure(flags int) error {
 	if flags&isNotRunning != 0 && c.Running() {
 		return ErrAlreadyRunning
 	}
+
+	if flags&isPrivileged != 0 && os.Geteuid() != 0 {
+		return ErrMethodNotAllowed
+	}
+
 	return nil
 }
 
@@ -1350,7 +1357,7 @@ func (c *Container) SetLogLevel(level LogLevel) error {
 
 // AddDeviceNode adds specified device to the container.
 func (c *Container) AddDeviceNode(source string, destination ...string) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isDefined | isRunning | isPrivileged); err != nil {
 		return err
 	}
 
@@ -1379,7 +1386,7 @@ func (c *Container) AddDeviceNode(source string, destination ...string) error {
 
 // RemoveDeviceNode removes the specified device from the container.
 func (c *Container) RemoveDeviceNode(source string, destination ...string) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isDefined | isRunning | isPrivileged); err != nil {
 		return err
 	}
 
