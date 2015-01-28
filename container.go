@@ -47,6 +47,7 @@ const (
 	isNotRunning
 	isPrivileged
 	isUnprivileged
+	isGreateEqualThanLXC11
 )
 
 func (c *Container) makeSure(flags int) error {
@@ -70,6 +71,9 @@ func (c *Container) makeSure(flags int) error {
 		return ErrMethodNotAllowed
 	}
 
+	if flags&isGreateEqualThanLXC11 != 0 && !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
+		return ErrNotSupported
+	}
 	return nil
 }
 
@@ -177,11 +181,7 @@ func (c *Container) DestroySnapshot(snapshot Snapshot) error {
 
 // DestroyAllSnapshots destroys all the snapshot.
 func (c *Container) DestroyAllSnapshots() error {
-	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
-		return ErrNotSupported
-	}
-
-	if err := c.makeSure(isDefined); err != nil {
+	if err := c.makeSure(isDefined | isGreateEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -541,11 +541,7 @@ func (c *Container) Destroy() error {
 
 // DestroyWithAllSnapshots destroys the container and its snapshots
 func (c *Container) DestroyWithAllSnapshots() error {
-	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
-		return ErrNotSupported
-	}
-
-	if err := c.makeSure(isDefined | isNotRunning); err != nil {
+	if err := c.makeSure(isDefined | isNotRunning | isGreateEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -1414,8 +1410,8 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 
 // Checkpoint checkpoints the container.
 func (c *Container) Checkpoint(opts CheckpointOptions) error {
-	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
-		return ErrNotSupported
+	if err := c.makeSure(isDefined | isGreateEqualThanLXC11); err != nil {
+		return err
 	}
 
 	cdirectory := C.CString(opts.Directory)
@@ -1430,8 +1426,8 @@ func (c *Container) Checkpoint(opts CheckpointOptions) error {
 
 // Restore restores the container from a checkpoint.
 func (c *Container) Restore(opts RestoreOptions) error {
-	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
-		return ErrNotSupported
+	if err := c.makeSure(isNotDefined | isGreateEqualThanLXC11); err != nil {
+		return err
 	}
 
 	cdirectory := C.CString(opts.Directory)
@@ -1439,6 +1435,45 @@ func (c *Container) Restore(opts RestoreOptions) error {
 
 	if !C.bool(C.go_lxc_restore(c.container, cdirectory, cverbose)) {
 		return ErrRestoreFailed
+	}
+	return nil
+}
+
+// AttachInterface attaches specifed netdev to the container.
+func (c *Container) AttachInterface(source, destination string) error {
+	if err := c.makeSure(isDefined | isRunning | isPrivileged | isGreateEqualThanLXC11); err != nil {
+		return err
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	cdestination := C.CString(destination)
+	defer C.free(unsafe.Pointer(cdestination))
+
+	if !bool(C.go_lxc_attach_interface(c.container, csource, cdestination)) {
+		return ErrAttachInterfaceFailed
+	}
+	return nil
+}
+
+// DetachInterface detaches specifed netdev from the container.
+func (c *Container) DetachInterface(source string) error {
+	if err := c.makeSure(isDefined | isRunning | isPrivileged | isGreateEqualThanLXC11); err != nil {
+		return err
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	if !bool(C.go_lxc_detach_interface(c.container, csource, nil)) {
+		return ErrDetachInterfaceFailed
 	}
 	return nil
 }

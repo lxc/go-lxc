@@ -67,6 +67,6 @@ extern pid_t go_lxc_init_pid(struct lxc_container *c);
 extern bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool verbose);
 extern bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose);
 
-// bool (*attach_interface)(struct lxc_container *c, const char *dev, const char *dst_dev);
-// bool (*detach_interface)(struct lxc_container *c, const char *dev, const char *dst_dev);
+extern bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
+extern bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
 // void lxc_log_close(void);

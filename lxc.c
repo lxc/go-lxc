@@ -338,3 +338,19 @@ bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose) {
 	return false;
 #endif
 }
+
+bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev) {
+#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
+    return c->attach_interface(c, dev, dst_dev);
+#else
+	return false;
+#endif
+}
+
+bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev) {
+#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
+    return c->detach_interface(c, dev, dst_dev);
+#else
+	return false;
+#endif
+}
