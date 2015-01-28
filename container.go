@@ -1412,6 +1412,7 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 	return nil
 }
 
+// Checkpoint checkpoints the container.
 func (c *Container) Checkpoint(opts CheckpointOptions) error {
 	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
 		return ErrNotSupported
@@ -1427,6 +1428,7 @@ func (c *Container) Checkpoint(opts CheckpointOptions) error {
 	return nil
 }
 
+// Restore restores the container from a checkpoint.
 func (c *Container) Restore(opts RestoreOptions) error {
 	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
 		return ErrNotSupported
