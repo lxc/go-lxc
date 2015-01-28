@@ -220,6 +220,19 @@ func TestCreateSnapshot(t *testing.T) {
 	}
 }
 
+func TestCreateSnapshots(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	for i := 0; i < 3; i++ {
+		if _, err := c.CreateSnapshot(); err != nil {
+			t.Errorf(err.Error())
+		}
+	}
+}
+
 func TestRestoreSnapshot(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
@@ -1188,6 +1201,17 @@ func TestDestroySnapshot(t *testing.T) {
 	}
 }
 
+func TestDestroyAllSnapshots(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if err := c.DestroyAllSnapshots(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestDestroy(t *testing.T) {
 	if supported("overlayfs") {
 		c, err := NewContainer(ContainerCloneOverlayName)
@@ -1210,8 +1234,16 @@ func TestDestroy(t *testing.T) {
 			t.Errorf(err.Error())
 		}
 	}
+	c, err := NewContainer(ContainerCloneName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
-	c, err := NewContainer(ContainerRestoreName)
+	if err := c.Destroy(); err != nil {
+		t.Errorf(err.Error())
+	}
+
+	c, err = NewContainer(ContainerRestoreName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1225,7 +1257,7 @@ func TestDestroy(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if err := c.DestroyWithAllSnapshots(); err != nil {
+	if err := c.Destroy(); err != nil {
 		t.Errorf(err.Error())
 	}
 }
