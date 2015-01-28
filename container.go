@@ -47,7 +47,7 @@ const (
 	isNotRunning
 	isPrivileged
 	isUnprivileged
-	isGreateEqualThanLXC11
+	isGreaterEqualThanLXC11
 )
 
 func (c *Container) makeSure(flags int) error {
@@ -71,7 +71,7 @@ func (c *Container) makeSure(flags int) error {
 		return ErrMethodNotAllowed
 	}
 
-	if flags&isGreateEqualThanLXC11 != 0 && !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
+	if flags&isGreaterEqualThanLXC11 != 0 && !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
 		return ErrNotSupported
 	}
 	return nil
@@ -181,7 +181,7 @@ func (c *Container) DestroySnapshot(snapshot Snapshot) error {
 
 // DestroyAllSnapshots destroys all the snapshot.
 func (c *Container) DestroyAllSnapshots() error {
-	if err := c.makeSure(isDefined | isGreateEqualThanLXC11); err != nil {
+	if err := c.makeSure(isDefined | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -541,7 +541,7 @@ func (c *Container) Destroy() error {
 
 // DestroyWithAllSnapshots destroys the container and its snapshots
 func (c *Container) DestroyWithAllSnapshots() error {
-	if err := c.makeSure(isDefined | isNotRunning | isGreateEqualThanLXC11); err != nil {
+	if err := c.makeSure(isDefined | isNotRunning | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -1410,7 +1410,7 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 
 // Checkpoint checkpoints the container.
 func (c *Container) Checkpoint(opts CheckpointOptions) error {
-	if err := c.makeSure(isDefined | isGreateEqualThanLXC11); err != nil {
+	if err := c.makeSure(isDefined | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -1426,7 +1426,7 @@ func (c *Container) Checkpoint(opts CheckpointOptions) error {
 
 // Restore restores the container from a checkpoint.
 func (c *Container) Restore(opts RestoreOptions) error {
-	if err := c.makeSure(isNotDefined | isGreateEqualThanLXC11); err != nil {
+	if err := c.makeSure(isNotDefined | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -1441,7 +1441,7 @@ func (c *Container) Restore(opts RestoreOptions) error {
 
 // AttachInterface attaches specifed netdev to the container.
 func (c *Container) AttachInterface(source, destination string) error {
-	if err := c.makeSure(isDefined | isRunning | isPrivileged | isGreateEqualThanLXC11); err != nil {
+	if err := c.makeSure(isDefined | isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -1462,7 +1462,7 @@ func (c *Container) AttachInterface(source, destination string) error {
 
 // DetachInterface detaches specifed netdev from the container.
 func (c *Container) DetachInterface(source string) error {
-	if err := c.makeSure(isDefined | isRunning | isPrivileged | isGreateEqualThanLXC11); err != nil {
+	if err := c.makeSure(isDefined | isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
