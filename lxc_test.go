@@ -1210,16 +1210,8 @@ func TestDestroy(t *testing.T) {
 			t.Errorf(err.Error())
 		}
 	}
-	c, err := NewContainer(ContainerCloneName)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
 
-	if err := c.Destroy(); err != nil {
-		t.Errorf(err.Error())
-	}
-
-	c, err = NewContainer(ContainerRestoreName)
+	c, err := NewContainer(ContainerRestoreName)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1233,7 +1225,7 @@ func TestDestroy(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	if err := c.Destroy(); err != nil {
+	if err := c.DestroyWithAllSnapshots(); err != nil {
 		t.Errorf(err.Error())
 	}
 }

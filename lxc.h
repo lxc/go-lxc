@@ -10,6 +10,7 @@ extern bool go_lxc_console(struct lxc_container *c, int ttynum, int stdinfd, int
 extern bool go_lxc_create(struct lxc_container *c, const char *t, const char *bdevtype, int flags, char * const argv[]);
 extern bool go_lxc_defined(struct lxc_container *c);
 extern bool go_lxc_destroy(struct lxc_container *c);
+extern bool go_lxc_destroy_with_snapshots(struct lxc_container *c);
 extern bool go_lxc_freeze(struct lxc_container *c);
 extern bool go_lxc_load_config(struct lxc_container *c, const char *alt_file);
 extern bool go_lxc_may_control(struct lxc_container *c);
@@ -23,6 +24,7 @@ extern bool go_lxc_set_config_item(struct lxc_container *c, const char *key, con
 extern bool go_lxc_set_config_path(struct lxc_container *c, const char *path);
 extern bool go_lxc_shutdown(struct lxc_container *c, int timeout);
 extern bool go_lxc_snapshot_destroy(struct lxc_container *c, const char *snapname);
+extern bool go_lxc_snapshot_destroy_all(struct lxc_container *c);
 extern bool go_lxc_snapshot_restore(struct lxc_container *c, const char *snapname, const char *newname);
 extern bool go_lxc_start(struct lxc_container *c, int useinit, char * const argv[]);
 extern bool go_lxc_stop(struct lxc_container *c);
@@ -64,3 +66,7 @@ extern int go_lxc_snapshot(struct lxc_container *c);
 extern pid_t go_lxc_init_pid(struct lxc_container *c);
 extern bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool verbose);
 extern bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose);
+
+// bool (*attach_interface)(struct lxc_container *c, const char *dev, const char *dst_dev);
+// bool (*detach_interface)(struct lxc_container *c, const char *dev, const char *dst_dev);
+// void lxc_log_close(void);

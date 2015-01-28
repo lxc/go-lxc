@@ -70,6 +70,14 @@ bool go_lxc_destroy(struct lxc_container *c) {
 	return c->destroy(c);
 }
 
+bool go_lxc_destroy_with_snapshots(struct lxc_container *c) {
+#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
+	return c->destroy_with_snapshots(c);
+#else
+	return false;
+#endif
+}
+
 bool go_lxc_wait(struct lxc_container *c, const char *state, int timeout) {
 	return c->wait(c, state, timeout);
 }
@@ -92,7 +100,7 @@ bool go_lxc_set_config_item(struct lxc_container *c, const char *key, const char
 }
 
 void go_lxc_clear_config(struct lxc_container *c) {
-    c->clear_config(c);
+	c->clear_config(c);
 }
 
 bool go_lxc_clear_config_item(struct lxc_container *c, const char *key) {
@@ -100,7 +108,7 @@ bool go_lxc_clear_config_item(struct lxc_container *c, const char *key) {
 }
 
 char* go_lxc_get_running_config_item(struct lxc_container *c, const char *key) {
-    return c->get_running_config_item(c, key);
+	return c->get_running_config_item(c, key);
 }
 
 char* go_lxc_get_keys(struct lxc_container *c, const char *key) {
@@ -219,7 +227,7 @@ int go_lxc_attach(struct lxc_container *c,
 	   elevated_privileges
 	   Do  not  drop privileges when running command inside the container. If this option is specified, the new process will not be added to the container's cgroup(s) and it will not drop its capabilities before executing.
 	   default_options.attach_flags &= ~(LXC_ATTACH_MOVE_TO_CGROUP | LXC_ATTACH_DROP_CAPABILITIES | LXC_ATTACH_APPARMOR);
-	*/
+	   */
 
 	ret = c->attach(c, lxc_attach_run_shell, NULL, &attach_options, &pid);
 	if (ret < 0)
@@ -292,6 +300,15 @@ bool go_lxc_snapshot_restore(struct lxc_container *c, const char *snapname, cons
 
 bool go_lxc_snapshot_destroy(struct lxc_container *c, const char *snapname) {
 	return c->snapshot_destroy(c, snapname);
+}
+
+bool go_lxc_snapshot_destroy_all(struct lxc_container *c) {
+#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
+	return c->snapshot_destroy_all(c);
+#else
+	return false;
+#endif
+
 }
 
 bool go_lxc_add_device_node(struct lxc_container *c, const char *src_path, const char *dest_path) {

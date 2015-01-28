@@ -7,6 +7,7 @@
 package lxc
 
 // #include <lxc/lxccontainer.h>
+// #include <lxc/version.h>
 // #include "lxc.h"
 import "C"
 
@@ -163,6 +164,25 @@ func (c *Container) DestroySnapshot(snapshot Snapshot) error {
 
 	if !bool(C.go_lxc_snapshot_destroy(c.container, csnapname)) {
 		return ErrDestroySnapshotFailed
+	}
+	return nil
+}
+
+// DestroyAllSnapshots destroys all the snapshot.
+func (c *Container) DestroyAllSnapshots() error {
+	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
+		return ErrNotSupported
+	}
+
+	if err := c.makeSure(isDefined); err != nil {
+		return err
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if !bool(C.go_lxc_snapshot_destroy_all(c.container)) {
+		return ErrDestroyAllSnapshotsFailed
 	}
 	return nil
 }
@@ -508,6 +528,25 @@ func (c *Container) Destroy() error {
 
 	if !bool(C.go_lxc_destroy(c.container)) {
 		return ErrDestroyFailed
+	}
+	return nil
+}
+
+// DestroyWithAllSnapshots destroys the container and its snapshots
+func (c *Container) DestroyWithAllSnapshots() error {
+	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
+		return ErrNotSupported
+	}
+
+	if err := c.makeSure(isDefined | isNotRunning); err != nil {
+		return err
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if !bool(C.go_lxc_destroy_with_snapshots(c.container)) {
+		return ErrDestroyWithAllSnapshotsFailed
 	}
 	return nil
 }
@@ -1367,6 +1406,9 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 }
 
 func (c *Container) Checkpoint(opts CheckpointOptions) error {
+	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
+		return ErrNotSupported
+	}
 
 	cdirectory := C.CString(opts.Directory)
 	cstop := C.bool(opts.Stop)
@@ -1379,6 +1421,9 @@ func (c *Container) Checkpoint(opts CheckpointOptions) error {
 }
 
 func (c *Container) Restore(opts RestoreOptions) error {
+	if !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
+		return ErrNotSupported
+	}
 
 	cdirectory := C.CString(opts.Directory)
 	cverbose := C.bool(opts.Verbose)
