@@ -1410,7 +1410,7 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 
 // Checkpoint checkpoints the container.
 func (c *Container) Checkpoint(opts CheckpointOptions) error {
-	if err := c.makeSure(isDefined | isGreaterEqualThanLXC11); err != nil {
+	if err := c.makeSure(isDefined | isRunning | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 

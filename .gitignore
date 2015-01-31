@@ -1,5 +1,6 @@
 examples/attach
 examples/attach_with_pipes
+examples/checkpoint
 examples/clone
 examples/concurrent_create
 examples/concurrent_destroy
