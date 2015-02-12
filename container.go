@@ -8,7 +8,7 @@ package lxc
 
 // #include <lxc/lxccontainer.h>
 // #include <lxc/version.h>
-// #include "lxc.h"
+// #include "lxc-binding.h"
 import "C"
 
 import (
