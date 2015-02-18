@@ -433,7 +433,7 @@ func (c *Container) Create(options TemplateOptions) error {
 
 // Start starts the container.
 func (c *Container) Start() error {
-	if err := c.makeSure(isDefined | isNotRunning); err != nil {
+	if err := c.makeSure(isNotRunning); err != nil {
 		return err
 	}
 
