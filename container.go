@@ -290,7 +290,7 @@ func (c *Container) SetVerbosity(verbosity Verbosity) {
 
 // Freeze freezes the running container.
 func (c *Container) Freeze() error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -310,7 +310,7 @@ func (c *Container) Freeze() error {
 
 // Unfreeze thaws the frozen container.
 func (c *Container) Unfreeze() error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -482,7 +482,7 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 
 // Stop stops the container.
 func (c *Container) Stop() error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -497,7 +497,7 @@ func (c *Container) Stop() error {
 
 // Reboot reboots the container.
 func (c *Container) Reboot() error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -512,7 +512,7 @@ func (c *Container) Reboot() error {
 
 // Shutdown shuts down the container.
 func (c *Container) Shutdown(timeout time.Duration) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 	c.mu.Lock()
@@ -831,7 +831,7 @@ func (c *Container) SetConfigPath(path string) error {
 
 // MemoryUsage returns memory usage of the container in bytes.
 func (c *Container) MemoryUsage() (ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -840,7 +840,7 @@ func (c *Container) MemoryUsage() (ByteSize, error) {
 
 // MemoryLimit returns memory limit of the container in bytes.
 func (c *Container) MemoryLimit() (ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -849,7 +849,7 @@ func (c *Container) MemoryLimit() (ByteSize, error) {
 
 // SetMemoryLimit sets memory limit of the container in bytes.
 func (c *Container) SetMemoryLimit(limit ByteSize) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -858,7 +858,7 @@ func (c *Container) SetMemoryLimit(limit ByteSize) error {
 
 // SoftMemoryLimit returns soft memory limit of the container in bytes.
 func (c *Container) SoftMemoryLimit() (ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -867,7 +867,7 @@ func (c *Container) SoftMemoryLimit() (ByteSize, error) {
 
 // SetSoftMemoryLimit sets soft  memory limit of the container in bytes.
 func (c *Container) SetSoftMemoryLimit(limit ByteSize) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -876,7 +876,7 @@ func (c *Container) SetSoftMemoryLimit(limit ByteSize) error {
 
 // KernelMemoryUsage returns current kernel memory allocation of the container in bytes.
 func (c *Container) KernelMemoryUsage() (ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -885,7 +885,7 @@ func (c *Container) KernelMemoryUsage() (ByteSize, error) {
 
 // KernelMemoryLimit returns kernel memory limit of the container in bytes.
 func (c *Container) KernelMemoryLimit() (ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -894,7 +894,7 @@ func (c *Container) KernelMemoryLimit() (ByteSize, error) {
 
 // SetKernelMemoryLimit sets kernel memory limit of the container in bytes.
 func (c *Container) SetKernelMemoryLimit(limit ByteSize) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -903,7 +903,7 @@ func (c *Container) SetKernelMemoryLimit(limit ByteSize) error {
 
 // MemorySwapUsage returns memory+swap usage of the container in bytes.
 func (c *Container) MemorySwapUsage() (ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -912,7 +912,7 @@ func (c *Container) MemorySwapUsage() (ByteSize, error) {
 
 // MemorySwapLimit returns the memory+swap limit of the container in bytes.
 func (c *Container) MemorySwapLimit() (ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -921,7 +921,7 @@ func (c *Container) MemorySwapLimit() (ByteSize, error) {
 
 // SetMemorySwapLimit sets memory+swap limit of the container in bytes.
 func (c *Container) SetMemorySwapLimit(limit ByteSize) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -930,7 +930,7 @@ func (c *Container) SetMemorySwapLimit(limit ByteSize) error {
 
 // BlkioUsage returns number of bytes transferred to/from the disk by the container.
 func (c *Container) BlkioUsage() (ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -953,7 +953,7 @@ func (c *Container) BlkioUsage() (ByteSize, error) {
 // CPUTime returns the total CPU time (in nanoseconds) consumed by all tasks
 // in this cgroup (including tasks lower in the hierarchy).
 func (c *Container) CPUTime() (time.Duration, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -970,7 +970,7 @@ func (c *Container) CPUTime() (time.Duration, error) {
 // CPUTimePerCPU returns the CPU time (in nanoseconds) consumed on each CPU by
 // all tasks in this cgroup (including tasks lower in the hierarchy).
 func (c *Container) CPUTimePerCPU() (map[int]time.Duration, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
 
@@ -991,7 +991,7 @@ func (c *Container) CPUTimePerCPU() (map[int]time.Duration, error) {
 // CPUStats returns the number of CPU cycles (in the units defined by USER_HZ on the system)
 // consumed by tasks in this cgroup and its children in both user mode and system (kernel) mode.
 func (c *Container) CPUStats() (map[string]int64, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
 
@@ -1020,7 +1020,7 @@ func (c *Container) CPUStats() (map[string]int64, error) {
 // be allocated by another caller.
 func (c *Container) ConsoleFd(ttynum int) (int, error) {
 	// FIXME: Make idiomatic
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -1038,7 +1038,7 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 //
 // This function will not return until the console has been exited by the user.
 func (c *Container) Console(options ConsoleOptions) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -1061,7 +1061,7 @@ func (c *Container) Console(options ConsoleOptions) error {
 // AttachShell attaches a shell to the container.
 // It clears all environment variables before attaching.
 func (c *Container) AttachShell(options AttachOptions) error {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
 
@@ -1111,7 +1111,7 @@ func (c *Container) RunCommandStatus(args []string, options AttachOptions) (int,
 		return -1, ErrInsufficientNumberOfArguments
 	}
 
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
 	}
 
@@ -1174,7 +1174,7 @@ func (c *Container) RunCommand(args []string, options AttachOptions) (bool, erro
 
 // Interfaces returns the names of the network interfaces.
 func (c *Container) Interfaces() ([]string, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
 
@@ -1190,7 +1190,7 @@ func (c *Container) Interfaces() ([]string, error) {
 
 // InterfaceStats returns the stats about container's network interfaces
 func (c *Container) InterfaceStats() (map[string]map[string]ByteSize, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
 
@@ -1237,7 +1237,7 @@ func (c *Container) InterfaceStats() (map[string]map[string]ByteSize, error) {
 
 // IPAddress returns the IP address of the given network interface.
 func (c *Container) IPAddress(interfaceName string) ([]string, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
 
@@ -1272,7 +1272,7 @@ func (c *Container) WaitIPAddresses(timeout time.Duration) ([]string, error) {
 
 // IPAddresses returns all IP addresses.
 func (c *Container) IPAddresses() ([]string, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
 
@@ -1289,7 +1289,7 @@ func (c *Container) IPAddresses() ([]string, error) {
 
 // IPv4Addresses returns all IPv4 addresses.
 func (c *Container) IPv4Addresses() ([]string, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
 
@@ -1308,7 +1308,7 @@ func (c *Container) IPv4Addresses() ([]string, error) {
 
 // IPv6Addresses returns all IPv6 addresses.
 func (c *Container) IPv6Addresses() ([]string, error) {
-	if err := c.makeSure(isDefined | isRunning); err != nil {
+	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
 
@@ -1353,7 +1353,7 @@ func (c *Container) SetLogLevel(level LogLevel) error {
 
 // AddDeviceNode adds specified device to the container.
 func (c *Container) AddDeviceNode(source string, destination ...string) error {
-	if err := c.makeSure(isDefined | isRunning | isPrivileged); err != nil {
+	if err := c.makeSure(isRunning | isPrivileged); err != nil {
 		return err
 	}
 
@@ -1382,7 +1382,7 @@ func (c *Container) AddDeviceNode(source string, destination ...string) error {
 
 // RemoveDeviceNode removes the specified device from the container.
 func (c *Container) RemoveDeviceNode(source string, destination ...string) error {
-	if err := c.makeSure(isDefined | isRunning | isPrivileged); err != nil {
+	if err := c.makeSure(isRunning | isPrivileged); err != nil {
 		return err
 	}
 
@@ -1410,7 +1410,7 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 
 // Checkpoint checkpoints the container.
 func (c *Container) Checkpoint(opts CheckpointOptions) error {
-	if err := c.makeSure(isDefined | isRunning | isGreaterEqualThanLXC11); err != nil {
+	if err := c.makeSure(isRunning | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -1441,7 +1441,7 @@ func (c *Container) Restore(opts RestoreOptions) error {
 
 // AttachInterface attaches specifed netdev to the container.
 func (c *Container) AttachInterface(source, destination string) error {
-	if err := c.makeSure(isDefined | isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
+	if err := c.makeSure(isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
@@ -1462,7 +1462,7 @@ func (c *Container) AttachInterface(source, destination string) error {
 
 // DetachInterface detaches specifed netdev from the container.
 func (c *Container) DetachInterface(source string) error {
-	if err := c.makeSure(isDefined | isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
+	if err := c.makeSure(isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
