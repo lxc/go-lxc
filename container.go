@@ -17,6 +17,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -104,6 +105,8 @@ func (c *Container) Name() string {
 func (c *Container) Defined() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	return bool(C.go_lxc_defined(c.container))
 }
@@ -112,6 +115,8 @@ func (c *Container) Defined() bool {
 func (c *Container) Running() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	return bool(C.go_lxc_running(c.container))
 }
@@ -120,6 +125,8 @@ func (c *Container) Running() bool {
 func (c *Container) Controllable() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	return bool(C.go_lxc_may_control(c.container))
 }
@@ -132,6 +139,8 @@ func (c *Container) CreateSnapshot() (*Snapshot, error) {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	ret := int(C.go_lxc_snapshot(c.container))
 	if ret < 0 {
@@ -148,6 +157,8 @@ func (c *Container) RestoreSnapshot(snapshot Snapshot, name string) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
@@ -169,6 +180,8 @@ func (c *Container) DestroySnapshot(snapshot Snapshot) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	csnapname := C.CString(snapshot.Name)
 	defer C.free(unsafe.Pointer(csnapname))
@@ -187,6 +200,8 @@ func (c *Container) DestroyAllSnapshots() error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_snapshot_destroy_all(c.container)) {
 		return ErrDestroyAllSnapshotsFailed
@@ -202,6 +217,8 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	var csnapshots *C.struct_lxc_snapshot
 
@@ -236,6 +253,8 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 func (c *Container) State() State {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	return StateMap[C.GoString(C.go_lxc_state(c.container))]
 }
@@ -245,6 +264,8 @@ func (c *Container) State() State {
 func (c *Container) InitPid() int {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	return int(C.go_lxc_init_pid(c.container))
 }
@@ -261,6 +282,8 @@ func (c *Container) Daemonize() bool {
 func (c *Container) WantDaemonize(state bool) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_want_daemonize(c.container, C.bool(state))) {
 		return ErrDaemonizeFailed
@@ -273,6 +296,8 @@ func (c *Container) WantDaemonize(state bool) error {
 func (c *Container) WantCloseAllFds(state bool) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_want_close_all_fds(c.container, C.bool(state))) {
 		return ErrCloseAllFdsFailed
@@ -300,6 +325,8 @@ func (c *Container) Freeze() error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_freeze(c.container)) {
 		return ErrFreezeFailed
@@ -320,6 +347,8 @@ func (c *Container) Unfreeze() error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_unfreeze(c.container)) {
 		return ErrUnfreezeFailed
@@ -343,6 +372,8 @@ func (c *Container) Create(options TemplateOptions) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	// use download template if not set
 	if options.Template == "" {
@@ -439,6 +470,8 @@ func (c *Container) Start() error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_start(c.container, 0, nil)) {
 		return ErrStartFailed
@@ -457,6 +490,8 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	// FIXME: Go runtime and src/lxc/start.c signal_handler are not playing nice together so use lxc-execute for now
 	// go-nuts thread: https://groups.google.com/forum/#!msg/golang-nuts/h9GbvfYv83w/5Ly_jvOr86wJ
@@ -488,6 +523,8 @@ func (c *Container) Stop() error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_stop(c.container)) {
 		return ErrStopFailed
@@ -503,6 +540,8 @@ func (c *Container) Reboot() error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_reboot(c.container)) {
 		return ErrRebootFailed
@@ -517,6 +556,8 @@ func (c *Container) Shutdown(timeout time.Duration) error {
 	}
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_shutdown(c.container, C.int(timeout.Seconds()))) {
 		return ErrShutdownFailed
@@ -532,6 +573,8 @@ func (c *Container) Destroy() error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_destroy(c.container)) {
 		return ErrDestroyFailed
@@ -547,6 +590,8 @@ func (c *Container) DestroyWithAllSnapshots() error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	if !bool(C.go_lxc_destroy_with_snapshots(c.container)) {
 		return ErrDestroyWithAllSnapshotsFailed
@@ -573,6 +618,8 @@ func (c *Container) Clone(name string, options CloneOptions) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	// use Directory backend if not set
 	if options.Backend == 0 {
@@ -620,6 +667,8 @@ func (c *Container) Rename(name string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
@@ -634,6 +683,8 @@ func (c *Container) Wait(state State, timeout time.Duration) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 	cstate := C.CString(state.String())
 	defer C.free(unsafe.Pointer(cstate))
 
@@ -644,6 +695,8 @@ func (c *Container) Wait(state State, timeout time.Duration) bool {
 func (c *Container) ConfigFileName() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	// allocated in lxc.c
 	configFileName := C.go_lxc_config_file_name(c.container)
@@ -659,6 +712,8 @@ func (c *Container) ConfigItem(key string) []string {
 
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	// allocated in lxc.c
 	configItem := C.go_lxc_get_config_item(c.container, ckey)
@@ -672,6 +727,8 @@ func (c *Container) ConfigItem(key string) []string {
 func (c *Container) SetConfigItem(key string, value string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
@@ -689,6 +746,8 @@ func (c *Container) SetConfigItem(key string, value string) error {
 func (c *Container) RunningConfigItem(key string) []string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
@@ -705,6 +764,8 @@ func (c *Container) RunningConfigItem(key string) []string {
 func (c *Container) CgroupItem(key string) []string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
@@ -721,6 +782,8 @@ func (c *Container) CgroupItem(key string) []string {
 func (c *Container) SetCgroupItem(key string, value string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
@@ -738,6 +801,8 @@ func (c *Container) SetCgroupItem(key string, value string) error {
 func (c *Container) ClearConfig() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	C.go_lxc_clear_config(c.container)
 }
@@ -746,6 +811,8 @@ func (c *Container) ClearConfig() {
 func (c *Container) ClearConfigItem(key string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
@@ -760,6 +827,8 @@ func (c *Container) ClearConfigItem(key string) error {
 func (c *Container) ConfigKeys(key ...string) []string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	var keys *_Ctype_char
 
@@ -783,6 +852,8 @@ func (c *Container) ConfigKeys(key ...string) []string {
 func (c *Container) LoadConfigFile(path string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
@@ -797,6 +868,8 @@ func (c *Container) LoadConfigFile(path string) error {
 func (c *Container) SaveConfigFile(path string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
@@ -811,6 +884,8 @@ func (c *Container) SaveConfigFile(path string) error {
 func (c *Container) ConfigPath() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	return C.GoString(C.go_lxc_get_config_path(c.container))
 }
@@ -819,6 +894,8 @@ func (c *Container) ConfigPath() string {
 func (c *Container) SetConfigPath(path string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
@@ -1026,6 +1103,8 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	ret := int(C.go_lxc_console_getfd(c.container, C.int(ttynum)))
 	if ret < 0 {
@@ -1044,6 +1123,8 @@ func (c *Container) Console(options ConsoleOptions) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	ret := bool(C.go_lxc_console(c.container,
 		C.int(options.Tty),
@@ -1067,6 +1148,8 @@ func (c *Container) AttachShell(options AttachOptions) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cenv := makeNullTerminatedArgs(options.Env)
 	if cenv == nil {
@@ -1117,6 +1200,8 @@ func (c *Container) RunCommandStatus(args []string, options AttachOptions) (int,
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cargs := makeNullTerminatedArgs(args)
 	if cargs == nil {
@@ -1180,6 +1265,8 @@ func (c *Container) Interfaces() ([]string, error) {
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	result := C.go_lxc_get_interfaces(c.container)
 	if result == nil {
@@ -1196,6 +1283,8 @@ func (c *Container) InterfaceStats() (map[string]map[string]ByteSize, error) {
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	var interfaceName string
 
@@ -1243,6 +1332,8 @@ func (c *Container) IPAddress(interfaceName string) ([]string, error) {
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cinterface := C.CString(interfaceName)
 	defer C.free(unsafe.Pointer(cinterface))
@@ -1278,6 +1369,8 @@ func (c *Container) IPAddresses() ([]string, error) {
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	result := C.go_lxc_get_ips(c.container, nil, nil, 0)
 	if result == nil {
@@ -1295,6 +1388,8 @@ func (c *Container) IPv4Addresses() ([]string, error) {
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cfamily := C.CString("inet")
 	defer C.free(unsafe.Pointer(cfamily))
@@ -1314,6 +1409,8 @@ func (c *Container) IPv6Addresses() ([]string, error) {
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	cfamily := C.CString("inet6")
 	defer C.free(unsafe.Pointer(cfamily))
@@ -1359,6 +1456,8 @@ func (c *Container) AddDeviceNode(source string, destination ...string) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	csource := C.CString(source)
 	defer C.free(unsafe.Pointer(csource))
@@ -1388,6 +1487,8 @@ func (c *Container) RemoveDeviceNode(source string, destination ...string) error
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	csource := C.CString(source)
 	defer C.free(unsafe.Pointer(csource))
@@ -1447,6 +1548,8 @@ func (c *Container) AttachInterface(source, destination string) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	csource := C.CString(source)
 	defer C.free(unsafe.Pointer(csource))
@@ -1468,6 +1571,8 @@ func (c *Container) DetachInterface(source string) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	csource := C.CString(source)
 	defer C.free(unsafe.Pointer(csource))
