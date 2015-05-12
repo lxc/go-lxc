@@ -250,6 +250,7 @@ func (l LogLevel) String() string {
 	return "NOTSET"
 }
 
+// Personality allows to set the architecture for the container.
 type Personality int64
 
 const (
