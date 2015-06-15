@@ -1051,6 +1051,36 @@ func TestIPAddress(t *testing.T) {
 	}
 }
 
+func TestIPv4Address(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if unprivileged() {
+		time.Sleep(3 * time.Second)
+	}
+
+	if _, err := c.IPv4Address("lo"); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestIPv46ddress(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if unprivileged() {
+		time.Sleep(3 * time.Second)
+	}
+
+	if _, err := c.IPv6Address("lo"); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestAddDeviceNode(t *testing.T) {
 	if unprivileged() {
 		t.Skip("skipping test in unprivileged mode.")

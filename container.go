@@ -1254,6 +1254,50 @@ func (c *Container) IPAddress(interfaceName string) ([]string, error) {
 	return convertArgs(result), nil
 }
 
+// IPv4Address returns the IPv4 address of the given network interface.
+func (c *Container) IPv4Address(interfaceName string) ([]string, error) {
+	if err := c.makeSure(isRunning); err != nil {
+		return nil, err
+	}
+
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	cinterface := C.CString(interfaceName)
+	defer C.free(unsafe.Pointer(cinterface))
+
+	cfamily := C.CString("inet")
+	defer C.free(unsafe.Pointer(cfamily))
+
+	result := C.go_lxc_get_ips(c.container, cinterface, cfamily, 0)
+	if result == nil {
+		return nil, ErrIPv4Addresses
+	}
+	return convertArgs(result), nil
+}
+
+// IPv6Address returns the IPv6 address of the given network interface.
+func (c *Container) IPv6Address(interfaceName string) ([]string, error) {
+	if err := c.makeSure(isRunning); err != nil {
+		return nil, err
+	}
+
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	cinterface := C.CString(interfaceName)
+	defer C.free(unsafe.Pointer(cinterface))
+
+	cfamily := C.CString("inet6")
+	defer C.free(unsafe.Pointer(cfamily))
+
+	result := C.go_lxc_get_ips(c.container, cinterface, cfamily, 0)
+	if result == nil {
+		return nil, ErrIPv6Addresses
+	}
+	return convertArgs(result), nil
+}
+
 // WaitIPAddresses waits until IPAddresses call returns something or time outs
 func (c *Container) WaitIPAddresses(timeout time.Duration) ([]string, error) {
 	now := time.Now()
