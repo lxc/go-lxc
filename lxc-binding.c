@@ -5,6 +5,9 @@
 // +build linux,cgo
 
 #include <stdbool.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <errno.h>
 
 #include <lxc/lxccontainer.h>
 #include <lxc/attach_options.h>
@@ -186,6 +189,22 @@ char** go_lxc_get_ips(struct lxc_container *c, const char *interface, const char
 	return c->get_ips(c, interface, family, scope);
 }
 
+int wait_for_pid_status(pid_t pid)
+{
+        int status, ret;
+
+again:
+        ret = waitpid(pid, &status, 0);
+        if (ret == -1) {
+                if (errno == EINTR)
+                        goto again;
+                return -1;
+        }
+        if (ret != pid)
+                goto again;
+        return status;
+}
+
 int go_lxc_attach(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
@@ -233,7 +252,7 @@ int go_lxc_attach(struct lxc_container *c,
 	if (ret < 0)
 		return -1;
 
-	ret = lxc_wait_for_pid_status(pid);
+	ret = wait_for_pid_status(pid);
 	if (ret < 0)
 		return -1;
 
