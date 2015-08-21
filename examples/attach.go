@@ -36,7 +36,7 @@ func main() {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
 
-	options := lxc.DefaultAttachOptions
+	options := lxc.DefaultAttachOptions()
 	options.ClearEnv = false
 	if clear {
 		options.ClearEnv = true

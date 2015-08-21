@@ -29,7 +29,7 @@ func init() {
 func main() {
 	var wg sync.WaitGroup
 
-	options := lxc.BusyboxTemplateOptions
+	options := lxc.BusyboxTemplateOptions()
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func(i int) {

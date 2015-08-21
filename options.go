@@ -48,18 +48,20 @@ type AttachOptions struct {
 }
 
 // DefaultAttachOptions is a convenient set of options to be used.
-var DefaultAttachOptions = AttachOptions{
-	Namespaces: -1,
-	Arch:       -1,
-	Cwd:        "/",
-	UID:        -1,
-	GID:        -1,
-	ClearEnv:   false,
-	Env:        nil,
-	EnvToKeep:  nil,
-	StdinFd:    os.Stdin.Fd(),
-	StdoutFd:   os.Stdout.Fd(),
-	StderrFd:   os.Stderr.Fd(),
+func DefaultAttachOptions() AttachOptions {
+	return AttachOptions{
+		Namespaces: -1,
+		Arch:       -1,
+		Cwd:        "/",
+		UID:        -1,
+		GID:        -1,
+		ClearEnv:   false,
+		Env:        nil,
+		EnvToKeep:  nil,
+		StdinFd:    os.Stdin.Fd(),
+		StdoutFd:   os.Stdout.Fd(),
+		StderrFd:   os.Stderr.Fd(),
+	}
 }
 
 // TemplateOptions type is used for defining various template options.
@@ -106,21 +108,27 @@ type TemplateOptions struct {
 }
 
 // DownloadTemplateOptions is a convenient set of options for "download" template.
-var DownloadTemplateOptions = TemplateOptions{
-	Template: "download",
-	Distro:   "ubuntu",
-	Release:  "trusty",
-	Arch:     "amd64",
+func DownloadTemplateOptions() TemplateOptions {
+	return TemplateOptions{
+		Template: "download",
+		Distro:   "ubuntu",
+		Release:  "trusty",
+		Arch:     "amd64",
+	}
 }
 
 // BusyboxTemplateOptions is a convenient set of options for "busybox" template.
-var BusyboxTemplateOptions = TemplateOptions{
-	Template: "busybox",
+func BusyboxTemplateOptions() TemplateOptions {
+	return TemplateOptions{
+		Template: "busybox",
+	}
 }
 
 // UbuntuTemplateOptions is a convenient set of options for "ubuntu" template.
-var UbuntuTemplateOptions = TemplateOptions{
-	Template: "ubuntu",
+func UbuntuTemplateOptions() TemplateOptions {
+	return TemplateOptions{
+		Template: "ubuntu",
+	}
 }
 
 // ConsoleOptions type is used for defining various console options.
@@ -142,13 +150,15 @@ type ConsoleOptions struct {
 	EscapeCharacter rune
 }
 
-// DefailtConsoleOptions is a convenient set of options to be used.
-var DefaultConsoleOptions = ConsoleOptions{
-	Tty:             -1,
-	StdinFd:         os.Stdin.Fd(),
-	StdoutFd:        os.Stdout.Fd(),
-	StderrFd:        os.Stderr.Fd(),
-	EscapeCharacter: 'a',
+// DefaultConsoleOptions is a convenient set of options to be used.
+func DefaultConsoleOptions() ConsoleOptions {
+	return ConsoleOptions{
+		Tty:             -1,
+		StdinFd:         os.Stdin.Fd(),
+		StdoutFd:        os.Stdout.Fd(),
+		StderrFd:        os.Stderr.Fd(),
+		EscapeCharacter: 'a',
+	}
 }
 
 // CloneOptions type is used for defining various clone options.
@@ -171,8 +181,8 @@ type CloneOptions struct {
 }
 
 // DefaultCloneOptions is a convenient set of options to be used.
-var DefaultCloneOptions = CloneOptions{
-	Backend: Directory,
+func DefaultCloneOptions() CloneOptions {
+	return CloneOptions{Backend: Directory}
 }
 
 // CheckpointOptions type is used for defining checkpoint options for CRIU

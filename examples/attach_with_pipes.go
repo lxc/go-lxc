@@ -66,7 +66,7 @@ func main() {
 		}
 	}()
 
-	options := lxc.DefaultAttachOptions
+	options := lxc.DefaultAttachOptions()
 
 	options.StdinFd = os.Stdin.Fd()
 	options.StdoutFd = stdoutWriter.Fd()
