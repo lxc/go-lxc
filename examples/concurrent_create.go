@@ -18,11 +18,13 @@ import (
 
 var (
 	lxcpath string
+	count   int
 )
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	flag.StringVar(&lxcpath, "lxcpath", lxc.DefaultConfigPath(), "Use specified container path")
+	flag.IntVar(&count, "count", 10, "Number of containers")
 	flag.Parse()
 }
 
@@ -30,7 +32,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	options := lxc.BusyboxTemplateOptions
-	for i := 0; i < 10; i++ {
+	for i := 0; i < count; i++ {
 		wg.Add(1)
 		go func(i int) {
 			c, err := lxc.NewContainer(strconv.Itoa(i), lxcpath)
