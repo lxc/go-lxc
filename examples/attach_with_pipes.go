@@ -52,7 +52,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		_, err := io.Copy(os.Stdout, stdoutReader)
+		_, err = io.Copy(os.Stdout, stdoutReader)
 		if err != nil {
 			log.Fatalf("ERROR: %s\n", err.Error())
 		}

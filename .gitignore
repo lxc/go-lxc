@@ -8,6 +8,7 @@ examples/concurrent_shutdown
 examples/concurrent_start
 examples/concurrent_stop
 examples/concurrent_stress
+examples/config
 examples/console
 examples/create
 examples/create_snapshot

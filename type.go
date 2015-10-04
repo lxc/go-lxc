@@ -109,6 +109,7 @@ const (
 	THAWED
 )
 
+// StateMap provides the mapping betweens the state names and states
 var StateMap = map[string]State{
 	"STOPPED":  STOPPED,
 	"STARTING": STARTING,
