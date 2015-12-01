@@ -9,6 +9,7 @@ package lxc
 // #cgo pkg-config: lxc
 // #cgo LDFLAGS: -llxc -lutil
 // #include <lxc/lxccontainer.h>
+// #include <lxc/version.h>
 // #include "lxc-binding.h"
 import "C"
 
@@ -187,4 +188,11 @@ func ActiveContainers(lxcpath ...string) []Container {
 	}
 
 	return containers
+}
+
+func VersionNumber() (major int, minor int) {
+	major = C.LXC_VERSION_MAJOR
+	minor = C.LXC_VERSION_MINOR
+
+	return
 }
