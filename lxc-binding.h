@@ -67,6 +67,21 @@ extern pid_t go_lxc_init_pid(struct lxc_container *c);
 extern bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool verbose);
 extern bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose);
 
+/* n.b. that we're just adding the fields here to shorten the definition
+ * of go_lxc_migrate; in the case where we don't have the ->migrate API call,
+ * we don't want to have to pass all the arguments in to let conditional
+ * compilation handle things, but the call will still fail
+ */
+#if LXC_VERSION_MAJOR != 2
+struct migrate_opts {
+	char *directory;
+	bool verbose;
+	bool stop;
+	char *predump_dir;
+};
+#endif
+int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opts *opts);
+
 extern bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
 extern bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
 // void lxc_log_close(void);

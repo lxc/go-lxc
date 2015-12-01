@@ -1493,6 +1493,37 @@ func (c *Container) Restore(opts RestoreOptions) error {
 	return nil
 }
 
+func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
+	if err := c.makeSure(isNotDefined | isGreaterEqualThanLXC20); err != nil {
+		return err
+	}
+
+	cdirectory := C.CString(opts.Directory)
+	defer C.free(unsafe.Pointer(cdirectory))
+
+	var cpredumpdir *C.char
+	cpredumpdir = nil
+
+	if opts.PredumpDir != "" {
+		cpredumpdir := C.CString(opts.PredumpDir)
+		defer C.free(unsafe.Pointer(cpredumpdir))
+	}
+
+	copts := C.struct_migrate_opts{
+		directory:   cdirectory,
+		verbose:     C.bool(opts.Verbose),
+		stop:        C.bool(opts.Stop),
+		predump_dir: cpredumpdir,
+	}
+
+	ret := C.int(C.go_lxc_migrate(c.container, C.uint(cmd), &copts))
+	if ret != 0 {
+		return fmt.Errorf("migration failed %d\n", ret)
+	}
+
+	return nil
+}
+
 // AttachInterface attaches specifed netdev to the container.
 func (c *Container) AttachInterface(source, destination string) error {
 	if err := c.makeSure(isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
