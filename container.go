@@ -1459,6 +1459,8 @@ func (c *Container) Checkpoint(opts CheckpointOptions) error {
 	}
 
 	cdirectory := C.CString(opts.Directory)
+	defer C.free(unsafe.Pointer(cdirectory))
+
 	cstop := C.bool(opts.Stop)
 	cverbose := C.bool(opts.Verbose)
 
@@ -1475,6 +1477,8 @@ func (c *Container) Restore(opts RestoreOptions) error {
 	}
 
 	cdirectory := C.CString(opts.Directory)
+	defer C.free(unsafe.Pointer(cdirectory))
+
 	cverbose := C.bool(opts.Verbose)
 
 	if !C.bool(C.go_lxc_restore(c.container, cdirectory, cverbose)) {
