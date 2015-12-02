@@ -33,3 +33,4 @@ examples/stop
 examples/unfreeze
 coverage.out
 tags
+*.swp
