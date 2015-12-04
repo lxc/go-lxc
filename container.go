@@ -1525,3 +1525,24 @@ func (c *Container) DetachInterface(source string) error {
 	}
 	return nil
 }
+
+// DetachInterfaceRename detaches specifed netdev from the container and renames it.
+func (c *Container) DetachInterfaceRename(source, target string) error {
+	if err := c.makeSure(isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
+		return err
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	ctarget := C.CString(target)
+	defer C.free(unsafe.Pointer(ctarget))
+
+	if !bool(C.go_lxc_detach_interface(c.container, csource, ctarget)) {
+		return ErrDetachInterfaceFailed
+	}
+	return nil
+}
