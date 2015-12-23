@@ -358,6 +358,14 @@ bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose) {
 #endif
 }
 
+int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opts *opts) {
+#if LXC_VERSION_MAJOR >= 2 && LXC_VERSION_MINOR >= 0
+	return c->migrate(c, cmd, opts, sizeof(*opts));
+#else
+	return -EINVAL;
+#endif
+}
+
 bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev) {
 #if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
     return c->attach_interface(c, dev, dst_dev);

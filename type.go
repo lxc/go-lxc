@@ -258,3 +258,9 @@ const (
 	X86    Personality = 0x0008
 	X86_64             = 0x0000
 )
+
+const (
+	MIGRATE_PRE_DUMP = 0
+	MIGRATE_DUMP     = 1
+	MIGRATE_RESTORE  = 2
+)

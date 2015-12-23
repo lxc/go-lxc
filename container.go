@@ -48,6 +48,7 @@ const (
 	isPrivileged
 	isUnprivileged
 	isGreaterEqualThanLXC11
+	isGreaterEqualThanLXC20
 )
 
 func (c *Container) makeSure(flags int) error {
@@ -74,6 +75,11 @@ func (c *Container) makeSure(flags int) error {
 	if flags&isGreaterEqualThanLXC11 != 0 && !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
 		return ErrNotSupported
 	}
+
+	if flags&isGreaterEqualThanLXC20 != 0 && !(C.LXC_VERSION_MINOR >= 2 && C.LXC_VERSION_MAJOR >= 0) {
+		return ErrNotSupported
+	}
+
 	return nil
 }
 
@@ -1484,6 +1490,37 @@ func (c *Container) Restore(opts RestoreOptions) error {
 	if !C.bool(C.go_lxc_restore(c.container, cdirectory, cverbose)) {
 		return ErrRestoreFailed
 	}
+	return nil
+}
+
+func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
+	if err := c.makeSure(isNotDefined | isGreaterEqualThanLXC20); err != nil {
+		return err
+	}
+
+	cdirectory := C.CString(opts.Directory)
+	defer C.free(unsafe.Pointer(cdirectory))
+
+	var cpredumpdir *C.char
+	cpredumpdir = nil
+
+	if opts.PredumpDir != "" {
+		cpredumpdir := C.CString(opts.PredumpDir)
+		defer C.free(unsafe.Pointer(cpredumpdir))
+	}
+
+	copts := C.struct_migrate_opts{
+		directory:   cdirectory,
+		verbose:     C.bool(opts.Verbose),
+		stop:        C.bool(opts.Stop),
+		predump_dir: cpredumpdir,
+	}
+
+	ret := C.int(C.go_lxc_migrate(c.container, C.uint(cmd), &copts))
+	if ret != 0 {
+		return fmt.Errorf("migration failed %d\n", ret)
+	}
+
 	return nil
 }
 
