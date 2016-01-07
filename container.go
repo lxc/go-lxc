@@ -72,11 +72,11 @@ func (c *Container) makeSure(flags int) error {
 		return ErrMethodNotAllowed
 	}
 
-	if flags&isGreaterEqualThanLXC11 != 0 && !(C.LXC_VERSION_MAJOR >= 1 && C.LXC_VERSION_MINOR >= 1) {
+	if flags&isGreaterEqualThanLXC11 != 0 && !VersionAtLeast(1, 1, 0) {
 		return ErrNotSupported
 	}
 
-	if flags&isGreaterEqualThanLXC20 != 0 && !(C.LXC_VERSION_MINOR >= 2 && C.LXC_VERSION_MAJOR >= 0) {
+	if flags&isGreaterEqualThanLXC20 != 0 && !VersionAtLeast(2, 0, 0) {
 		return ErrNotSupported
 	}
 
