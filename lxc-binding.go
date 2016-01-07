@@ -196,3 +196,22 @@ func VersionNumber() (major int, minor int) {
 
 	return
 }
+
+func VersionAtLeast(major int, minor int, micro int) bool {
+	if major > C.LXC_VERSION_MAJOR {
+		return false
+	}
+
+	if major == C.LXC_VERSION_MAJOR &&
+		minor > C.LXC_VERSION_MINOR {
+		return false
+	}
+
+	if major == C.LXC_VERSION_MAJOR &&
+		minor == C.LXC_VERSION_MINOR &&
+		micro > C.LXC_VERSION_MICRO {
+		return false
+	}
+
+	return true
+}
