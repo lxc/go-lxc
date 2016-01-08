@@ -373,7 +373,7 @@ int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opt
 
 bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev) {
 #if VERSION_AT_LEAST(1, 1, 0)
-    return c->attach_interface(c, dev, dst_dev);
+	return c->attach_interface(c, dev, dst_dev);
 #else
 	return false;
 #endif
@@ -381,7 +381,7 @@ bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const cha
 
 bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev) {
 #if VERSION_AT_LEAST(1, 1, 0)
-    return c->detach_interface(c, dev, dst_dev);
+	return c->detach_interface(c, dev, dst_dev);
 #else
 	return false;
 #endif
