@@ -13,6 +13,11 @@
 #include <lxc/attach_options.h>
 #include <lxc/version.h>
 
+#define VERSION_AT_LEAST(major, minor, micro)							\
+	(!(major > LXC_VERSION_MAJOR ||								\
+	major == LXC_VERSION_MAJOR && minor > LXC_VERSION_MINOR ||				\
+	major == LXC_VERSION_MAJOR && minor == LXC_VERSION_MINOR && micro > LXC_VERSION_MICRO))
+
 bool go_lxc_defined(struct lxc_container *c) {
 	return c->is_defined(c);
 }
@@ -74,7 +79,7 @@ bool go_lxc_destroy(struct lxc_container *c) {
 }
 
 bool go_lxc_destroy_with_snapshots(struct lxc_container *c) {
-#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
+#if VERSION_AT_LEAST(1, 1, 0)
 	return c->destroy_with_snapshots(c);
 #else
 	return false;
@@ -322,7 +327,7 @@ bool go_lxc_snapshot_destroy(struct lxc_container *c, const char *snapname) {
 }
 
 bool go_lxc_snapshot_destroy_all(struct lxc_container *c) {
-#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
+#if VERSION_AT_LEAST(1, 1, 0)
 	return c->snapshot_destroy_all(c);
 #else
 	return false;
@@ -343,7 +348,7 @@ bool go_lxc_rename(struct lxc_container *c, const char *newname) {
 }
 
 bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool verbose) {
-#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
+#if VERSION_AT_LEAST(1, 1, 0)
 	return c->checkpoint(c, directory, stop, verbose);
 #else
 	return false;
@@ -351,7 +356,7 @@ bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool
 }
 
 bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose) {
-#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
+#if VERSION_AT_LEAST(1, 1, 0)
 	return c->restore(c, directory, verbose);
 #else
 	return false;
@@ -359,7 +364,7 @@ bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose) {
 }
 
 int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opts *opts) {
-#if LXC_VERSION_MAJOR >= 2 && LXC_VERSION_MINOR >= 0
+#if VERSION_AT_LEAST(2, 0, 0)
 	return c->migrate(c, cmd, opts, sizeof(*opts));
 #else
 	return -EINVAL;
@@ -367,16 +372,16 @@ int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opt
 }
 
 bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev) {
-#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
-    return c->attach_interface(c, dev, dst_dev);
+#if VERSION_AT_LEAST(1, 1, 0)
+	return c->attach_interface(c, dev, dst_dev);
 #else
 	return false;
 #endif
 }
 
 bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev) {
-#if LXC_VERSION_MAJOR >= 1 && LXC_VERSION_MINOR >= 1
-    return c->detach_interface(c, dev, dst_dev);
+#if VERSION_AT_LEAST(1, 1, 0)
+	return c->detach_interface(c, dev, dst_dev);
 #else
 	return false;
 #endif
