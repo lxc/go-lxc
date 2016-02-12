@@ -4,7 +4,9 @@ This package implements [Go](http://golang.org) bindings for the [LXC](http://li
 
 ## Requirements
 
-This package requires [LXC 1.x](https://github.com/lxc/lxc/releases) and its development package to be installed. Works with [Go 1.x](http://golang.org/dl).
+This package requires [LXC 1.x](https://github.com/lxc/lxc/releases) and its development package to be installed. Works with [Go 1.x](http://golang.org/dl). Following command should install required dependencies on Ubuntu:
+
+	apt-get install -y pkg-config lxc-dev
 
 ## Installing
 
