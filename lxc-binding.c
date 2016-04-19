@@ -13,6 +13,8 @@
 #include <lxc/attach_options.h>
 #include <lxc/version.h>
 
+#include "lxc-binding.h"
+
 #define VERSION_AT_LEAST(major, minor, micro)							\
 	(!(major > LXC_VERSION_MAJOR ||								\
 	major == LXC_VERSION_MAJOR && minor > LXC_VERSION_MINOR ||				\
