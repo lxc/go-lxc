@@ -84,4 +84,3 @@ int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opt
 
 extern bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
 extern bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
-// void lxc_log_close(void);
