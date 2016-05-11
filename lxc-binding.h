@@ -80,7 +80,15 @@ struct migrate_opts {
 	char *predump_dir;
 };
 #endif
-int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opts *opts);
+
+/* This is a struct that we can add "extra" (i.e. options added after 2.0.0)
+ * migrate options to, so that we don't have to have a massive function
+ * signature when the list of options grows.
+ */
+struct extra_migrate_opts {
+	bool preserves_inodes;
+};
+int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opts *opts, struct extra_migrate_opts *extras);
 
 extern bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
 extern bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
