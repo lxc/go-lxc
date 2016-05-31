@@ -189,8 +189,9 @@ type RestoreOptions struct {
 }
 
 type MigrateOptions struct {
-	Directory  string
-	Verbose    bool
-	Stop       bool
-	PredumpDir string
+	Directory       string
+	Verbose         bool
+	Stop            bool
+	PredumpDir      string
+	PreservesInodes bool
 }

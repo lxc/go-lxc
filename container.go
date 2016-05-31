@@ -1509,6 +1509,9 @@ func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 		defer C.free(unsafe.Pointer(cpredumpdir))
 	}
 
+	/* Since we can't do conditional compilation here, we allocate the
+	 * "extras" struct and then merge them in the C code.
+	 */
 	copts := C.struct_migrate_opts{
 		directory:   cdirectory,
 		verbose:     C.bool(opts.Verbose),
@@ -1516,7 +1519,11 @@ func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 		predump_dir: cpredumpdir,
 	}
 
-	ret := C.int(C.go_lxc_migrate(c.container, C.uint(cmd), &copts))
+	extras := C.struct_extra_migrate_opts{
+		preserves_inodes: C.bool(opts.PreservesInodes),
+	}
+
+	ret := C.int(C.go_lxc_migrate(c.container, C.uint(cmd), &copts, &extras))
 	if ret != 0 {
 		return fmt.Errorf("migration failed %d\n", ret)
 	}
