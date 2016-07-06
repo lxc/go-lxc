@@ -1502,10 +1502,9 @@ func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 	defer C.free(unsafe.Pointer(cdirectory))
 
 	var cpredumpdir *C.char
-	cpredumpdir = nil
 
 	if opts.PredumpDir != "" {
-		cpredumpdir := C.CString(opts.PredumpDir)
+		cpredumpdir = C.CString(opts.PredumpDir)
 		defer C.free(unsafe.Pointer(cpredumpdir))
 	}
 
