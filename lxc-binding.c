@@ -366,6 +366,10 @@ bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose) {
 }
 
 int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opts *opts, struct extra_migrate_opts *extras) {
+#if VERSION_AT_LEAST(2, 0, 4)
+	opts->action_script = extras->action_script;
+#endif
+
 #if VERSION_AT_LEAST(2, 0, 1)
 	opts->preserves_inodes = extras->preserves_inodes;
 #endif
