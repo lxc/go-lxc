@@ -1527,6 +1527,7 @@ func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 	extras := C.struct_extra_migrate_opts{
 		preserves_inodes: C.bool(opts.PreservesInodes),
 		action_script:    cActionScript,
+		ghost_limit:      C.uint64_t(opts.GhostLimit),
 	}
 
 	ret := C.int(C.go_lxc_migrate(c.container, C.uint(cmd), &copts, &extras))
