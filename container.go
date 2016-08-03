@@ -1478,7 +1478,7 @@ func (c *Container) Checkpoint(opts CheckpointOptions) error {
 
 // Restore restores the container from a checkpoint.
 func (c *Container) Restore(opts RestoreOptions) error {
-	if err := c.makeSure(isDefined | isGreaterEqualThanLXC11); err != nil {
+	if err := c.makeSure(isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
 
