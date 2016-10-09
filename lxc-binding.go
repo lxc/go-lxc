@@ -8,6 +8,9 @@ package lxc
 
 // #cgo pkg-config: lxc
 // #cgo LDFLAGS: -llxc -lutil
+// #ifndef LXC_DEVEL
+// #define LXC_DEVEL 0
+// #endif
 // #include <lxc/lxccontainer.h>
 // #include <lxc/version.h>
 // #include "lxc-binding.h"
@@ -198,6 +201,10 @@ func VersionNumber() (major int, minor int) {
 }
 
 func VersionAtLeast(major int, minor int, micro int) bool {
+	if C.LXC_DEVEL == 1 {
+		return true
+	}
+
 	if major > C.LXC_VERSION_MAJOR {
 		return false
 	}

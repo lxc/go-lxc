@@ -15,10 +15,14 @@
 
 #include "lxc-binding.h"
 
+#ifndef LXC_DEVEL
+#define LXC_DEVEL 0
+#endif
+
 #define VERSION_AT_LEAST(major, minor, micro)							\
-	(!(major > LXC_VERSION_MAJOR ||								\
+	((LXC_DEVEL == 1) || (!(major > LXC_VERSION_MAJOR ||					\
 	major == LXC_VERSION_MAJOR && minor > LXC_VERSION_MINOR ||				\
-	major == LXC_VERSION_MAJOR && minor == LXC_VERSION_MINOR && micro > LXC_VERSION_MICRO))
+	major == LXC_VERSION_MAJOR && minor == LXC_VERSION_MINOR && micro > LXC_VERSION_MICRO)))
 
 bool go_lxc_defined(struct lxc_container *c) {
 	return c->is_defined(c);
