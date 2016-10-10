@@ -926,6 +926,77 @@ func TestCPUStats(t *testing.T) {
 	}
 }
 
+func TestRunCommandNoWait(t *testing.T) {
+	c, err := NewContainer("TestRunCommandNoWait")
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+
+	options := DownloadTemplateOptions
+	if !unprivileged() {
+		options = BusyboxTemplateOptions
+	}
+
+	if err := c.Create(options); err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+	defer c.Destroy()
+
+	err = c.Start()
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+	defer c.Stop()
+
+	argsThree := []string{"/bin/sh", "-c", "exit 0"}
+	pid, err := c.RunCommandNoWait(argsThree, DefaultAttachOptions)
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+
+	proc, err := os.FindProcess(pid)
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+
+	procState, err := proc.Wait()
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+	if !procState.Success() {
+		t.Errorf("Expected success")
+		t.FailNow()
+	}
+
+	argsThree = []string{"/bin/sh", "-c", "exit 0"}
+	pid, err = c.RunCommandNoWait(argsThree, DefaultAttachOptions)
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+	proc, err = os.FindProcess(pid)
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+
+	procState, err = proc.Wait()
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+	if procState.Success() {
+		t.Errorf("Expected failure")
+		t.FailNow()
+	}
+}
+
 func TestRunCommand(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
