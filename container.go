@@ -1164,6 +1164,64 @@ func (c *Container) RunCommandStatus(args []string, options AttachOptions) (int,
 	return ret, nil
 }
 
+func (c *Container) RunCommandNoWait(args []string, options AttachOptions) (int, error) {
+	if len(args) == 0 {
+		return -1, ErrInsufficientNumberOfArguments
+	}
+
+	if err := c.makeSure(isRunning); err != nil {
+		return -1, err
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	cargs := makeNullTerminatedArgs(args)
+	if cargs == nil {
+		return -1, ErrAllocationFailed
+	}
+	defer freeNullTerminatedArgs(cargs, len(args))
+
+	cenv := makeNullTerminatedArgs(options.Env)
+	if cenv == nil {
+		return -1, ErrAllocationFailed
+	}
+	defer freeNullTerminatedArgs(cenv, len(options.Env))
+
+	cenvToKeep := makeNullTerminatedArgs(options.EnvToKeep)
+	if cenvToKeep == nil {
+		return -1, ErrAllocationFailed
+	}
+	defer freeNullTerminatedArgs(cenvToKeep, len(options.EnvToKeep))
+
+	cwd := C.CString(options.Cwd)
+	defer C.free(unsafe.Pointer(cwd))
+
+	var attachedPid C.pid_t
+	ret := int(C.go_lxc_attach_no_wait(
+		c.container,
+		C.bool(options.ClearEnv),
+		C.int(options.Namespaces),
+		C.long(options.Arch),
+		C.uid_t(options.UID),
+		C.gid_t(options.GID),
+		C.int(options.StdinFd),
+		C.int(options.StdoutFd),
+		C.int(options.StderrFd),
+		cwd,
+		cenv,
+		cenvToKeep,
+		cargs,
+		&attachedPid,
+	))
+
+	if ret < 0 {
+		return -1, ErrAttachFailed
+	}
+
+	return int(attachedPid), nil
+}
+
 // RunCommand attachs a shell and runs the command within the container.
 // The process will wait for the command to finish and return a success status. An error
 // is returned only when invocation of the command completely fails.

@@ -60,6 +60,17 @@ extern int go_lxc_attach(struct lxc_container *c,
 		char *initial_cwd,
 		char **extra_env_vars,
 		char **extra_keep_env);
+extern int go_lxc_attach_no_wait(struct lxc_container *c,
+		bool clear_env,
+		int namespaces,
+		long personality,
+		uid_t uid, gid_t gid,
+		int stdinfd, int stdoutfd, int stderrfd,
+		char *initial_cwd,
+		char **extra_env_vars,
+		char **extra_keep_env,
+		const char * const argv[],
+		pid_t *attached_pid);
 extern int go_lxc_console_getfd(struct lxc_container *c, int ttynum);
 extern int go_lxc_snapshot_list(struct lxc_container *c, struct lxc_snapshot **ret);
 extern int go_lxc_snapshot(struct lxc_container *c);
