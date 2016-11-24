@@ -757,7 +757,7 @@ func (c *Container) ClearConfigItem(key string) error {
 	defer C.free(unsafe.Pointer(ckey))
 
 	if !bool(C.go_lxc_clear_config_item(c.container, ckey)) {
-		return ErrClearingCgroupItemFailed
+		return ErrClearingConfigItemFailed
 	}
 	return nil
 }
