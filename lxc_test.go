@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"testing"
 	"time"
 )
@@ -1104,6 +1105,23 @@ func TestCommandWithUIDGID(t *testing.T) {
 }
 
 func TestCommandWithArch(t *testing.T) {
+	uname := syscall.Utsname{}
+	if err := syscall.Uname(&uname); err != nil {
+		t.Errorf(err.Error())
+	}
+
+	arch := ""
+	for _, c := range uname.Machine {
+		if c == 0 {
+			break
+		}
+		arch += string(byte(c))
+	}
+
+	if arch != "x86_64" && arch != "i686" {
+		t.Skip("skipping architecture test, not on x86")
+	}
+
 	c, err := NewContainer(ContainerName)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -1224,7 +1242,9 @@ func TestIPv4Addresses(t *testing.T) {
 }
 
 func TestIPv6Addresses(t *testing.T) {
-	t.Skip("skipping test")
+	if !unprivileged() {
+		t.Skip("skipping test in privileged mode.")
+	}
 
 	c, err := NewContainer(ContainerName)
 	if err != nil {
