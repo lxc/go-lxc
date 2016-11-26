@@ -974,12 +974,13 @@ func TestRunCommandNoWait(t *testing.T) {
 		t.FailNow()
 	}
 
-	argsThree = []string{"/bin/sh", "-c", "exit 0"}
+	argsThree = []string{"/bin/sh", "-c", "exit 1"}
 	pid, err = c.RunCommandNoWait(argsThree, DefaultAttachOptions)
 	if err != nil {
 		t.Errorf(err.Error())
 		t.FailNow()
 	}
+
 	proc, err = os.FindProcess(pid)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -991,6 +992,7 @@ func TestRunCommandNoWait(t *testing.T) {
 		t.Errorf(err.Error())
 		t.FailNow()
 	}
+
 	if procState.Success() {
 		t.Errorf("Expected failure")
 		t.FailNow()
