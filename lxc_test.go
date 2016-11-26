@@ -1242,7 +1242,9 @@ func TestIPv4Addresses(t *testing.T) {
 }
 
 func TestIPv6Addresses(t *testing.T) {
-	t.Skip("skipping test")
+	if !unprivileged() {
+		t.Skip("skipping test in privileged mode.")
+	}
 
 	c, err := NewContainer(ContainerName)
 	if err != nil {
