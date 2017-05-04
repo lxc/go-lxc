@@ -231,5 +231,5 @@ func VersionAtLeast(major int, minor int, micro int) bool {
 func IsSupportedConfigItem(key string) bool {
 	configItem := C.CString(key)
 	defer C.free(unsafe.Pointer(configItem))
-	return go_lxc_config_item_is_supported(configItem)
+	return bool(C.go_lxc_config_item_is_supported(configItem))
 }
