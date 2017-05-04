@@ -1457,3 +1457,15 @@ func TestState(t *testing.T) {
 		t.Error("zero value of State should be invalid")
 	}
 }
+
+func TestSupportedConfigItems(t *testing.T) {
+	if VersionAtLeast(2, 1, 0) {
+		if !IsSupportedConfigItem("lxc.arch") {
+			t.Errorf("IsSupportedConfigItem failed to detect \"lxc.arch\" as supported config item...")
+		}
+
+		if IsSupportedConfigItem("lxc.nonsense") {
+			t.Errorf("IsSupportedConfigItem failed to detect \"lxc.nonsense\" as unsupported config item...")
+		}
+	}
+}

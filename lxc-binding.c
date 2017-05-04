@@ -446,3 +446,12 @@ bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const cha
 	return false;
 #endif
 }
+
+bool go_lxc_config_item_is_supported(const char *key)
+{
+#if VERSION_AT_LEAST(2, 1, 0)
+	return lxc_config_item_is_supported(key);
+#else
+	return false;
+#endif
+}
