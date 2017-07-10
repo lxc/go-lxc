@@ -1449,14 +1449,25 @@ func (c *Container) IPv6Addresses() ([]string, error) {
 
 // LogFile returns the name of the logfile.
 func (c *Container) LogFile() string {
+	if VersionAtLeast(2, 1, 0) {
+		return c.ConfigItem("lxc.log.file")[0]
+	}
+
 	return c.ConfigItem("lxc.logfile")[0]
 }
 
 // SetLogFile sets the name of the logfile.
 func (c *Container) SetLogFile(filename string) error {
-	if err := c.SetConfigItem("lxc.logfile", filename); err != nil {
+	var err error
+	if VersionAtLeast(2, 1, 0) {
+		err = c.SetConfigItem("lxc.log.file", filename)
+	} else {
+		err = c.SetConfigItem("lxc.logfile", filename)
+	}
+	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
