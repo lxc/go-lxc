@@ -1279,16 +1279,21 @@ func (c *Container) InterfaceStats() (map[string]map[string]ByteSize, error) {
 
 	statistics := make(map[string]map[string]ByteSize)
 
-	for i := 0; i < len(c.ConfigItem("lxc.network")); i++ {
-		interfaceType := c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.type", i))
+	netPrefix := "lxc.net"
+	if !VersionAtLeast(2, 1, 0) {
+		netPrefix = "lxc.network"
+	}
+
+	for i := 0; i < len(c.ConfigItem(netPrefix)); i++ {
+		interfaceType := c.RunningConfigItem(fmt.Sprintf("%s.%d.type", netPrefix, i))
 		if interfaceType == nil {
 			continue
 		}
 
 		if interfaceType[0] == "veth" {
-			interfaceName = c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.veth.pair", i))[0]
+			interfaceName = c.RunningConfigItem(fmt.Sprintf("%s.%d.veth.pair", netPrefix, i))[0]
 		} else {
-			interfaceName = c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.link", i))[0]
+			interfaceName = c.RunningConfigItem(fmt.Sprintf("%s.%d.link", netPrefix, i))[0]
 		}
 
 		for _, v := range []string{"rx", "tx"} {
