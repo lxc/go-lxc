@@ -1473,12 +1473,22 @@ func (c *Container) SetLogFile(filename string) error {
 
 // LogLevel returns the level of the logfile.
 func (c *Container) LogLevel() LogLevel {
+	if VersionAtLeast(2, 1, 0) {
+		return logLevelMap[c.ConfigItem("lxc.log.level")[0]]
+	}
+
 	return logLevelMap[c.ConfigItem("lxc.loglevel")[0]]
 }
 
 // SetLogLevel sets the level of the logfile.
 func (c *Container) SetLogLevel(level LogLevel) error {
-	if err := c.SetConfigItem("lxc.loglevel", level.String()); err != nil {
+	var err error
+	if VersionAtLeast(2, 1, 0) {
+		err = c.SetConfigItem("lxc.log.level", level.String())
+	} else {
+		err = c.SetConfigItem("lxc.loglevel", level.String())
+	}
+	if err != nil {
 		return err
 	}
 	return nil
