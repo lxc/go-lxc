@@ -1279,16 +1279,21 @@ func (c *Container) InterfaceStats() (map[string]map[string]ByteSize, error) {
 
 	statistics := make(map[string]map[string]ByteSize)
 
-	for i := 0; i < len(c.ConfigItem("lxc.network")); i++ {
-		interfaceType := c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.type", i))
+	netPrefix := "lxc.net"
+	if !VersionAtLeast(2, 1, 0) {
+		netPrefix = "lxc.network"
+	}
+
+	for i := 0; i < len(c.ConfigItem(netPrefix)); i++ {
+		interfaceType := c.RunningConfigItem(fmt.Sprintf("%s.%d.type", netPrefix, i))
 		if interfaceType == nil {
 			continue
 		}
 
 		if interfaceType[0] == "veth" {
-			interfaceName = c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.veth.pair", i))[0]
+			interfaceName = c.RunningConfigItem(fmt.Sprintf("%s.%d.veth.pair", netPrefix, i))[0]
 		} else {
-			interfaceName = c.RunningConfigItem(fmt.Sprintf("lxc.network.%d.link", i))[0]
+			interfaceName = c.RunningConfigItem(fmt.Sprintf("%s.%d.link", netPrefix, i))[0]
 		}
 
 		for _, v := range []string{"rx", "tx"} {
@@ -1449,25 +1454,46 @@ func (c *Container) IPv6Addresses() ([]string, error) {
 
 // LogFile returns the name of the logfile.
 func (c *Container) LogFile() string {
+	if VersionAtLeast(2, 1, 0) {
+		return c.ConfigItem("lxc.log.file")[0]
+	}
+
 	return c.ConfigItem("lxc.logfile")[0]
 }
 
 // SetLogFile sets the name of the logfile.
 func (c *Container) SetLogFile(filename string) error {
-	if err := c.SetConfigItem("lxc.logfile", filename); err != nil {
+	var err error
+	if VersionAtLeast(2, 1, 0) {
+		err = c.SetConfigItem("lxc.log.file", filename)
+	} else {
+		err = c.SetConfigItem("lxc.logfile", filename)
+	}
+	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 // LogLevel returns the level of the logfile.
 func (c *Container) LogLevel() LogLevel {
+	if VersionAtLeast(2, 1, 0) {
+		return logLevelMap[c.ConfigItem("lxc.log.level")[0]]
+	}
+
 	return logLevelMap[c.ConfigItem("lxc.loglevel")[0]]
 }
 
 // SetLogLevel sets the level of the logfile.
 func (c *Container) SetLogLevel(level LogLevel) error {
-	if err := c.SetConfigItem("lxc.loglevel", level.String()); err != nil {
+	var err error
+	if VersionAtLeast(2, 1, 0) {
+		err = c.SetConfigItem("lxc.log.level", level.String())
+	} else {
+		err = c.SetConfigItem("lxc.loglevel", level.String())
+	}
+	if err != nil {
 		return err
 	}
 	return nil
