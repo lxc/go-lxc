@@ -65,7 +65,7 @@ func Release(c *Container) bool {
 func Version() string {
 	version := C.GoString(C.lxc_get_version())
 	if C.LXC_DEVEL == 1 {
-		fmt.Sprintf("%s (devel)", version)
+		version = fmt.Sprintf("%s (devel)", version)
 	}
 	return version
 }
