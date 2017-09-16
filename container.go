@@ -26,8 +26,8 @@ import (
 
 // Container struct
 type Container struct {
-	container *C.struct_lxc_container
 	mu        sync.RWMutex
+	container *C.struct_lxc_container
 
 	verbosity Verbosity
 }
