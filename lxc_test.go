@@ -37,10 +37,7 @@ func PathExists(name string) bool {
 }
 
 func unprivileged() bool {
-	if os.Geteuid() != 0 {
-		return true
-	}
-	return false
+	return os.Geteuid() != 0
 }
 
 func supported(moduleName string) bool {
@@ -1011,7 +1008,7 @@ func TestRunCommand(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if ok != true {
+	if !ok {
 		t.Errorf("Expected success")
 	}
 
@@ -1020,7 +1017,7 @@ func TestRunCommand(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if ok != false {
+	if ok {
 		t.Errorf("Expected failure")
 	}
 }
@@ -1040,7 +1037,7 @@ func TestCommandWithEnv(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if ok != true {
+	if !ok {
 		t.Errorf("Expected success")
 	}
 }
@@ -1060,7 +1057,7 @@ func TestCommandWithEnvToKeep(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if ok != true {
+	if !ok {
 		t.Errorf("Expected success")
 	}
 }
@@ -1079,7 +1076,7 @@ func TestCommandWithCwd(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if ok != true {
+	if !ok {
 		t.Errorf("Expected success")
 	}
 }
@@ -1099,7 +1096,7 @@ func TestCommandWithUIDGID(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if ok != true {
+	if !ok {
 		t.Errorf("Expected success")
 	}
 }
@@ -1135,7 +1132,7 @@ func TestCommandWithArch(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if ok != true {
+	if !ok {
 		t.Errorf("Expected success")
 	}
 }
