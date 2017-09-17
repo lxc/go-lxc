@@ -150,11 +150,7 @@ func TestCreate(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	options := DownloadTemplateOptions
-	if !unprivileged() {
-		options = BusyboxTemplateOptions
-	}
-	if err := c.Create(options); err != nil {
+	if err := c.Create(BusyboxTemplateOptions); err != nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -931,12 +927,7 @@ func TestRunCommandNoWait(t *testing.T) {
 		t.FailNow()
 	}
 
-	options := DownloadTemplateOptions
-	if !unprivileged() {
-		options = BusyboxTemplateOptions
-	}
-
-	if err := c.Create(options); err != nil {
+	if err := c.Create(BusyboxTemplateOptions); err != nil {
 		t.Errorf(err.Error())
 		t.FailNow()
 	}
