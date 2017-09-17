@@ -116,12 +116,12 @@ func ContainerNames(lxcpath ...string) []string {
 
 // Containers returns the defined and active containers on the system. Only
 // containers that could retrieved successfully are returned.
-func Containers(lxcpath ...string) []Container {
-	var containers []Container
+func Containers(lxcpath ...string) []*Container {
+	var containers []*Container
 
 	for _, v := range ContainerNames(lxcpath...) {
 		if container, err := NewContainer(v, lxcpath...); err == nil {
-			containers = append(containers, *container)
+			containers = append(containers, container)
 		}
 	}
 
@@ -151,12 +151,12 @@ func DefinedContainerNames(lxcpath ...string) []string {
 
 // DefinedContainers returns the defined containers on the system.  Only
 // containers that could retrieved successfully are returned.
-func DefinedContainers(lxcpath ...string) []Container {
-	var containers []Container
+func DefinedContainers(lxcpath ...string) []*Container {
+	var containers []*Container
 
 	for _, v := range DefinedContainerNames(lxcpath...) {
 		if container, err := NewContainer(v, lxcpath...); err == nil {
-			containers = append(containers, *container)
+			containers = append(containers, container)
 		}
 	}
 
@@ -186,12 +186,12 @@ func ActiveContainerNames(lxcpath ...string) []string {
 
 // ActiveContainers returns the active containers on the system. Only
 // containers that could retrieved successfully are returned.
-func ActiveContainers(lxcpath ...string) []Container {
-	var containers []Container
+func ActiveContainers(lxcpath ...string) []*Container {
+	var containers []*Container
 
 	for _, v := range ActiveContainerNames(lxcpath...) {
 		if container, err := NewContainer(v, lxcpath...); err == nil {
-			containers = append(containers, *container)
+			containers = append(containers, container)
 		}
 	}
 
