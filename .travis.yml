@@ -17,7 +17,7 @@ matrix:
 before_install:
  - sudo add-apt-repository ppa:ubuntu-lxc/daily -y
  - sudo apt-get update
- - sudo apt-get install -qq liblxc1 lxc-dev lxc-common uidmap
+ - sudo apt-get install -qq lxc lxc-dev uidmap
  - echo "${USER}:100000:65536" | sudo tee /etc/subuid
  - echo "${USER}:100000:65536" | sudo tee /etc/subgid
  - mkdir -p ~/.config/lxc/
