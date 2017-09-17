@@ -464,10 +464,6 @@ func (c *Container) StartWithArgs(args []string) error {
 
 // Execute executes the given command in a temporary container.
 func (c *Container) Execute(args ...string) ([]byte, error) {
-	if err := c.makeSure(isNotDefined); err != nil {
-		return nil, err
-	}
-
 	cargs := []string{"lxc-execute", "-n", c.Name(), "-P", c.ConfigPath(), "--"}
 	cargs = append(cargs, args...)
 
