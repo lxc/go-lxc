@@ -198,6 +198,7 @@ func ActiveContainers(lxcpath ...string) []Container {
 	return containers
 }
 
+// VersionNumber returns the LXC version.
 func VersionNumber() (major int, minor int) {
 	major = C.LXC_VERSION_MAJOR
 	minor = C.LXC_VERSION_MINOR
@@ -205,6 +206,7 @@ func VersionNumber() (major int, minor int) {
 	return
 }
 
+// VersionAtLeast returns true when the tested version >= current version.
 func VersionAtLeast(major int, minor int, micro int) bool {
 	if C.LXC_DEVEL == 1 {
 		return true
@@ -228,6 +230,7 @@ func VersionAtLeast(major int, minor int, micro int) bool {
 	return true
 }
 
+// IsSupportedConfigItem returns true if the key belongs to a supported config item.
 func IsSupportedConfigItem(key string) bool {
 	configItem := C.CString(key)
 	defer C.free(unsafe.Pointer(configItem))

@@ -452,6 +452,7 @@ func (c *Container) Start() error {
 	return nil
 }
 
+// StartWithArgs starts the container using given arguments.
 func (c *Container) StartWithArgs(args []string) error {
 	if err := c.makeSure(isNotRunning); err != nil {
 		return err
@@ -1178,6 +1179,7 @@ func (c *Container) RunCommandStatus(args []string, options AttachOptions) (int,
 	return ret, nil
 }
 
+// RunCommandNoWait runs the given command and returns without waiting it to finish.
 func (c *Container) RunCommandNoWait(args []string, options AttachOptions) (int, error) {
 	if len(args) == 0 {
 		return -1, ErrInsufficientNumberOfArguments
@@ -1591,6 +1593,7 @@ func (c *Container) Restore(opts RestoreOptions) error {
 	return nil
 }
 
+// Migrate migrates the container.
 func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 	if err := c.makeSure(isNotDefined | isGreaterEqualThanLXC20); err != nil {
 		return err
@@ -1636,7 +1639,7 @@ func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 
 	ret := C.int(C.go_lxc_migrate(c.container, C.uint(cmd), &copts, &extras))
 	if ret != 0 {
-		return fmt.Errorf("migration failed %d\n", ret)
+		return fmt.Errorf("migration failed %d", ret)
 	}
 
 	return nil
