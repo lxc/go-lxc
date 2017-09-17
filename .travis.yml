@@ -16,7 +16,14 @@ matrix:
 
 before_install:
  - sudo add-apt-repository ppa:ubuntu-lxc/daily -y
- - sudo apt-get install -qq libapparmor-dev libcap-dev libseccomp-dev python3-dev python3-setuptools docbook2x libgnutls-dev liblua5.2-dev libselinux1-dev libcgmanager-dev liblxc1 lxc-dev
+ - sudo apt-get update
+ - sudo apt-get install -qq liblxc1 lxc-dev lxc-common uidmap
+ - mkdir .config/lxc/default.conf
+ - echo "${USER}:100000:65536" | sudo tee /etc/subuid
+ - echo "${USER}:100000:65536" | sudo tee /etc/subgid
+ - cp /etc/lxc/default.conf ~/.config/lxc/default.conf
+ - echo "lxc.id_map = u 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
+ - echo "lxc.id_map = g 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
 
 install:
   - go get gopkg.in/lxc/go-lxc.v2
