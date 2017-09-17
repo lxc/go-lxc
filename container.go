@@ -468,7 +468,7 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 		return nil, err
 	}
 
-	cargs := []string{"lxc-execute", "-n", c.Name(), "-P", c.ConfigPath(), "--"}
+	cargs := []string{"lxc-execute", "-l", "trace", "-o", "/dev/stderr", "-n", c.Name(), "-P", c.ConfigPath(), "--"}
 	cargs = append(cargs, args...)
 
 	c.mu.Lock()
@@ -478,7 +478,7 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 	// go-nuts thread: https://groups.google.com/forum/#!msg/golang-nuts/h9GbvfYv83w/5Ly_jvOr86wJ
 	output, err := exec.Command(cargs[0], cargs[1:]...).CombinedOutput()
 	if err != nil {
-		return nil, ErrExecuteFailed
+		return nil, fmt.Errorf("stgraber: arg0=%v, args=%v, %v\n%s", cargs[0], cargs[1:], err, output)
 	}
 
 	return output, nil

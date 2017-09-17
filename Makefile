@@ -10,19 +10,19 @@ format:
 
 test:
 	@echo "$(OK_COLOR)==> Running go test $(NO_COLOR)"
-	@sudo `which go` test -v
+	@sudo `which go` test -v -x
 
 test-race:
 	@echo "$(OK_COLOR)==> Running go test $(NO_COLOR)"
-	@sudo `which go` test -race -v
+	@sudo `which go` test -race -v -x
 
 test-unprivileged:
 	@echo "$(OK_COLOR)==> Running go test for unprivileged user$(NO_COLOR)"
-	@`which go` test -v
+	@`which go` test -v -x
 
 test-unprivileged-race:
 	@echo "$(OK_COLOR)==> Running go test for unprivileged user$(NO_COLOR)"
-	@`which go` test -race -v
+	@`which go` test -race -v -x
 
 cover:
 	@sudo `which go` test -v -coverprofile=coverage.out
@@ -44,5 +44,13 @@ escape-analysis:
 
 ctags:
 	@ctags -R --languages=c,go
+
+setup-test-cgroup:
+	for d in /sys/fs/cgroup/*; do \
+	    [ -f $$d/cgroup.clone_children ] && echo 1 | sudo tee $$d/cgroup.clone_children; \
+	    [ -f $$d/cgroup.use_hierarchy ] && echo 1 | sudo tee $$d/cgroup.use_hierarchy; \
+	    sudo mkdir -p $$d/lxc; \
+	    sudo chown -R $$USER: $$d/lxc; \
+	done
 
 .PHONY: all format test doc vet lint ctags

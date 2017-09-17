@@ -20,10 +20,13 @@ before_install:
  - sudo apt-get install -qq lxc lxc-dev uidmap
  - echo "${USER}:100000:65536" | sudo tee /etc/subuid
  - echo "${USER}:100000:65536" | sudo tee /etc/subgid
+ - echo "${USER} veth lxcbr0 10" | sudo tee -a /etc/lxc/lxc-usernet
  - mkdir -p ~/.config/lxc/
  - cp /etc/lxc/default.conf ~/.config/lxc/default.conf
  - echo "lxc.idmap = u 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
  - echo "lxc.idmap = g 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
+ - "make setup-test-cgroup"
+ - chmod +x ${HOME}
 
 install:
   - go get gopkg.in/lxc/go-lxc.v2
