@@ -1352,6 +1352,9 @@ func TestDestroyAllSnapshots(t *testing.T) {
 	}
 
 	if err := c.DestroyAllSnapshots(); err != nil {
+		if err == ErrNotSupported {
+			t.Skip("skipping due to lxc version.")
+		}
 		t.Errorf(err.Error())
 	}
 }
