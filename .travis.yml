@@ -22,8 +22,8 @@ before_install:
  - echo "${USER}:100000:65536" | sudo tee /etc/subgid
  - mkdir -p ~/.config/lxc/
  - cp /etc/lxc/default.conf ~/.config/lxc/default.conf
- - echo "lxc.id_map = u 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
- - echo "lxc.id_map = g 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
+ - echo "lxc.idmap = u 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
+ - echo "lxc.idmap = g 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
 
 install:
   - go get gopkg.in/lxc/go-lxc.v2
