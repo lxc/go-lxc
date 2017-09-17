@@ -667,7 +667,13 @@ func TestConfigKeys(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	keys := strings.Join(c.ConfigKeys("lxc.network.0"), " ")
+	keys := ""
+	if VersionAtLeast(2, 1, 0) {
+		keys = strings.Join(c.ConfigKeys("lxc.net.0"), " ")
+	} else {
+		keys = strings.Join(c.ConfigKeys("lxc.network.0"), " ")
+	}
+
 	if !strings.Contains(keys, "mtu") {
 		t.Errorf("Keys failed...")
 	}
