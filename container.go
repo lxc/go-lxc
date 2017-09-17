@@ -360,11 +360,6 @@ func (c *Container) Create(options TemplateOptions) error {
 		options.Backend = Directory
 	}
 
-	// unprivileged users are only allowed to use "download" template
-	if os.Geteuid() != 0 && options.Template != "download" {
-		return ErrTemplateNotAllowed
-	}
-
 	var args []string
 	if options.Template == "download" {
 		// required parameters
