@@ -45,4 +45,12 @@ escape-analysis:
 ctags:
 	@ctags -R --languages=c,go
 
+setup-test-cgroup:
+	for d in /sys/fs/cgroup/*; do \
+	    [ -f $$d/cgroup.clone_children ] && echo 1 | sudo tee $$d/cgroup.clone_children; \
+	    [ -f $$d/cgroup.use_hierarchy ] && echo 1 | sudo tee $$d/cgroup.use_hierarchy; \
+	    sudo mkdir -p $$d/lxc; \
+	    sudo chown -R $$USER: $$d/lxc; \
+	done
+
 .PHONY: all format test doc vet lint ctags
