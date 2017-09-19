@@ -16,6 +16,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -466,6 +467,13 @@ func (c *Container) StartWithArgs(args []string) error {
 func (c *Container) Execute(args ...string) ([]byte, error) {
 	if err := c.makeSure(isNotDefined); err != nil {
 		return nil, err
+	}
+
+	// Deal with LXC 2.1's need of a defined container
+	if VersionAtLeast(2, 1, 0) {
+		os.MkdirAll(filepath.Join(c.ConfigPath(), c.Name()), 0700)
+		c.SaveConfigFile(filepath.Join(c.ConfigPath(), c.Name(), "config"))
+		defer os.RemoveAll(filepath.Join(c.ConfigPath(), c.Name()))
 	}
 
 	cargs := []string{"lxc-execute", "-n", c.Name(), "-P", c.ConfigPath(), "--"}
