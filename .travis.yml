@@ -7,6 +7,7 @@ go:
   - 1.6
   - 1.7
   - 1.8
+  - 1.9
   - tip
 
 matrix:
@@ -26,6 +27,9 @@ before_install:
  - echo "lxc.idmap = u 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
  - echo "lxc.idmap = g 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
  - "make setup-test-cgroup"
+ - mkdir -p ~/.local/share
+ - chmod +x ~/.local/share
+ - chmod +x ~/.local/
  - chmod +x ${HOME}
 
 install:
