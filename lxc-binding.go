@@ -64,9 +64,14 @@ func Release(c *Container) bool {
 // Version returns the LXC version.
 func Version() string {
 	version := C.GoString(C.lxc_get_version())
-	if C.LXC_DEVEL == 1 {
+
+	// New liblxc versions append "-devel" when LXC_DEVEL is set.
+	if strings.HasSuffix(version, "-devel") {
+		return fmt.Sprintf("%s (devel)", version[:(len(version) - len("-devel"))])
+	} else if C.LXC_DEVEL == 1 {
 		version = fmt.Sprintf("%s (devel)", version)
 	}
+
 	return version
 }
 
