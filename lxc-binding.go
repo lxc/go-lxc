@@ -19,6 +19,7 @@ import "C"
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"unsafe"
 )
 
@@ -67,7 +68,7 @@ func Version() string {
 
 	// New liblxc versions append "-devel" when LXC_DEVEL is set.
 	if strings.HasSuffix(version, "-devel") {
-		return fmt.Sprintf("%s (devel)", version[:(len(version) - len("-devel"))])
+		return fmt.Sprintf("%s (devel)", version[:(len(version)-len("-devel"))])
 	} else if C.LXC_DEVEL == 1 {
 		version = fmt.Sprintf("%s (devel)", version)
 	}
