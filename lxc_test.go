@@ -690,6 +690,17 @@ func TestInterfaces(t *testing.T) {
 	}
 }
 
+func TestInterfaceStats(t *testing.T) {
+	c, err := NewContainer(ContainerName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if _, err := c.InterfaceStats(); err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestMemoryUsage(t *testing.T) {
 	c, err := NewContainer(ContainerName)
 	if err != nil {
