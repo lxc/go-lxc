@@ -45,6 +45,10 @@ escape-analysis:
 ctags:
 	@ctags -R --languages=c,go
 
+scope:
+	@echo "$(OK_COLOR)==> Exported container calls in container.go $(NO_COLOR)"
+	@/bin/grep -E "\bc+\.([A-Z])\w+" container.go || true
+
 setup-test-cgroup:
 	for d in /sys/fs/cgroup/*; do \
 	    [ -f $$d/cgroup.clone_children ] && echo 1 | sudo tee $$d/cgroup.clone_children; \
