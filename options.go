@@ -198,3 +198,11 @@ type MigrateOptions struct {
 	PreservesInodes bool
 	GhostLimit      uint64
 }
+
+// ConsoleLogOptioins type is used for defining console log options.
+type ConsoleLogOptions struct {
+	ClearLog       bool
+	ReadLog        bool
+	ReadMax        uint64
+	WriteToLogFile bool
+}

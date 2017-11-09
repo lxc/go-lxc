@@ -113,3 +113,15 @@ int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opt
 
 extern bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
 extern bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
+
+#if !VERSION_AT_LEAST(3, 0, 0)
+struct lxc_console_log {
+	bool clear;
+	bool read;
+	uint64_t *read_max;
+	char *data;
+	bool write_logfile;
+};
+#endif
+
+extern int go_lxc_console_log(struct lxc_container *c, struct lxc_console_log *log);
