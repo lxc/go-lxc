@@ -2,6 +2,11 @@
 // Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
 
+#define VERSION_AT_LEAST(major, minor, micro)							\
+	((LXC_DEVEL == 1) || (!(major > LXC_VERSION_MAJOR ||					\
+	major == LXC_VERSION_MAJOR && minor > LXC_VERSION_MINOR ||				\
+	major == LXC_VERSION_MAJOR && minor == LXC_VERSION_MINOR && micro > LXC_VERSION_MICRO)))
+
 extern bool go_lxc_add_device_node(struct lxc_container *c, const char *src_path, const char *dest_path);
 extern void go_lxc_clear_config(struct lxc_container *c);
 extern bool go_lxc_clear_config_item(struct lxc_container *c, const char *key);
@@ -108,3 +113,15 @@ int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opt
 
 extern bool go_lxc_attach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
 extern bool go_lxc_detach_interface(struct lxc_container *c, const char *dev, const char *dst_dev);
+
+#if !VERSION_AT_LEAST(3, 0, 0)
+struct lxc_console_log {
+	bool clear;
+	bool read;
+	uint64_t *read_max;
+	char *data;
+	bool write_logfile;
+};
+#endif
+
+extern int go_lxc_console_log(struct lxc_container *c, struct lxc_console_log *log);

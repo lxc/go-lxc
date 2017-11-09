@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 	"unsafe"
 )
@@ -1865,4 +1866,44 @@ func (c *Container) SetRunningConfigItem(key string, value string) error {
 		return ErrSettingConfigItemFailed
 	}
 	return nil
+}
+
+// ConsoleLog allows to perform operations on the container's in-memory console
+// buffer.
+func (c *Container) ConsoleLog(opt ConsoleLogOptions) ([]byte, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	cl := C.struct_lxc_console_log{
+		clear:         C.bool(opt.ClearLog),
+		read:          C.bool(opt.ReadLog),
+		data:          nil,
+		write_logfile: C.bool(opt.WriteToLogFile),
+	}
+	// CGO is a fickle little beast:
+	// We need to manually allocate memory here that we pass to C. If we
+	// were to pass a GO pointer by passing a C.uint64_t pointer we'd end in
+	// the situation where we have a GO pointer that points to a GO pointer.
+	// Go will freak out when this happens. So give C its own memory.
+	var buf unsafe.Pointer
+	buf = C.malloc(C.sizeof_uint64_t)
+	if buf == nil {
+		return nil, syscall.ENOMEM
+	}
+	defer C.free(buf)
+
+	cl.read_max = (*C.uint64_t)(buf)
+	*cl.read_max = C.uint64_t(opt.ReadMax)
+
+	ret := C.go_lxc_console_log(c.container, &cl)
+	if ret < 0 {
+		return nil, syscall.Errno(-ret)
+	}
+
+	numBytes := C.int(*cl.read_max)
+	if C.uint64_t(numBytes) != *cl.read_max {
+		return nil, syscall.ERANGE
+	}
+
+	return C.GoBytes(unsafe.Pointer(cl.data), numBytes), nil
 }
