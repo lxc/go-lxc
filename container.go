@@ -490,6 +490,23 @@ func (c *Container) StartWithArgs(args []string) error {
 	return nil
 }
 
+// StartExecute starts a container. It runs a minimal init as PID 1 and the
+// requested program as the second process.
+func (c *Container) StartExecute(args []string) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if err := c.makeSure(isNotRunning); err != nil {
+		return err
+	}
+
+	if !bool(C.go_lxc_start(c.container, 1, makeNullTerminatedArgs(args))) {
+		return ErrStartFailed
+	}
+
+	return nil
+}
+
 // Execute executes the given command in a temporary container.
 func (c *Container) Execute(args ...string) ([]byte, error) {
 	c.mu.Lock()
