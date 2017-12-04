@@ -517,18 +517,6 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 	}
 
 	return output, nil
-	/*
-		cargs := makeNullTerminatedArgs(args)
-		if cargs == nil {
-			return ErrAllocationFailed
-		}
-		defer freeNullTerminatedArgs(cargs, len(args))
-
-		if !bool(C.go_lxc_start(c.container, 1, cargs)) {
-			return ErrExecuteFailed
-		}
-		return nil
-	*/
 }
 
 // Stop stops the container.
