@@ -516,12 +516,9 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 		return nil, err
 	}
 
-	// Deal with LXC 2.1's need of a defined container
-	if VersionAtLeast(2, 1, 0) {
-		os.MkdirAll(filepath.Join(c.configPath(), c.name()), 0700)
-		c.saveConfigFile(filepath.Join(c.configPath(), c.name(), "config"))
-		defer os.RemoveAll(filepath.Join(c.configPath(), c.name()))
-	}
+	os.MkdirAll(filepath.Join(c.configPath(), c.name()), 0700)
+	c.saveConfigFile(filepath.Join(c.configPath(), c.name(), "config"))
+	defer os.RemoveAll(filepath.Join(c.configPath(), c.name()))
 
 	cargs := []string{"lxc-execute", "-n", c.name(), "-P", c.configPath(), "--"}
 	cargs = append(cargs, args...)
@@ -534,18 +531,6 @@ func (c *Container) Execute(args ...string) ([]byte, error) {
 	}
 
 	return output, nil
-	/*
-		cargs := makeNullTerminatedArgs(args)
-		if cargs == nil {
-			return ErrAllocationFailed
-		}
-		defer freeNullTerminatedArgs(cargs, len(args))
-
-		if !bool(C.go_lxc_start(c.container, 1, cargs)) {
-			return ErrExecuteFailed
-		}
-		return nil
-	*/
 }
 
 // Stop stops the container.
