@@ -197,6 +197,7 @@ type MigrateOptions struct {
 	Stop            bool
 	PreservesInodes bool
 	GhostLimit      uint64
+	FeaturesToCheck CriuFeatures
 }
 
 // ConsoleLogOptioins type is used for defining console log options.

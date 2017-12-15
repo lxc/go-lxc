@@ -108,6 +108,7 @@ struct extra_migrate_opts {
 	bool preserves_inodes;
 	char *action_script;
 	uint64_t ghost_limit;
+	uint64_t features_to_check;
 };
 int go_lxc_migrate(struct lxc_container *c, unsigned int cmd, struct migrate_opts *opts, struct extra_migrate_opts *extras);
 
