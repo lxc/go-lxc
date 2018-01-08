@@ -1853,24 +1853,6 @@ func (c *Container) DetachInterfaceRename(source, target string) error {
 	return nil
 }
 
-// SetRunningConfigItem sets the value of the given config item in the
-// container's in-memory config.
-func (c *Container) SetRunningConfigItem(key string, value string) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	ckey := C.CString(key)
-	defer C.free(unsafe.Pointer(ckey))
-
-	cvalue := C.CString(value)
-	defer C.free(unsafe.Pointer(cvalue))
-
-	if !bool(C.go_lxc_set_running_config_item(c.container, ckey, cvalue)) {
-		return ErrSettingConfigItemFailed
-	}
-	return nil
-}
-
 // ConsoleLog allows to perform operations on the container's in-memory console
 // buffer.
 func (c *Container) ConsoleLog(opt ConsoleLogOptions) ([]byte, error) {

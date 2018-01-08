@@ -454,14 +454,6 @@ bool go_lxc_config_item_is_supported(const char *key)
 #endif
 }
 
-bool go_lxc_set_running_config_item(struct lxc_container *c, const char *key, const char *value) {
-#if VERSION_AT_LEAST(3, 0, 0)
-	return c->set_running_config_item(c, key, value);
-#else
-	return false;
-#endif
-}
-
 int go_lxc_console_log(struct lxc_container *c, struct lxc_console_log *log) {
 #if VERSION_AT_LEAST(3, 0, 0)
 	return c->console_log(c, log);
