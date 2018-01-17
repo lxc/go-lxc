@@ -1892,3 +1892,9 @@ func (c *Container) ConsoleLog(opt ConsoleLogOptions) ([]byte, error) {
 
 	return C.GoBytes(unsafe.Pointer(cl.data), numBytes), nil
 }
+
+// ErrorNum returns the error_num field of the container.
+func (c *Container) ErrorNum() int {
+	cError := C.go_lxc_error_num(c.container)
+	return int(cError)
+}

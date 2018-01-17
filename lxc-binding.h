@@ -124,3 +124,4 @@ struct lxc_console_log {
 #endif
 
 extern int go_lxc_console_log(struct lxc_container *c, struct lxc_console_log *log);
+extern int go_lxc_error_num(struct lxc_container *c);
