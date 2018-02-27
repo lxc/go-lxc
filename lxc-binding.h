@@ -119,7 +119,6 @@ struct lxc_console_log {
 	bool read;
 	uint64_t *read_max;
 	char *data;
-	bool write_logfile;
 };
 #endif
 
