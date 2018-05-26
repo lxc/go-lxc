@@ -1282,7 +1282,12 @@ func (c *Container) runCommandStatus(args []string, options AttachOptions) (int,
 		cargs,
 	))
 
-	return ret, nil
+	if ret < 0 {
+		return ret, nil
+	}
+
+	// Mirror the behavior of WEXITSTATUS().
+	return int((ret & 0xFF00) >> 8), nil
 }
 
 // RunCommandStatus attachs a shell and runs the command within the container.
