@@ -997,7 +997,7 @@ func (c *Container) KernelMemoryLimit() (ByteSize, error) {
 		return -1, err
 	}
 
-	return c.cgroupItemAsByteSize("memory.kmem.usage_in_bytes", ErrKMemLimit)
+	return c.cgroupItemAsByteSize("memory.kmem.limit_in_bytes", ErrKMemLimit)
 }
 
 // SetKernelMemoryLimit sets kernel memory limit of the container in bytes.
