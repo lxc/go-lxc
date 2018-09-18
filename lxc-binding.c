@@ -172,10 +172,12 @@ bool go_lxc_clone(struct lxc_container *c, const char *newname, const char *lxcp
 
 int go_lxc_console_getfd(struct lxc_container *c, int ttynum) {
 	int masterfd;
+	int ret = 0;
 
-	if (c->console_getfd(c, &ttynum, &masterfd) < 0) {
-		return -1;
-	}
+	ret = c->console_getfd(c, &ttynum, &masterfd);
+	if (ret < 0)
+		return ret;
+
 	return masterfd;
 }
 
@@ -251,7 +253,7 @@ int go_lxc_attach_no_wait(struct lxc_container *c,
 
 	ret = c->attach(c, lxc_attach_run_command, &command, &attach_options, attached_pid);
 	if (ret < 0)
-		return -1;
+		return ret;
 
 	return 0;
 }
@@ -301,16 +303,16 @@ int go_lxc_attach(struct lxc_container *c,
 
 	ret = c->attach(c, lxc_attach_run_shell, NULL, &attach_options, &pid);
 	if (ret < 0)
-		return -1;
+		return ret;
 
 	ret = wait_for_pid_status(pid);
 	if (ret < 0)
-		return -1;
+		return ret;
 
 	if (WIFEXITED(ret))
 		return WEXITSTATUS(ret);
 
-	return -1;
+	return ret;
 }
 
 int go_lxc_attach_run_wait(struct lxc_container *c,
