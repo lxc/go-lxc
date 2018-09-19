@@ -92,12 +92,20 @@ bool go_lxc_wait(struct lxc_container *c, const char *state, int timeout) {
 }
 
 char* go_lxc_get_config_item(struct lxc_container *c, const char *key) {
+	char *value = NULL;
+
 	int len = c->get_config_item(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
 	}
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
+again:
+	value = (char*)malloc(sizeof(char)*len + 1);
+
+	if (value == NULL) {
+		goto again;
+	}
+
 	if (c->get_config_item(c, key, value, len + 1) != len) {
 		return NULL;
 	}
@@ -121,12 +129,20 @@ char* go_lxc_get_running_config_item(struct lxc_container *c, const char *key) {
 }
 
 char* go_lxc_get_keys(struct lxc_container *c, const char *key) {
+	char *value = NULL;
+
 	int len = c->get_keys(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
 	}
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
+again:
+	value = (char*)malloc(sizeof(char)*len + 1);
+
+	if (value == NULL) {
+		goto again;
+	}
+
 	if (c->get_keys(c, key, value, len + 1) != len) {
 		return NULL;
 	}
@@ -134,12 +150,20 @@ char* go_lxc_get_keys(struct lxc_container *c, const char *key) {
 }
 
 char* go_lxc_get_cgroup_item(struct lxc_container *c, const char *key) {
+	char *value = NULL;
+
 	int len = c->get_cgroup_item(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
 	}
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
+again:
+	value = (char*)malloc(sizeof(char)*len + 1);
+
+	if (value == NULL) {
+		goto again;
+	}
+
 	if (c->get_cgroup_item(c, key, value, len + 1) != len) {
 		return NULL;
 	}
