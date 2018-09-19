@@ -1168,7 +1168,7 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 
 	ret := int(C.go_lxc_console_getfd(c.container, C.int(ttynum)))
 	if ret < 0 {
-		return -1, ErrAttachFailed
+		return ret, ErrAttachFailed
 	}
 	return ret, nil
 }
@@ -1359,7 +1359,7 @@ func (c *Container) RunCommandNoWait(args []string, options AttachOptions) (int,
 	))
 
 	if ret < 0 {
-		return -1, ErrAttachFailed
+		return ret, ErrAttachFailed
 	}
 
 	return int(attachedPid), nil

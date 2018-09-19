@@ -92,12 +92,20 @@ bool go_lxc_wait(struct lxc_container *c, const char *state, int timeout) {
 }
 
 char* go_lxc_get_config_item(struct lxc_container *c, const char *key) {
+	char *value = NULL;
+
 	int len = c->get_config_item(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
 	}
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
+again:
+	value = (char*)malloc(sizeof(char)*len + 1);
+
+	if (value == NULL) {
+		goto again;
+	}
+
 	if (c->get_config_item(c, key, value, len + 1) != len) {
 		return NULL;
 	}
@@ -121,12 +129,20 @@ char* go_lxc_get_running_config_item(struct lxc_container *c, const char *key) {
 }
 
 char* go_lxc_get_keys(struct lxc_container *c, const char *key) {
+	char *value = NULL;
+
 	int len = c->get_keys(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
 	}
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
+again:
+	value = (char*)malloc(sizeof(char)*len + 1);
+
+	if (value == NULL) {
+		goto again;
+	}
+
 	if (c->get_keys(c, key, value, len + 1) != len) {
 		return NULL;
 	}
@@ -134,12 +150,20 @@ char* go_lxc_get_keys(struct lxc_container *c, const char *key) {
 }
 
 char* go_lxc_get_cgroup_item(struct lxc_container *c, const char *key) {
+	char *value = NULL;
+
 	int len = c->get_cgroup_item(c, key, NULL, 0);
 	if (len <= 0) {
 		return NULL;
 	}
 
-	char* value = (char*)malloc(sizeof(char)*len + 1);
+again:
+	value = (char*)malloc(sizeof(char)*len + 1);
+
+	if (value == NULL) {
+		goto again;
+	}
+
 	if (c->get_cgroup_item(c, key, value, len + 1) != len) {
 		return NULL;
 	}
@@ -172,10 +196,12 @@ bool go_lxc_clone(struct lxc_container *c, const char *newname, const char *lxcp
 
 int go_lxc_console_getfd(struct lxc_container *c, int ttynum) {
 	int masterfd;
+	int ret = 0;
 
-	if (c->console_getfd(c, &ttynum, &masterfd) < 0) {
-		return -1;
-	}
+	ret = c->console_getfd(c, &ttynum, &masterfd);
+	if (ret < 0)
+		return ret;
+
 	return masterfd;
 }
 
@@ -251,7 +277,7 @@ int go_lxc_attach_no_wait(struct lxc_container *c,
 
 	ret = c->attach(c, lxc_attach_run_command, &command, &attach_options, attached_pid);
 	if (ret < 0)
-		return -1;
+		return ret;
 
 	return 0;
 }
@@ -301,16 +327,16 @@ int go_lxc_attach(struct lxc_container *c,
 
 	ret = c->attach(c, lxc_attach_run_shell, NULL, &attach_options, &pid);
 	if (ret < 0)
-		return -1;
+		return ret;
 
 	ret = wait_for_pid_status(pid);
 	if (ret < 0)
-		return -1;
+		return ret;
 
 	if (WIFEXITED(ret))
 		return WEXITSTATUS(ret);
 
-	return -1;
+	return ret;
 }
 
 int go_lxc_attach_run_wait(struct lxc_container *c,
