@@ -101,12 +101,12 @@ char* go_lxc_get_config_item(struct lxc_container *c, const char *key) {
 
 again:
 	value = (char*)malloc(sizeof(char)*len + 1);
-
 	if (value == NULL) {
 		goto again;
 	}
 
 	if (c->get_config_item(c, key, value, len + 1) != len) {
+		free(value);
 		return NULL;
 	}
 	return value;
@@ -144,6 +144,7 @@ again:
 	}
 
 	if (c->get_keys(c, key, value, len + 1) != len) {
+		free(value);
 		return NULL;
 	}
 	return value;
@@ -165,6 +166,7 @@ again:
 	}
 
 	if (c->get_cgroup_item(c, key, value, len + 1) != len) {
+		free(value);
 		return NULL;
 	}
 	return value;
