@@ -59,6 +59,9 @@ func Release(c *Container) bool {
 	// http://golang.org/pkg/runtime/#SetFinalizer
 	runtime.SetFinalizer(c, nil)
 
+	// Go is bad at refcounting sometimes
+	c.mu.Lock()
+
 	return C.lxc_container_put(c.container) == 1
 }
 
