@@ -492,3 +492,12 @@ int go_lxc_console_log(struct lxc_container *c, struct lxc_console_log *log) {
 	return false;
 #endif
 }
+
+bool go_lxc_has_api_extension(const char *extension)
+{
+#if VERSION_AT_LEAST(3, 1, 0)
+	return lxc_has_api_extension(extension);
+#else
+	return false;
+#endif
+}

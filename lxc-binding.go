@@ -243,3 +243,10 @@ func IsSupportedConfigItem(key string) bool {
 	defer C.free(unsafe.Pointer(configItem))
 	return bool(C.go_lxc_config_item_is_supported(configItem))
 }
+
+// HasApiExtension returns true if the extension is supported.
+func HasApiExtension(extension string) bool {
+	apiExtension := C.CString(extension)
+	defer C.free(unsafe.Pointer(apiExtension))
+	return bool(C.go_lxc_has_api_extension(apiExtension))
+}
