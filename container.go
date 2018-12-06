@@ -840,20 +840,16 @@ func (c *Container) ConfigKeys(key ...string) []string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	var keys *_Ctype_char
-
+	var ckey *C.char
 	if key != nil && len(key) == 1 {
-		ckey := C.CString(key[0])
+		ckey = C.CString(key[0])
 		defer C.free(unsafe.Pointer(ckey))
-
-		// allocated in lxc.c
-		keys = C.go_lxc_get_keys(c.container, ckey)
-		defer C.free(unsafe.Pointer(keys))
-	} else {
-		// allocated in lxc.c
-		keys = C.go_lxc_get_keys(c.container, nil)
-		defer C.free(unsafe.Pointer(keys))
 	}
+
+	// allocated in lxc.c
+	keys := C.go_lxc_get_keys(c.container, ckey)
+	defer C.free(unsafe.Pointer(keys))
+
 	ret := strings.TrimSpace(C.GoString(keys))
 	return strings.Split(ret, "\n")
 }
