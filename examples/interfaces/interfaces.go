@@ -29,6 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+	defer c.Release()
 
 	log.Printf("Interfaces\n")
 	if interfaces, err := c.Interfaces(); err != nil {

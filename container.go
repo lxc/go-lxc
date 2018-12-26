@@ -101,6 +101,18 @@ func (c *Container) setCgroupItemWithByteSize(filename string, limit ByteSize, m
 	return nil
 }
 
+// Release decrements the reference counter of the container object.
+// nil on success or if reference was successfully dropped and container has been freed, and ErrReleaseFailed on error.
+func (c *Container) Release() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if C.lxc_container_put(c.container) == -1 {
+		return ErrReleaseFailed
+	}
+	return nil
+}
+
 func (c *Container) name() string {
 	return C.GoString(c.container.name)
 }

@@ -27,5 +27,6 @@ func main() {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
 		}
+		c[i].Release()
 	}
 }

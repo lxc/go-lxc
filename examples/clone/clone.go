@@ -31,6 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+	defer c.Release()
 
 	if backend == 0 {
 		log.Fatalf("ERROR: %s\n", lxc.ErrUnknownBackendStore)

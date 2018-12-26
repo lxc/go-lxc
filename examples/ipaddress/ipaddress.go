@@ -29,6 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+	defer c.Release()
 
 	log.Printf("IPAddress(\"lo\")\n")
 	if addresses, err := c.IPAddress("lo"); err != nil {

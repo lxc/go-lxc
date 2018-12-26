@@ -39,6 +39,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+	defer c.Release()
 
 	stdoutReader, stdoutWriter, err := os.Pipe()
 	if err != nil {

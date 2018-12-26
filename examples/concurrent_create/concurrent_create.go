@@ -39,6 +39,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
+			defer c.Release()
 
 			log.Printf("Creating the container (%d)...\n", i)
 			if err := c.Create(options); err != nil {

@@ -30,6 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+	defer c.Release()
 
 	log.Printf("Shutting down the container...\n")
 	if err := c.Shutdown(30 * time.Second); err != nil {

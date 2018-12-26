@@ -27,6 +27,7 @@ func main() {
 	c := lxc.DefinedContainers(lxcpath)
 	for i := range c {
 		log.Printf("%s (%s)\n", c[i].Name(), c[i].State())
+		c[i].Release()
 	}
 
 	log.Println()
@@ -35,6 +36,7 @@ func main() {
 	c = lxc.ActiveContainers(lxcpath)
 	for i := range c {
 		log.Printf("%s (%s)\n", c[i].Name(), c[i].State())
+		c[i].Release()
 	}
 
 	log.Println()
@@ -43,5 +45,6 @@ func main() {
 	c = lxc.ActiveContainers(lxcpath)
 	for i := range c {
 		log.Printf("%s (%s)\n", c[i].Name(), c[i].State())
+		c[i].Release()
 	}
 }
