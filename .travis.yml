@@ -24,8 +24,8 @@ before_install:
  - echo "${USER} veth lxcbr0 10" | sudo tee -a /etc/lxc/lxc-usernet
  - mkdir -p ~/.config/lxc/
  - cp /etc/lxc/default.conf ~/.config/lxc/default.conf
- - echo "lxc.idmap = u 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
- - echo "lxc.idmap = g 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
+ - echo "lxc.id_map = u 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
+ - echo "lxc.id_map = g 0 100000 65536" | sudo tee -a ~/.config/lxc/default.conf
  - "make setup-test-cgroup"
  - mkdir -p ~/.local/share
  - chmod +x ~/.local/share
