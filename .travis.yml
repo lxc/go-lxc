@@ -4,9 +4,6 @@ os:
   - linux
 
 go:
-  - "1.6"
-  - "1.7"
-  - "1.8"
   - "1.9"
   - "1.10"
   - "1.11"
@@ -30,16 +27,21 @@ before_install:
  - echo "lxc.id_map = g 0 100000 65536" | sudo tee -a ${HOME}/.config/lxc/default.conf
  - "make setup-test-cgroup"
  - mkdir -p ${HOME}/.local/share/lxc
+ - chmod +x ${HOME}
+ - chmod +x ${HOME}/.local
+ - chmod +x ${HOME}/.local/share
+ - chmod +x ${HOME}/.local/share/lxc
 
 install:
+  - go get golang.org/x/tools/cmd/goimports
   - go get gopkg.in/lxc/go-lxc.v2
 
 script:
   - "make all"
   - "make test"
   - "make test-race"
-#  - "make test-unprivileged"
-#  - "make test-unprivileged-race"
+  - "make test-unprivileged"
+  - "make test-unprivileged-race"
   - "make cover"
 
 notifications:
