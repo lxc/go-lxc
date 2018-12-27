@@ -27,11 +27,11 @@ func init() {
 }
 
 func main() {
-
 	c, err := lxc.NewContainer(name, lxcpath)
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+	defer c.Release()
 
 	//setting hostname
 	err = c.SetConfigItem("lxc.utsname", hostname)

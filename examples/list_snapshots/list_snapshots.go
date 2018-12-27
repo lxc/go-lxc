@@ -28,5 +28,6 @@ func main() {
 			log.Printf("LXC path: %s\n", s.Path)
 			log.Println()
 		}
+		c[i].Release()
 	}
 }

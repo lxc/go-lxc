@@ -18,13 +18,13 @@ import "C"
 
 import (
 	"fmt"
-	"runtime"
 	"strconv"
 	"strings"
 	"unsafe"
 )
 
 // NewContainer returns a new container struct.
+// Caller needs to call Release() on the returned container to release its resources.
 func NewContainer(name string, lxcpath ...string) (*Container, error) {
 	var container *C.struct_lxc_container
 
@@ -45,8 +45,6 @@ func NewContainer(name string, lxcpath ...string) (*Container, error) {
 	}
 	c := &Container{container: container, verbosity: Quiet}
 
-	// http://golang.org/pkg/runtime/#SetFinalizer
-	runtime.SetFinalizer(c, Release)
 	return c, nil
 }
 
@@ -57,13 +55,10 @@ func Acquire(c *Container) bool {
 
 // Release decrements the reference counter of the container object.
 func Release(c *Container) bool {
-	// http://golang.org/pkg/runtime/#SetFinalizer
-	runtime.SetFinalizer(c, nil)
-
-	// Go is bad at refcounting sometimes
-	c.mu.Lock()
-
-	return C.lxc_container_put(c.container) == 1
+	if C.lxc_container_put(c.container) == -1 {
+		return false
+	}
+	return true
 }
 
 // Version returns the LXC version.
@@ -124,6 +119,7 @@ func ContainerNames(lxcpath ...string) []string {
 
 // Containers returns the defined and active containers on the system. Only
 // containers that could retrieved successfully are returned.
+// Caller needs to call Release() on the returned containers to release resources.
 func Containers(lxcpath ...string) []*Container {
 	var containers []*Container
 
@@ -159,6 +155,7 @@ func DefinedContainerNames(lxcpath ...string) []string {
 
 // DefinedContainers returns the defined containers on the system.  Only
 // containers that could retrieved successfully are returned.
+// Caller needs to call Release() on the returned containers to release resources.
 func DefinedContainers(lxcpath ...string) []*Container {
 	var containers []*Container
 
@@ -194,6 +191,7 @@ func ActiveContainerNames(lxcpath ...string) []string {
 
 // ActiveContainers returns the active containers on the system. Only
 // containers that could retrieved successfully are returned.
+// Caller needs to call Release() on the returned containers to release resources.
 func ActiveContainers(lxcpath ...string) []*Container {
 	var containers []*Container
 

@@ -38,6 +38,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("ERROR: %s\n", err.Error())
 			}
+			defer c.Release()
 
 			log.Printf("Destroying the container (%d)...\n", i)
 			if err := c.Destroy(); err != nil {

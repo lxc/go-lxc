@@ -35,6 +35,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+	defer c.Release()
 
 	if verbose {
 		c.SetVerbosity(lxc.Verbose)

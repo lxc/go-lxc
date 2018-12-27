@@ -30,6 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+	defer c.Release()
 
 	log.Printf("Unfreezing the container...\n")
 	if err := c.Unfreeze(); err != nil {
