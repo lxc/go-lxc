@@ -7,7 +7,7 @@ ALL_BIN_FILES = $(patsubst %.go,%,$(ALL_GO_FILES))
 all: $(ALL_GO_FILES)
 
 define PROGRAM_template
-$(1): format vet lint
+$(1): vet
 	@echo "$(OK_COLOR)==> Building $(1) $(NO_COLOR)"
 	@cd $(dir $1); go build
 endef
@@ -24,7 +24,7 @@ format:
 
 vet:
 	@echo "$(OK_COLOR)==> Running go vet $(NO_COLOR)"
-	@$(foreach file,$(ALL_GO_FILES),go vet $(file);)
+	@$(foreach file,$(ALL_GO_FILES),go tool vet -all $(file);)
 
 lint:
 	@echo "$(OK_COLOR)==> Running golint $(NO_COLOR)"
