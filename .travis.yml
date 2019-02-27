@@ -4,9 +4,9 @@ os:
   - linux
 
 go:
-  - "1.9"
   - "1.10"
   - "1.11"
+  - "1.12"
   - tip
 
 matrix:
@@ -40,8 +40,8 @@ script:
   - "make all"
   - "make test"
   - "make test-race"
-  - "make test-unprivileged"
-  - "make test-unprivileged-race"
+  - "make test-privileged"
+  - "make test-privileged-race"
   - "make cover"
 
 notifications:

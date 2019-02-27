@@ -24,7 +24,7 @@ format:
 
 vet:
 	@echo "$(OK_COLOR)==> Running go vet $(NO_COLOR)"
-	@$(foreach file,$(ALL_GO_FILES),go tool vet -all $(file);)
+	@$(foreach file,$(ALL_GO_FILES),go vet -all $(file);)
 
 lint:
 	@echo "$(OK_COLOR)==> Running golint $(NO_COLOR)"
