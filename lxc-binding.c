@@ -195,7 +195,12 @@ bool go_lxc_save_config(struct lxc_container *c, const char *alt_file) {
 }
 
 bool go_lxc_clone(struct lxc_container *c, const char *newname, const char *lxcpath, int flags, const char *bdevtype) {
-	return c->clone(c, newname, lxcpath, flags, bdevtype, NULL, 0, NULL) != NULL;
+	struct lxc_container *c2 = c->clone(c, newname, lxcpath, flags, bdevtype, NULL, 0, NULL);
+	if (c2 == NULL) {
+		return false;
+	}
+	lxc_container_put(c2);
+	return true;
 }
 
 int go_lxc_console_getfd(struct lxc_container *c, int ttynum) {
