@@ -8,19 +8,19 @@ format:
 	@gofmt -s -w *.go
 	@goimports -w *.go || true
 
-test:
-	@echo "$(OK_COLOR)==> Running tests for priveleged user $(NO_COLOR)"
+test-privileged:
+	@echo "$(OK_COLOR)==> Running tests for privileged user $(NO_COLOR)"
 	@sudo `which go` test -v -coverprofile=/tmp/priv.out
 
-test-race:
-	@echo "$(OK_COLOR)==> Running tests with -race flag for priveleged user $(NO_COLOR)"
+test-privileged-race:
+	@echo "$(OK_COLOR)==> Running tests with -race flag for privileged user $(NO_COLOR)"
 	@sudo `which go` test -race -v
 
-test-unprivileged:
+test:
 	@echo "$(OK_COLOR)==> Running tests for unprivileged user $(NO_COLOR)"
 	@`which go` test -v -coverprofile=/tmp/unpriv.out
 
-test-unprivileged-race:
+test-race:
 	@echo "$(OK_COLOR)==> Running tests with -race flag for unprivileged user $(NO_COLOR)"
 	@`which go` test -race -v
 
