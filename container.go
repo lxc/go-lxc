@@ -125,7 +125,7 @@ func (c *Container) Name() string {
 	return c.name()
 }
 
-// String returns the string represantation of container.
+// String returns the string representation of container.
 func (c *Container) String() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -1818,7 +1818,7 @@ func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 	return nil
 }
 
-// AttachInterface attaches specifed netdev to the container.
+// AttachInterface attaches specified netdev to the container.
 func (c *Container) AttachInterface(source, destination string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -1839,7 +1839,7 @@ func (c *Container) AttachInterface(source, destination string) error {
 	return nil
 }
 
-// DetachInterface detaches specifed netdev from the container.
+// DetachInterface detaches specified netdev from the container.
 func (c *Container) DetachInterface(source string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -1857,7 +1857,7 @@ func (c *Container) DetachInterface(source string) error {
 	return nil
 }
 
-// DetachInterfaceRename detaches specifed netdev from the container and renames it.
+// DetachInterfaceRename detaches specified netdev from the container and renames it.
 func (c *Container) DetachInterfaceRename(source, target string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()

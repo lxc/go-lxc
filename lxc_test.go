@@ -534,7 +534,7 @@ func TestControllable(t *testing.T) {
 	defer c.Release()
 
 	if !c.Controllable() {
-		t.Errorf("Controling the container failed...")
+		t.Errorf("Controlling the container failed...")
 	}
 }
 
