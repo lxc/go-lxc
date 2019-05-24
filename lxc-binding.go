@@ -7,7 +7,6 @@
 package lxc
 
 // #cgo pkg-config: lxc
-// #cgo LDFLAGS: -llxc -lutil
 // #include <lxc/lxccontainer.h>
 // #include <lxc/version.h>
 // #include "lxc-binding.h"
