@@ -6,5 +6,7 @@
 
 package lxc
 
-// #cgo LDFLAGS: -static -llxc -lseccomp -lutil -lcap
+// #cgo LDFLAGS: -static -llxc -lutil -lselinux -lcap -lseccomp
+// #cgo pkg-config: lxc libseccomp libselinux libcap gnutls
+// #include <selinux/selinux.h>
 import "C"

@@ -6,7 +6,7 @@
 
 package lxc
 
-// #cgo pkg-config: lxc
+// #cgo pkg-config: lxc libseccomp libselinux libcap gnutls
 // #include <lxc/lxccontainer.h>
 // #include <lxc/version.h>
 // #include "lxc-binding.h"
