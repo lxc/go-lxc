@@ -6,5 +6,5 @@
 
 package lxc
 
-// #cgo LDFLAGS: -llxc -lutil
+// #cgo pkg-config: lxc
 import "C"
