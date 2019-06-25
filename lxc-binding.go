@@ -6,7 +6,6 @@
 
 package lxc
 
-// #cgo pkg-config: lxc
 // #include <lxc/lxccontainer.h>
 // #include <lxc/version.h>
 // #include "lxc-binding.h"
