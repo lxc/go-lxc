@@ -2,10 +2,9 @@
 // Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
 
-// +build linux,cgo,!static_build
+// +build >go1.10,linux,cgo
 
 package lxc
 
-// #cgo CFLAGS: -std=gnu11 -Wvla -Werror
-// #cgo pkg-config: lxc
+// #cgo CFLAGS: -fvisibility=hidden
 import "C"
