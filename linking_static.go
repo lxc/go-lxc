@@ -6,6 +6,7 @@
 
 package lxc
 
+// #cgo CFLAGS: -std=gnu11 -Wvla -Werror
 // #cgo pkg-config: --static lxc
 // #cgo LDFLAGS: -static
 import "C"
