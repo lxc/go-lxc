@@ -306,6 +306,14 @@ func (c *Container) InitPidFd() int {
 	return int(C.go_lxc_init_pidfd(c.container))
 }
 
+// SeccompNotifyFd returns the seccomp notify fd of the container.
+func (c *Container) SeccompNotifyFd() int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	return int(C.go_lxc_seccomp_notify_fd(c.container))
+}
+
 // Daemonize returns true if the container wished to be daemonized.
 func (c *Container) Daemonize() bool {
 	c.mu.RLock()
