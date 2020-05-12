@@ -297,6 +297,15 @@ func (c *Container) InitPid() int {
 	return int(C.go_lxc_init_pid(c.container))
 }
 
+// InitPidFd returns the pidfd of the container's init process as
+// seen from outside the container.
+func (c *Container) InitPidFd() int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	return int(C.go_lxc_init_pidfd(c.container))
+}
+
 // Daemonize returns true if the container wished to be daemonized.
 func (c *Container) Daemonize() bool {
 	c.mu.RLock()

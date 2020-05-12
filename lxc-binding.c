@@ -4,6 +4,7 @@
 
 // +build linux,cgo
 
+#include <errno.h>
 #include <stdbool.h>
 #include <string.h>
 #include <sys/types.h>
@@ -19,6 +20,12 @@
 #ifndef LXC_DEVEL
 #define LXC_DEVEL 0
 #endif
+
+#define ret_errno(__errno__)         \
+	({                           \
+		errno = (__errno__); \
+		-(__errno__);        \
+	})
 
 bool go_lxc_defined(struct lxc_container *c) {
 	return c->is_defined(c);
@@ -42,6 +49,14 @@ bool go_lxc_unfreeze(struct lxc_container *c) {
 
 pid_t go_lxc_init_pid(struct lxc_container *c) {
 	return c->init_pid(c);
+}
+
+int go_lxc_init_pidfd(struct lxc_container *c) {
+#if VERSION_AT_LEAST(4, 0, 0)
+	return c->init_pidfd(c);
+#else
+	return ret_errno(ENOSYS);
+#endif
 }
 
 bool go_lxc_want_daemonize(struct lxc_container *c, bool state) {
