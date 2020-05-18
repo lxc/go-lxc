@@ -313,11 +313,16 @@ func (c *Container) InitPidFd() (*os.File, error) {
 }
 
 // SeccompNotifyFd returns the seccomp notify fd of the container.
-func (c *Container) SeccompNotifyFd() int {
+func (c *Container) SeccompNotifyFd() (*os.File, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	return int(C.go_lxc_seccomp_notify_fd(c.container))
+	notifyFd := int(C.go_lxc_seccomp_notify_fd(c.container))
+	if notifyFd < 0 {
+		return nil, unix.Errno(unix.EBADF)
+	}
+
+	return os.NewFile(uintptr(notifyFd), "seccomp notify"), nil
 }
 
 // Daemonize returns true if the container wished to be daemonized.
