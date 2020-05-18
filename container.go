@@ -25,6 +25,8 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 // Container struct
@@ -297,21 +299,30 @@ func (c *Container) InitPid() int {
 	return int(C.go_lxc_init_pid(c.container))
 }
 
-// InitPidFd returns the pidfd of the container's init process as
-// seen from outside the container.
-func (c *Container) InitPidFd() int {
+// InitPidFd returns the pidfd of the container's init process.
+func (c *Container) InitPidFd() (*os.File, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	return int(C.go_lxc_init_pidfd(c.container))
+	pidfd := int(C.go_lxc_init_pidfd(c.container))
+	if pidfd < 0 {
+		return nil, unix.Errno(unix.EBADF)
+	}
+
+	return os.NewFile(uintptr(pidfd), "[pidfd]"), nil
 }
 
 // SeccompNotifyFd returns the seccomp notify fd of the container.
-func (c *Container) SeccompNotifyFd() int {
+func (c *Container) SeccompNotifyFd() (*os.File, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	return int(C.go_lxc_seccomp_notify_fd(c.container))
+	notifyFd := int(C.go_lxc_seccomp_notify_fd(c.container))
+	if notifyFd < 0 {
+		return nil, unix.Errno(unix.EBADF)
+	}
+
+	return os.NewFile(uintptr(notifyFd), "seccomp notify"), nil
 }
 
 // Daemonize returns true if the container wished to be daemonized.
