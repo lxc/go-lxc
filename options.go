@@ -71,6 +71,8 @@ type TemplateOptions struct {
 	// Backend specifies the type of the backend.
 	Backend BackendStore
 
+	BackendSpecs *BackendStoreSpecs
+
 	// Distro specifies the name of the distribution.
 	Distro string
 
@@ -104,6 +106,23 @@ type TemplateOptions struct {
 	// ExtraArgs provides a way to specify template specific args.
 	ExtraArgs []string
 }
+
+
+type BackendStoreSpecs struct {
+	FSType string
+	FSSize uint64
+	Dir *string
+	ZFS struct {
+		Root string
+	}
+	LVM struct {
+		VG, LV, Thinpool string
+	}
+	RBD struct {
+		Name, Pool string
+	}
+}
+
 
 // DownloadTemplateOptions is a convenient set of options for "download" template.
 var DownloadTemplateOptions = TemplateOptions{

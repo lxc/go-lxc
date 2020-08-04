@@ -75,11 +75,11 @@ bool go_lxc_want_close_all_fds(struct lxc_container *c, bool state) {
 	return c->want_close_all_fds(c, state);
 }
 
-bool go_lxc_create(struct lxc_container *c, const char *t, const char *bdevtype, int flags, char * const argv[]) {
+bool go_lxc_create(struct lxc_container *c, const char *t, const char *bdevtype, struct bdev_specs *specs, int flags, char * const argv[]) {
 	if (strncmp(t, "none", strlen(t)) == 0) {
-		return c->create(c, NULL, bdevtype, NULL, !!(flags & LXC_CREATE_QUIET), argv);
+		return c->create(c, NULL, bdevtype, specs, !!(flags & LXC_CREATE_QUIET), argv);
 	}
-	return c->create(c, t, bdevtype, NULL, !!(flags & LXC_CREATE_QUIET), argv);
+	return c->create(c, t, bdevtype, specs, !!(flags & LXC_CREATE_QUIET), argv);
 }
 
 bool go_lxc_start(struct lxc_container *c, int useinit, char * const argv[]) {
