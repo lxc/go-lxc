@@ -23,6 +23,8 @@ var (
 	verbose    bool
 	flush      bool
 	validation bool
+	fssize     string
+	bdevtype   string
 )
 
 func init() {
@@ -35,6 +37,11 @@ func init() {
 	flag.BoolVar(&verbose, "verbose", false, "Verbose output")
 	flag.BoolVar(&flush, "flush", false, "Flush the cache")
 	flag.BoolVar(&validation, "validation", false, "GPG validation")
+
+	flag.StringVar(&bdevtype, "bdev", "dir", "backing store type")
+	flag.StringVar(&fssize, "fssize", "", "backing store size")
+	// TODO support more flags for zfs, lvm, or rbd
+
 	flag.Parse()
 }
 
@@ -50,6 +57,20 @@ func main() {
 		c.SetVerbosity(lxc.Verbose)
 	}
 
+	var backend lxc.BackendStore
+	if err := (&backend).Set(bdevtype); err != nil {
+		log.Fatalf("ERROR: %s\n", err.Error())
+	}
+
+	var bdevSize lxc.ByteSize
+	if fssize != "" {
+		var err error
+		bdevSize, err = lxc.ParseBytes(fssize)
+		if err != nil {
+			log.Fatalf("ERROR: %s\n", err.Error())
+		}
+	}
+
 	options := lxc.TemplateOptions{
 		Template:             template,
 		Distro:               distro,
@@ -57,7 +78,14 @@ func main() {
 		Arch:                 arch,
 		FlushCache:           flush,
 		DisableGPGValidation: validation,
+		Backend:              backend,
+		BackendSpecs: &lxc.BackendStoreSpecs{
+			FSSize: uint64(bdevSize),
+		},
 	}
+
+	c.SetLogFile("log")
+	c.SetLogLevel(lxc.DEBUG)
 
 	if err := c.Create(options); err != nil {
 		log.Printf("ERROR: %s\n", err.Error())

@@ -407,16 +407,11 @@ func (c *Container) Create(options TemplateOptions) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	// FIXME: Support bdev_specs
-	//
-	// bdev_specs:
-	// zfs requires zfsroot
-	// lvm requires lvname/vgname/thinpool as well as fstype and fssize
-	// btrfs requires nothing
-	// dir requires nothing
 	if err := c.makeSure(isNotDefined); err != nil {
 		return err
 	}
+
+	bdevspecs := buildBdevSpecs(options.BackendSpecs)
 
 	// use download template if not set
 	if options.Template == "" {
@@ -489,9 +484,9 @@ func (c *Container) Create(options TemplateOptions) error {
 		}
 		defer freeNullTerminatedArgs(cargs, len(args))
 
-		ret = bool(C.go_lxc_create(c.container, ctemplate, cbackend, C.int(c.verbosity), cargs))
+		ret = bool(C.go_lxc_create(c.container, ctemplate, cbackend, bdevspecs, C.int(c.verbosity), cargs))
 	} else {
-		ret = bool(C.go_lxc_create(c.container, ctemplate, cbackend, C.int(c.verbosity), nil))
+		ret = bool(C.go_lxc_create(c.container, ctemplate, cbackend, bdevspecs, C.int(c.verbosity), nil))
 	}
 
 	if !ret {
@@ -1949,4 +1944,66 @@ func (c *Container) ConsoleLog(opt ConsoleLogOptions) ([]byte, error) {
 func (c *Container) ErrorNum() int {
 	cError := C.go_lxc_error_num(c.container)
 	return int(cError)
+}
+
+func buildBdevSpecs(o *BackendStoreSpecs) *C.struct_bdev_specs {
+	if o == nil {
+		return nil
+	}
+
+	// bdev_specs:
+	// zfs requires zfsroot
+	// lvm requires lvname/vgname/thinpool as well as fstype and fssize
+	// btrfs requires nothing
+	// dir requires nothing
+
+	specs := C.struct_bdev_specs{}
+
+	if o.FSType != "" {
+		fstype := C.CString(o.FSType)
+		specs.fstype = fstype 
+		defer C.free(unsafe.Pointer(fstype))
+	}
+
+	if o.FSSize > 0  {
+		specs.fssize = C.uint64_t(o.FSSize)
+	}
+
+	if o.ZFS.Root != "" { 
+		zfsroot := C.CString(o.ZFS.Root)
+		specs.zfs.zfsroot = zfsroot
+		defer C.free(unsafe.Pointer(zfsroot))
+	}
+	
+	if o.LVM.VG != "" {
+		vg := C.CString(o.LVM.VG)
+		specs.lvm.vg = vg
+		defer C.free(unsafe.Pointer(vg))
+	}
+
+	if o.LVM.Thinpool != "" {
+		lv := C.CString(o.LVM.Thinpool)
+		specs.lvm.thinpool = lv
+		defer C.free(unsafe.Pointer(lv))
+	}
+
+	if o.RBD.Name != "" {
+		lv := C.CString(o.RBD.Name)
+		specs.rbd.rbdname = lv
+		defer C.free(unsafe.Pointer(lv))
+	}
+
+	if o.RBD.Pool != "" {
+		lv := C.CString(o.RBD.Pool)
+		specs.rbd.rbdpool = lv
+		defer C.free(unsafe.Pointer(lv))
+	}
+
+	if o.Dir != nil {
+		dir := C.CString(*o.Dir)
+		specs.dir = dir
+		defer C.free(unsafe.Pointer(dir))
+	}
+
+	return &specs
 }

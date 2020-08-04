@@ -9,7 +9,13 @@ package lxc
 // #include <lxc/lxccontainer.h>
 import "C"
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
+	"unicode"
+)
 
 // Verbosity type
 type Verbosity int
@@ -150,7 +156,7 @@ func (t State) String() string {
 type ByteSize float64
 
 const (
-	_ = iota
+	B = iota
 	// KB - kilobyte
 	KB ByteSize = 1 << (10 * iota)
 	// MB - megabyte
@@ -189,6 +195,78 @@ func (b ByteSize) String() string {
 		return fmt.Sprintf("%.2fKB", b/KB)
 	}
 	return fmt.Sprintf("%.2fB", b)
+}
+
+// Used to convert user input to ByteSize
+var unitMap = map[string]ByteSize{
+	"B":     B,
+	"BYTE":  B,
+	"BYTES": B,
+
+	"KB":        KB,
+	"KILOBYTE":  KB,
+	"KILOBYTES": KB,
+
+	"MB":        MB,
+	"MEGABYTE":  MB,
+	"MEGABYTES": MB,
+
+	"GB":        GB,
+	"GIGABYTE":  GB,
+	"GIGABYTES": GB,
+
+	"TB":        TB,
+	"TERABYTE":  TB,
+	"TERABYTES": TB,
+
+	"PB":        PB,
+	"PETABYTE":  PB,
+	"PETABYTES": PB,
+
+	"EB":       EB,
+	"EXABYTE":  EB,
+	"EXABYTES": EB,
+}
+
+// Inspired from https://github.com/inhies/go-bytesize
+
+// ParseBytes parses a byte size string. A byte size string is a number followed by
+// a unit suffix, such as "1024B" or "1 MB". Valid byte units are "B", "KB",
+// "MB", "GB", "TB", "PB" and "EB". You can also use the long
+// format of units, such as "kilobyte" or "kilobytes".
+func ParseBytes(s string) (ByteSize, error) {
+	// Remove leading and trailing whitespace
+	s = strings.TrimSpace(s)
+
+	split := make([]string, 0)
+	for i, r := range s {
+		if !unicode.IsDigit(r) {
+			// Split the string by digit and size designator, remove whitespace
+			split = append(split, strings.TrimSpace(string(s[:i])))
+			split = append(split, strings.TrimSpace(string(s[i:])))
+			break
+		}
+	}
+
+	// Check to see if we split successfully
+	if len(split) != 2 {
+		return 0, errors.New("Unrecognized size suffix")
+	}
+
+	// Check for MB, MEGABYTE, and MEGABYTES
+	unit, ok := unitMap[strings.ToUpper(split[1])]
+	if !ok {
+		return 0, errors.New("Unrecognized size suffix " + split[1])
+
+	}
+
+	value, err := strconv.ParseFloat(split[0], 64)
+	if err != nil {
+		return 0, err
+	}
+
+	bytesize := ByteSize(value * float64(unit))
+	return bytesize, nil
 }
 
 // LogLevel type specifies possible log levels.
