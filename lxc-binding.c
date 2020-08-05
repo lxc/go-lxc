@@ -67,6 +67,14 @@ int go_lxc_seccomp_notify_fd(struct lxc_container *c) {
 #endif
 }
 
+int go_lxc_devpts_fd(struct lxc_container *c) {
+#if VERSION_AT_LEAST(4, 0, 4)
+	return c->devpts_fd(c);
+#else
+	return ret_errno(ENOSYS);
+#endif
+}
+
 bool go_lxc_want_daemonize(struct lxc_container *c, bool state) {
 	return c->want_daemonize(c, state);
 }
