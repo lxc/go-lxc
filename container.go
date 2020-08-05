@@ -312,6 +312,19 @@ func (c *Container) InitPidFd() (*os.File, error) {
 	return os.NewFile(uintptr(pidfd), "[pidfd]"), nil
 }
 
+// DevptsFd returns the pidfd of the container's init process.
+func (c *Container) DevptsFd() (*os.File, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	devptsFd := int(C.go_lxc_devpts_fd(c.container))
+	if devptsFd < 0 {
+		return nil, unix.Errno(unix.EBADF)
+	}
+
+	return os.NewFile(uintptr(devptsFd), "/dev/pts/ptmx"), nil
+}
+
 // SeccompNotifyFd returns the seccomp notify fd of the container.
 func (c *Container) SeccompNotifyFd() (*os.File, error) {
 	c.mu.RLock()

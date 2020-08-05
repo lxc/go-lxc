@@ -81,6 +81,7 @@ extern int go_lxc_snapshot_list(struct lxc_container *c, struct lxc_snapshot **r
 extern int go_lxc_snapshot(struct lxc_container *c);
 extern pid_t go_lxc_init_pid(struct lxc_container *c);
 extern int go_lxc_init_pidfd(struct lxc_container *c);
+extern int go_lxc_devpts_fd(struct lxc_container *c);
 extern int go_lxc_seccomp_notify_fd(struct lxc_container *c);
 extern bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool verbose);
 extern bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose);
