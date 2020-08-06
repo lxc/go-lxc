@@ -67,6 +67,14 @@ int go_lxc_seccomp_notify_fd(struct lxc_container *c) {
 #endif
 }
 
+int go_lxc_seccomp_notify_fd_active(struct lxc_container *c) {
+#if VERSION_AT_LEAST(4, 0, 5)
+	return c->seccomp_notify_fd_active(c);
+#else
+	return ret_errno(ENOSYS);
+#endif
+}
+
 int go_lxc_devpts_fd(struct lxc_container *c) {
 #if VERSION_AT_LEAST(4, 0, 5)
 	return c->devpts_fd(c);

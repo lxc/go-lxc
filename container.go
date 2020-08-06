@@ -338,6 +338,19 @@ func (c *Container) SeccompNotifyFd() (*os.File, error) {
 	return os.NewFile(uintptr(notifyFd), "seccomp notify"), nil
 }
 
+// SeccompNotifyFdActive returns the seccomp notify fd of the running container.
+func (c *Container) SeccompNotifyFdActive() (*os.File, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	notifyFd := int(C.go_lxc_seccomp_notify_fd_active(c.container))
+	if notifyFd < 0 {
+		return nil, unix.Errno(unix.EBADF)
+	}
+
+	return os.NewFile(uintptr(notifyFd), "seccomp notify"), nil
+}
+
 // Daemonize returns true if the container wished to be daemonized.
 func (c *Container) Daemonize() bool {
 	c.mu.RLock()
