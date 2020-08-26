@@ -279,6 +279,10 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 
 // Caller needs to hold the lock
 func (c *Container) state() State {
+	if c.container == nil {
+		return StateMap["STOPPED"]
+	}
+
 	return StateMap[C.GoString(C.go_lxc_state(c.container))]
 }
 
@@ -1987,20 +1991,20 @@ func buildBdevSpecs(o *BackendStoreSpecs) *C.struct_bdev_specs {
 
 	if o.FSType != "" {
 		fstype := C.CString(o.FSType)
-		specs.fstype = fstype 
+		specs.fstype = fstype
 		defer C.free(unsafe.Pointer(fstype))
 	}
 
-	if o.FSSize > 0  {
+	if o.FSSize > 0 {
 		specs.fssize = C.uint64_t(o.FSSize)
 	}
 
-	if o.ZFS.Root != "" { 
+	if o.ZFS.Root != "" {
 		zfsroot := C.CString(o.ZFS.Root)
 		specs.zfs.zfsroot = zfsroot
 		defer C.free(unsafe.Pointer(zfsroot))
 	}
-	
+
 	if o.LVM.VG != "" {
 		vg := C.CString(o.LVM.VG)
 		specs.lvm.vg = vg
