@@ -279,6 +279,10 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 
 // Caller needs to hold the lock
 func (c *Container) state() State {
+	if c.container == nil {
+		return StateMap["STOPPED"]
+	}
+
 	return StateMap[C.GoString(C.go_lxc_state(c.container))]
 }
 
