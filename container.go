@@ -838,6 +838,10 @@ func (c *Container) RunningConfigItem(key string) []string {
 }
 
 func (c *Container) cgroupItem(key string) []string {
+	if c.container == nil {
+		return nil
+	}
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
