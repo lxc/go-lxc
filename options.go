@@ -107,12 +107,11 @@ type TemplateOptions struct {
 	ExtraArgs []string
 }
 
-
 type BackendStoreSpecs struct {
 	FSType string
 	FSSize uint64
-	Dir *string
-	ZFS struct {
+	Dir    *string
+	ZFS    struct {
 		Root string
 	}
 	LVM struct {
@@ -122,7 +121,6 @@ type BackendStoreSpecs struct {
 		Name, Pool string
 	}
 }
-
 
 // DownloadTemplateOptions is a convenient set of options for "download" template.
 var DownloadTemplateOptions = TemplateOptions{
