@@ -28,6 +28,9 @@ type AttachOptions struct {
 	// GID specifies the group id to run as.
 	GID int
 
+	// Groups specifies the list of additional group ids to run with.
+	Groups []int
+
 	// If ClearEnv is true the environment is cleared before running the command.
 	ClearEnv bool
 
@@ -54,6 +57,7 @@ var DefaultAttachOptions = AttachOptions{
 	Cwd:        "/",
 	UID:        -1,
 	GID:        -1,
+	Groups:     nil,
 	ClearEnv:   false,
 	Env:        nil,
 	EnvToKeep:  nil,

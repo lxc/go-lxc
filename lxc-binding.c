@@ -289,7 +289,7 @@ int go_lxc_attach_no_wait(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
 		long personality,
-		uid_t uid, gid_t gid,
+		uid_t uid, gid_t gid, lxc_groups_t groups,
 		int stdinfd, int stdoutfd, int stderrfd,
 		char *initial_cwd,
 		char **extra_env_vars,
@@ -311,6 +311,7 @@ int go_lxc_attach_no_wait(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
+	attach_options.groups = groups;
 
 	attach_options.stdin_fd = stdinfd;
 	attach_options.stdout_fd = stdoutfd;
@@ -334,7 +335,7 @@ int go_lxc_attach(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
 		long personality,
-		uid_t uid, gid_t gid,
+		uid_t uid, gid_t gid, lxc_groups_t groups,
 		int stdinfd, int stdoutfd, int stderrfd,
 		char *initial_cwd,
 		char **extra_env_vars,
@@ -354,6 +355,7 @@ int go_lxc_attach(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
+	attach_options.groups = groups;
 
 	attach_options.stdin_fd = stdinfd;
 	attach_options.stdout_fd = stdoutfd;
@@ -391,7 +393,7 @@ int go_lxc_attach_run_wait(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
 		long personality,
-		uid_t uid, gid_t gid,
+		uid_t uid, gid_t gid, lxc_groups_t groups,
 		int stdinfd, int stdoutfd, int stderrfd,
 		char *initial_cwd,
 		char **extra_env_vars,
@@ -411,6 +413,7 @@ int go_lxc_attach_run_wait(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
+	attach_options.groups = groups;
 
 	attach_options.stdin_fd = stdinfd;
 	attach_options.stdout_fd = stdoutfd;
