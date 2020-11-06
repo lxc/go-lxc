@@ -311,7 +311,9 @@ int go_lxc_attach_no_wait(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
+#if VERSION_AT_LEAST(4, 1, 0)
 	attach_options.groups = groups;
+#endif
 
 	attach_options.stdin_fd = stdinfd;
 	attach_options.stdout_fd = stdoutfd;
@@ -355,7 +357,9 @@ int go_lxc_attach(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
+#if VERSION_AT_LEAST(4, 1, 0)
 	attach_options.groups = groups;
+#endif
 
 	attach_options.stdin_fd = stdinfd;
 	attach_options.stdout_fd = stdoutfd;
@@ -413,7 +417,9 @@ int go_lxc_attach_run_wait(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
+#if VERSION_AT_LEAST(4, 1, 0)
 	attach_options.groups = groups;
+#endif
 
 	attach_options.stdin_fd = stdinfd;
 	attach_options.stdout_fd = stdoutfd;
