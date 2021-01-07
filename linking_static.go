@@ -7,6 +7,6 @@
 package lxc
 
 // #cgo CFLAGS: -std=gnu11 -Wvla -Werror
-// #cgo pkg-config: --static lxc
+// #cgo pkg-config: --static lxc libcrypto
 // #cgo LDFLAGS: -static
 import "C"
