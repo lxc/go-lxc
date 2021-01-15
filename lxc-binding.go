@@ -56,10 +56,7 @@ func Acquire(c *Container) bool {
 
 // Release decrements the reference counter of the container object.
 func Release(c *Container) bool {
-	if C.lxc_container_put(c.container) == -1 {
-		return false
-	}
-	return true
+	return c.Release() == nil
 }
 
 // Version returns the LXC version.
