@@ -112,6 +112,9 @@ func (c *Container) Release() error {
 	if C.lxc_container_put(c.container) == -1 {
 		return ErrReleaseFailed
 	}
+
+	c.container = nil
+
 	return nil
 }
 
