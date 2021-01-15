@@ -48,15 +48,15 @@ func NewContainer(name string, lxcpath ...string) (*Container, error) {
 
 // Acquire increments the reference counter of the container object.
 func Acquire(c *Container) bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	return C.lxc_container_get(c.container) == 1
 }
 
 // Release decrements the reference counter of the container object.
 func Release(c *Container) bool {
-	if C.lxc_container_put(c.container) == -1 {
-		return false
-	}
-	return true
+	return c.Release() == nil
 }
 
 // Version returns the LXC version.
