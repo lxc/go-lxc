@@ -119,6 +119,10 @@ func (c *Container) Release() error {
 }
 
 func (c *Container) name() string {
+	if c.container == nil {
+		return ""
+	}
+
 	return C.GoString(c.container.name)
 }
 
@@ -140,6 +144,10 @@ func (c *Container) String() string {
 
 // Caller needs to hold the lock
 func (c *Container) defined() bool {
+	if c.container == nil {
+		return false
+	}
+
 	return bool(C.go_lxc_defined(c.container))
 }
 
@@ -153,6 +161,10 @@ func (c *Container) Defined() bool {
 
 // Caller needs to hold the lock
 func (c *Container) running() bool {
+	if c.container == nil {
+		return false
+	}
+
 	return bool(C.go_lxc_running(c.container))
 }
 
@@ -169,6 +181,10 @@ func (c *Container) Controllable() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return false
+	}
+
 	return bool(C.go_lxc_may_control(c.container))
 }
 
@@ -176,6 +192,10 @@ func (c *Container) Controllable() bool {
 func (c *Container) CreateSnapshot() (*Snapshot, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
 
 	if err := c.makeSure(isDefined | isNotRunning); err != nil {
 		return nil, err
@@ -192,6 +212,10 @@ func (c *Container) CreateSnapshot() (*Snapshot, error) {
 func (c *Container) RestoreSnapshot(snapshot Snapshot, name string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isDefined); err != nil {
 		return err
@@ -214,6 +238,10 @@ func (c *Container) DestroySnapshot(snapshot Snapshot) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isDefined); err != nil {
 		return err
 	}
@@ -232,6 +260,10 @@ func (c *Container) DestroyAllSnapshots() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isDefined | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
@@ -246,6 +278,10 @@ func (c *Container) DestroyAllSnapshots() error {
 func (c *Container) Snapshots() ([]Snapshot, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
 
 	if err := c.makeSure(isDefined); err != nil {
 		return nil, err
@@ -303,6 +339,10 @@ func (c *Container) InitPid() int {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return -1
+	}
+
 	return int(C.go_lxc_init_pid(c.container))
 }
 
@@ -310,6 +350,10 @@ func (c *Container) InitPid() int {
 func (c *Container) InitPidFd() (*os.File, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
 
 	pidfd := int(C.go_lxc_init_pidfd(c.container))
 	if pidfd < 0 {
@@ -324,6 +368,10 @@ func (c *Container) DevptsFd() (*os.File, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
+
 	devptsFd := int(C.go_lxc_devpts_fd(c.container))
 	if devptsFd < 0 {
 		return nil, unix.Errno(unix.EBADF)
@@ -336,6 +384,10 @@ func (c *Container) DevptsFd() (*os.File, error) {
 func (c *Container) SeccompNotifyFd() (*os.File, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
 
 	notifyFd := int(C.go_lxc_seccomp_notify_fd(c.container))
 	if notifyFd < 0 {
@@ -350,6 +402,10 @@ func (c *Container) SeccompNotifyFdActive() (*os.File, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
+
 	notifyFd := int(C.go_lxc_seccomp_notify_fd_active(c.container))
 	if notifyFd < 0 {
 		return nil, unix.Errno(unix.EBADF)
@@ -363,6 +419,10 @@ func (c *Container) Daemonize() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return false
+	}
+
 	return bool(c.container.daemonize)
 }
 
@@ -370,6 +430,10 @@ func (c *Container) Daemonize() bool {
 func (c *Container) WantDaemonize(state bool) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if !bool(C.go_lxc_want_daemonize(c.container, C.bool(state))) {
 		return ErrDaemonizeFailed
@@ -382,6 +446,10 @@ func (c *Container) WantDaemonize(state bool) error {
 func (c *Container) WantCloseAllFds(state bool) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if !bool(C.go_lxc_want_close_all_fds(c.container, C.bool(state))) {
 		return ErrCloseAllFdsFailed
@@ -402,6 +470,10 @@ func (c *Container) Freeze() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	// check the state using lockless version
 	if c.state() == FROZEN {
 		return ErrAlreadyFrozen
@@ -418,6 +490,10 @@ func (c *Container) Freeze() error {
 func (c *Container) Unfreeze() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning); err != nil {
 		return err
@@ -533,6 +609,10 @@ func (c *Container) Start() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isNotRunning); err != nil {
 		return err
 	}
@@ -547,6 +627,10 @@ func (c *Container) Start() error {
 func (c *Container) StartWithArgs(args []string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isNotRunning); err != nil {
 		return err
@@ -563,6 +647,10 @@ func (c *Container) StartWithArgs(args []string) error {
 func (c *Container) StartExecute(args []string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isNotRunning); err != nil {
 		return err
@@ -611,6 +699,10 @@ func (c *Container) Stop() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
@@ -625,6 +717,10 @@ func (c *Container) Stop() error {
 func (c *Container) Reboot() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning); err != nil {
 		return err
@@ -641,6 +737,10 @@ func (c *Container) Shutdown(timeout time.Duration) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning); err != nil {
 		return err
 	}
@@ -656,6 +756,10 @@ func (c *Container) Destroy() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isDefined | isNotRunning); err != nil {
 		return err
 	}
@@ -670,6 +774,10 @@ func (c *Container) Destroy() error {
 func (c *Container) DestroyWithAllSnapshots() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isDefined | isNotRunning | isGreaterEqualThanLXC11); err != nil {
 		return err
@@ -743,6 +851,10 @@ func (c *Container) Rename(name string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isDefined | isNotRunning); err != nil {
 		return err
 	}
@@ -761,6 +873,10 @@ func (c *Container) Wait(state State, timeout time.Duration) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return false
+	}
+
 	cstate := C.CString(state.String())
 	defer C.free(unsafe.Pointer(cstate))
 
@@ -772,6 +888,10 @@ func (c *Container) ConfigFileName() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return ""
+	}
+
 	// allocated in lxc.c
 	configFileName := C.go_lxc_config_file_name(c.container)
 	defer C.free(unsafe.Pointer(configFileName))
@@ -780,6 +900,10 @@ func (c *Container) ConfigFileName() string {
 }
 
 func (c *Container) configItem(key string) []string {
+	if c.container == nil {
+		return nil
+	}
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
@@ -800,6 +924,10 @@ func (c *Container) ConfigItem(key string) []string {
 }
 
 func (c *Container) setConfigItem(key string, value string) error {
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
@@ -821,6 +949,10 @@ func (c *Container) SetConfigItem(key string, value string) error {
 }
 
 func (c *Container) runningConfigItem(key string) []string {
+	if c.container == nil {
+		return nil
+	}
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
@@ -857,6 +989,10 @@ func (c *Container) cgroupItem(key string) []string {
 }
 
 func (c *Container) setCgroupItem(key string, value string) error {
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
 
@@ -890,6 +1026,10 @@ func (c *Container) ClearConfig() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return
+	}
+
 	C.go_lxc_clear_config(c.container)
 }
 
@@ -897,6 +1037,10 @@ func (c *Container) ClearConfig() {
 func (c *Container) ClearConfigItem(key string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	ckey := C.CString(key)
 	defer C.free(unsafe.Pointer(ckey))
@@ -911,6 +1055,10 @@ func (c *Container) ClearConfigItem(key string) error {
 func (c *Container) ConfigKeys(key ...string) []string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+
+	if c.container == nil {
+		return nil
+	}
 
 	var ret string
 	if key != nil && len(key) == 1 {
@@ -938,6 +1086,10 @@ func (c *Container) LoadConfigFile(path string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 
@@ -948,6 +1100,10 @@ func (c *Container) LoadConfigFile(path string) error {
 }
 
 func (c *Container) saveConfigFile(path string) error {
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
 
@@ -966,6 +1122,10 @@ func (c *Container) SaveConfigFile(path string) error {
 }
 
 func (c *Container) configPath() string {
+	if c.container == nil {
+		return ""
+	}
+
 	return C.GoString(C.go_lxc_get_config_path(c.container))
 }
 
@@ -981,6 +1141,10 @@ func (c *Container) ConfigPath() string {
 func (c *Container) SetConfigPath(path string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
@@ -1236,6 +1400,10 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return -1, ErrNotDefined
+	}
+
 	// FIXME: Make idiomatic
 	if err := c.makeSure(isRunning); err != nil {
 		return -1, err
@@ -1254,6 +1422,10 @@ func (c *Container) ConsoleFd(ttynum int) (int, error) {
 func (c *Container) Console(options ConsoleOptions) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning); err != nil {
 		return err
@@ -1277,6 +1449,10 @@ func (c *Container) Console(options ConsoleOptions) error {
 func (c *Container) AttachShell(options AttachOptions) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning); err != nil {
 		return err
@@ -1317,6 +1493,10 @@ func (c *Container) AttachShell(options AttachOptions) error {
 }
 
 func (c *Container) runCommandStatus(args []string, options AttachOptions) (int, error) {
+	if c.container == nil {
+		return -1, ErrNotDefined
+	}
+
 	if len(args) == 0 {
 		return -1, ErrInsufficientNumberOfArguments
 	}
@@ -1462,6 +1642,10 @@ func (c *Container) Interfaces() ([]string, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
@@ -1530,6 +1714,10 @@ func (c *Container) IPAddress(interfaceName string) ([]string, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
@@ -1548,6 +1736,10 @@ func (c *Container) IPAddress(interfaceName string) ([]string, error) {
 func (c *Container) IPv4Address(interfaceName string) ([]string, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
@@ -1570,6 +1762,10 @@ func (c *Container) IPv4Address(interfaceName string) ([]string, error) {
 func (c *Container) IPv6Address(interfaceName string) ([]string, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
@@ -1608,6 +1804,10 @@ func (c *Container) WaitIPAddresses(timeout time.Duration) ([]string, error) {
 }
 
 func (c *Container) ipAddresses() ([]string, error) {
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
@@ -1633,6 +1833,10 @@ func (c *Container) IPv4Addresses() ([]string, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
 	}
@@ -1651,6 +1855,10 @@ func (c *Container) IPv4Addresses() ([]string, error) {
 func (c *Container) IPv6Addresses() ([]string, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning); err != nil {
 		return nil, err
@@ -1730,6 +1938,10 @@ func (c *Container) AddDeviceNode(source string, destination ...string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning | isPrivileged); err != nil {
 		return err
 	}
@@ -1757,6 +1969,10 @@ func (c *Container) AddDeviceNode(source string, destination ...string) error {
 func (c *Container) RemoveDeviceNode(source string, destination ...string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning | isPrivileged); err != nil {
 		return err
@@ -1786,6 +2002,10 @@ func (c *Container) Checkpoint(opts CheckpointOptions) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
@@ -1807,6 +2027,10 @@ func (c *Container) Restore(opts RestoreOptions) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
@@ -1826,6 +2050,10 @@ func (c *Container) Restore(opts RestoreOptions) error {
 func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isNotDefined | isGreaterEqualThanLXC20); err != nil {
 		return err
@@ -1883,6 +2111,10 @@ func (c *Container) AttachInterface(source, destination string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
@@ -1904,6 +2136,10 @@ func (c *Container) DetachInterface(source string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
 	if err := c.makeSure(isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
 		return err
 	}
@@ -1921,6 +2157,10 @@ func (c *Container) DetachInterface(source string) error {
 func (c *Container) DetachInterfaceRename(source, target string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
 
 	if err := c.makeSure(isRunning | isPrivileged | isGreaterEqualThanLXC11); err != nil {
 		return err
@@ -1943,6 +2183,10 @@ func (c *Container) DetachInterfaceRename(source, target string) error {
 func (c *Container) ConsoleLog(opt ConsoleLogOptions) ([]byte, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return nil, ErrNotDefined
+	}
 
 	cl := C.struct_lxc_console_log{
 		clear: C.bool(opt.ClearLog),
@@ -1979,6 +2223,10 @@ func (c *Container) ConsoleLog(opt ConsoleLogOptions) ([]byte, error) {
 
 // ErrorNum returns the error_num field of the container.
 func (c *Container) ErrorNum() int {
+	if c.container == nil {
+		return -1
+	}
+
 	cError := C.go_lxc_error_num(c.container)
 	return int(cError)
 }
