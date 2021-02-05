@@ -1503,7 +1503,7 @@ func makeGroups(groups []int) C.struct_lxc_groups_t {
 	for i, g := range groups {
 		l[i] = C.gid_t(g)
 	}
-	return C.struct_lxc_groups_t{size: C.int(len(groups)), list: &l[0]}
+	return C.struct_lxc_groups_t{size: C.size_t(len(groups)), list: &l[0]}
 }
 
 func (c *Container) runCommandStatus(args []string, options AttachOptions) (int, error) {

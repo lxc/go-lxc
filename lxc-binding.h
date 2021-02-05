@@ -48,7 +48,7 @@ extern const char* go_lxc_get_config_path(struct lxc_container *c);
 extern const char* go_lxc_state(struct lxc_container *c);
 #if !VERSION_AT_LEAST(4, 1, 0)
 typedef struct lxc_groups_t {
-	int size;
+	size_t size;
 	gid_t *list;
 } lxc_groups_t;
 # endif
