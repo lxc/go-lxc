@@ -1473,12 +1473,15 @@ func (c *Container) AttachShell(options AttachOptions) error {
 	cwd := C.CString(options.Cwd)
 	defer C.free(unsafe.Pointer(cwd))
 
+	groups := makeGroups(options.Groups)
+
 	ret := int(C.go_lxc_attach(c.container,
 		C.bool(options.ClearEnv),
 		C.int(options.Namespaces),
 		C.long(options.Arch),
 		C.uid_t(options.UID),
 		C.gid_t(options.GID),
+		groups,
 		C.int(options.StdinFd),
 		C.int(options.StdoutFd),
 		C.int(options.StderrFd),
@@ -1490,6 +1493,17 @@ func (c *Container) AttachShell(options AttachOptions) error {
 		return ErrAttachFailed
 	}
 	return nil
+}
+
+func makeGroups(groups []int) C.struct_lxc_groups_t {
+	if len(groups) == 0 {
+		return C.struct_lxc_groups_t{size: 0, list: nil}
+	}
+	l := make([]C.gid_t, len(groups))
+	for i, g := range groups {
+		l[i] = C.gid_t(g)
+	}
+	return C.struct_lxc_groups_t{size: C.size_t(len(groups)), list: &l[0]}
 }
 
 func (c *Container) runCommandStatus(args []string, options AttachOptions) (int, error) {
@@ -1526,6 +1540,8 @@ func (c *Container) runCommandStatus(args []string, options AttachOptions) (int,
 	cwd := C.CString(options.Cwd)
 	defer C.free(unsafe.Pointer(cwd))
 
+	groups := makeGroups(options.Groups)
+
 	ret := int(C.go_lxc_attach_run_wait(
 		c.container,
 		C.bool(options.ClearEnv),
@@ -1533,6 +1549,7 @@ func (c *Container) runCommandStatus(args []string, options AttachOptions) (int,
 		C.long(options.Arch),
 		C.uid_t(options.UID),
 		C.gid_t(options.GID),
+		groups,
 		C.int(options.StdinFd),
 		C.int(options.StdoutFd),
 		C.int(options.StderrFd),
@@ -1595,6 +1612,8 @@ func (c *Container) RunCommandNoWait(args []string, options AttachOptions) (int,
 	cwd := C.CString(options.Cwd)
 	defer C.free(unsafe.Pointer(cwd))
 
+	groups := makeGroups(options.Groups)
+
 	var attachedPid C.pid_t
 	ret := int(C.go_lxc_attach_no_wait(
 		c.container,
@@ -1603,6 +1622,7 @@ func (c *Container) RunCommandNoWait(args []string, options AttachOptions) (int,
 		C.long(options.Arch),
 		C.uid_t(options.UID),
 		C.gid_t(options.GID),
+		groups,
 		C.int(options.StdinFd),
 		C.int(options.StdoutFd),
 		C.int(options.StderrFd),

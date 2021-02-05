@@ -46,11 +46,17 @@ extern char* go_lxc_get_keys(struct lxc_container *c, const char *key);
 extern char* go_lxc_get_running_config_item(struct lxc_container *c, const char *key);
 extern const char* go_lxc_get_config_path(struct lxc_container *c);
 extern const char* go_lxc_state(struct lxc_container *c);
+#if !VERSION_AT_LEAST(4, 1, 0)
+typedef struct lxc_groups_t {
+	size_t size;
+	gid_t *list;
+} lxc_groups_t;
+# endif
 extern int go_lxc_attach_run_wait(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
 		long personality,
-		uid_t uid, gid_t gid,
+		uid_t uid, gid_t gid, lxc_groups_t groups,
 		int stdinfd, int stdoutfd, int stderrfd,
 		char *initial_cwd,
 		char **extra_env_vars,
@@ -60,7 +66,7 @@ extern int go_lxc_attach(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
 		long personality,
-		uid_t uid, gid_t gid,
+		uid_t uid, gid_t gid, lxc_groups_t groups,
 		int stdinfd, int stdoutfd, int stderrfd,
 		char *initial_cwd,
 		char **extra_env_vars,
@@ -69,7 +75,7 @@ extern int go_lxc_attach_no_wait(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
 		long personality,
-		uid_t uid, gid_t gid,
+		uid_t uid, gid_t gid, lxc_groups_t groups,
 		int stdinfd, int stdoutfd, int stderrfd,
 		char *initial_cwd,
 		char **extra_env_vars,
