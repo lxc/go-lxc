@@ -2,6 +2,8 @@
 // Use of this source code is governed by a LGPLv2.1
 // license that can be found in the LICENSE file.
 
+#include <lxc/attach_options.h>
+
 #define VERSION_AT_LEAST(major, minor, micro)							\
 	((LXC_DEVEL == 1) || (!(major > LXC_VERSION_MAJOR ||					\
 	major == LXC_VERSION_MAJOR && minor > LXC_VERSION_MINOR ||				\
@@ -46,12 +48,14 @@ extern char* go_lxc_get_keys(struct lxc_container *c, const char *key);
 extern char* go_lxc_get_running_config_item(struct lxc_container *c, const char *key);
 extern const char* go_lxc_get_config_path(struct lxc_container *c);
 extern const char* go_lxc_state(struct lxc_container *c);
-#if !VERSION_AT_LEAST(4, 1, 0)
+
+#if !VERSION_AT_LEAST(4, 1, 0) && !defined(LXC_ATTACH_SETGROUPS)
 typedef struct lxc_groups_t {
 	size_t size;
 	gid_t *list;
 } lxc_groups_t;
 # endif
+
 extern int go_lxc_attach_run_wait(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
