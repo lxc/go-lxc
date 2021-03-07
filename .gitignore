@@ -3,3 +3,4 @@ examples/*/*
 coverage.out
 tags
 *.swp
+**/.idea

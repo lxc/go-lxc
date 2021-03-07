@@ -65,7 +65,7 @@ func (t BackendStore) String() string {
 	case Overlayfs:
 		return "overlayfs"
 	case Loopback:
-		return "loopback"
+		return "loop"
 	case Best:
 		return "best"
 	}
