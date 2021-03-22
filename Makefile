@@ -51,6 +51,10 @@ escape-analysis:
 ctags:
 	@ctags -R --languages=c,go
 
+update-gomod:
+	go get -t -v -d -u ./...
+	go mod tidy
+
 scope:
 	@echo "$(OK_COLOR)==> Exported container calls in container.go $(NO_COLOR)"
 	@/bin/grep -E "\bc+\.([A-Z])\w+" container.go || true
