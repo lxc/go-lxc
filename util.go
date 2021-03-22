@@ -47,7 +47,6 @@ static size_t getArrayLength(char **array) {
 import "C"
 
 import (
-	"reflect"
 	"unsafe"
 )
 
@@ -82,21 +81,11 @@ func convertNArgs(cArgs **C.char, size int) []string {
 		return nil
 	}
 
-	var A []*C.char
-
-	hdr := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(cArgs)),
-		Len:  size,
-		Cap:  size,
-	}
-	cArgsInterface := reflect.NewAt(reflect.TypeOf(A), unsafe.Pointer(&hdr)).Elem().Interface()
-
+	tmpslice := (*[1 << 30]*C.char)(unsafe.Pointer(cArgs))[:size:size]
 	result := make([]string, size)
-	for i := 0; i < size; i++ {
-		result[i] = C.GoString(cArgsInterface.([]*C.char)[i])
+	for i, s := range tmpslice {
+		result[i] = C.GoString(s)
 	}
-	C.freeCharArray(cArgs, C.size_t(size))
-
 	return result
 }
 
