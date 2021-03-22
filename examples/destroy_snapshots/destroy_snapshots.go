@@ -9,7 +9,7 @@ package main
 import (
 	"log"
 
-	"gopkg.in/lxc/go-lxc.v2"
+	"github.com/lxc/go-lxc"
 )
 
 func main() {

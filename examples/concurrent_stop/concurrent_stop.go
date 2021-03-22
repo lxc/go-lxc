@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"sync"
 
-	"gopkg.in/lxc/go-lxc.v2"
+	"github.com/lxc/go-lxc"
 )
 
 var (
