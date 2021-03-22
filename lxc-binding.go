@@ -312,7 +312,13 @@ func runtimeLiblxcVersionAtLeast(major int, minor int, micro int) bool {
 }
 
 // HasApiExtension returns true if the extension is supported.
+// Deprecated: Please use HasAPIExtension instead.
 func HasApiExtension(extension string) bool {
+	return HasAPIExtension(extension)
+}
+
+// HasAPIExtension returns true if the extension is supported.
+func HasAPIExtension(extension string) bool {
 	if runtimeLiblxcVersionAtLeast(3, 1, 0) {
 		apiExtension := C.CString(extension)
 		defer C.free(unsafe.Pointer(apiExtension))
