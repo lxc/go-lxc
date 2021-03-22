@@ -1,0 +1,4 @@
+golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4 h1:EZ2mChiOa8udjfp6rRmswTbtZN/QzUQp4ptM4rnjHvc=
+golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+gopkg.in/lxc/go-lxc.v2 v2.0.0-20210307013912-d9b9f727ce0f h1:9y525Y4faBC8unh1imBJFSV1i6SvklzDKFLticZQ6EA=
+gopkg.in/lxc/go-lxc.v2 v2.0.0-20210307013912-d9b9f727ce0f/go.mod h1:4K0lbUXeslpmjwJZyW1lI6s5j97mrsj4+kpYwwvuLXo=
