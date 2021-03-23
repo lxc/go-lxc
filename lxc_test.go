@@ -1209,9 +1209,9 @@ func TestCommandWithEnvToKeep(t *testing.T) {
 
 	options := DefaultAttachOptions
 	options.ClearEnv = true
-	options.EnvToKeep = []string{"TERM"}
+	options.EnvToKeep = []string{"USER"}
 
-	args := []string{"/bin/sh", "-c", fmt.Sprintf("test $TERM = '%s'", os.Getenv("TERM"))}
+	args := []string{"/bin/sh", "-c", fmt.Sprintf("test $USER = '%s'", os.Getenv("USER"))}
 	ok, err := c.RunCommand(args, DefaultAttachOptions)
 	if err != nil {
 		t.Errorf(err.Error())
