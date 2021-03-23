@@ -723,7 +723,7 @@ func TestConfigItem(t *testing.T) {
 	}
 	defer c.Release()
 
-	if c.ConfigItem("lxc.utsname")[0] != ContainerName() {
+	if c.ConfigItem("lxc.uts.name")[0] != ContainerName() {
 		t.Errorf("ConfigItem failed...")
 	}
 }
@@ -735,11 +735,11 @@ func TestSetConfigItem(t *testing.T) {
 	}
 	defer c.Release()
 
-	if err := c.SetConfigItem("lxc.utsname", ContainerName()); err != nil {
+	if err := c.SetConfigItem("lxc.uts.name", ContainerName()); err != nil {
 		t.Errorf(err.Error())
 	}
 
-	if c.ConfigItem("lxc.utsname")[0] != ContainerName() {
+	if c.ConfigItem("lxc.uts.name")[0] != ContainerName() {
 		t.Errorf("ConfigItem failed...")
 	}
 }
