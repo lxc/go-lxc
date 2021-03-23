@@ -27,7 +27,6 @@ const (
 	DefaultContainerRestoreName      = "ipsum"
 	DefaultContainerCloneName        = "consectetur"
 	DefaultContainerCloneOverlayName = "adipiscing"
-	DefaultContainerCloneAufsName    = "pellentesque"
 )
 
 func exists(name string) bool {
@@ -115,13 +114,6 @@ func ContainerCloneOverlayName() string {
 		return fmt.Sprintf("%s-unprivileged", DefaultContainerCloneOverlayName)
 	}
 	return DefaultContainerCloneOverlayName
-}
-
-func ContainerCloneAufsName() string {
-	if unprivileged() {
-		return fmt.Sprintf("%s-unprivileged", DefaultContainerCloneAufsName)
-	}
-	return DefaultContainerCloneAufsName
 }
 
 func TestVersion(t *testing.T) {
@@ -266,32 +258,6 @@ func TestCloneUsingOverlayfs(t *testing.T) {
 
 	err = c.Clone(ContainerCloneOverlayName(), CloneOptions{
 		Backend:  Overlayfs,
-		KeepName: true,
-		KeepMAC:  true,
-		Snapshot: true,
-	})
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-}
-
-func TestCloneUsingAufs(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
-	if !supported("aufs") {
-		t.Skip("skipping test as aufs support is missing.")
-	}
-
-	c, err := NewContainer(ContainerName())
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer c.Release()
-
-	err = c.Clone(ContainerCloneAufsName(), CloneOptions{
-		Backend:  Aufs,
 		KeepName: true,
 		KeepMAC:  true,
 		Snapshot: true,
@@ -1556,17 +1522,6 @@ func TestDestroy(t *testing.T) {
 		}
 	}
 
-	if !unprivileged() && supported("aufs") {
-		c, err := NewContainer(ContainerCloneAufsName())
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		defer c.Release()
-
-		if err := c.Destroy(); err != nil {
-			t.Errorf(err.Error())
-		}
-	}
 	c, err := NewContainer(ContainerCloneName())
 	if err != nil {
 		t.Errorf(err.Error())
