@@ -81,7 +81,7 @@ func convertNArgs(cArgs **C.char, size int) []string {
 		return nil
 	}
 
-	tmpslice := (*[1 << 30]*C.char)(unsafe.Pointer(cArgs))[:size:size]
+	tmpslice := (*[(1 << 29) - 1]*C.char)(unsafe.Pointer(cArgs))[:size:size]
 	result := make([]string, size)
 	for i, s := range tmpslice {
 		result[i] = C.GoString(s)
