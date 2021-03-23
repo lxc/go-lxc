@@ -83,8 +83,8 @@ func template() TemplateOptions {
 	// travis uses trusy which comes with lxc 1.0.x so use a compatible image
 	return TemplateOptions{
 		Template: "download",
-		Distro:   "ubuntu",
-		Release:  "trusty",
+		Distro:   "alpine",
+		Release:  "edge",
 		Arch:     "amd64",
 	}
 }
