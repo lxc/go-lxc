@@ -75,11 +75,6 @@ func ipv6() bool {
 }
 
 func template() TemplateOptions {
-	if !unprivileged() {
-		return BusyboxTemplateOptions
-	}
-
-	// travis uses trusy which comes with lxc 1.0.x so use a compatible image
 	return TemplateOptions{
 		Template: "download",
 		Distro:   "alpine",
