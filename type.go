@@ -156,21 +156,30 @@ func (t State) String() string {
 type ByteSize float64
 
 const (
+	// B - byte
 	B = iota
+
 	// KB - kilobyte
 	KB ByteSize = 1 << (10 * iota)
+
 	// MB - megabyte
 	MB
+
 	// GB - gigabyte
 	GB
+
 	// TB - terabyte
 	TB
+
 	// PB - petabyte
 	PB
+
 	// EB - exabyte
 	EB
+
 	// ZB - zettabyte
 	ZB
+
 	// YB - yottabyte
 	YB
 )
@@ -333,20 +342,34 @@ func (l LogLevel) String() string {
 type Personality int64
 
 const (
-	X86    Personality = 0x0008
-	X86_64             = 0x0000
+	// X86 - Intel 32bit
+	X86 Personality = 0x0008
+
+	// X86_64 - Intel 64bit
+	X86_64 = 0x0000
 )
 
 const (
-	MIGRATE_PRE_DUMP      = 0
-	MIGRATE_DUMP          = 1
-	MIGRATE_RESTORE       = 2
+	// MIGRATE_PRE_DUMP - pre-dump live migration phase
+	MIGRATE_PRE_DUMP = 0
+
+	// MIGRATE_DUMP - main live migration phase
+	MIGRATE_DUMP = 1
+
+	// MIGRATE_RESTORE - post migration phase
+	MIGRATE_RESTORE = 2
+
+	// MIGRATE_FEATURE_CHECK - migration feature check
 	MIGRATE_FEATURE_CHECK = 3
 )
 
+// CriuFeatures represents a set of CRIU features
 type CriuFeatures uint64
 
 const (
+	// FEATURE_MEM_TRACK - memory tracking support
 	FEATURE_MEM_TRACK CriuFeatures = 1 << iota
+
+	// FEATURE_LAZY_PAGES - lazy pages support
 	FEATURE_LAZY_PAGES
 )

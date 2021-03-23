@@ -18,7 +18,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -296,13 +295,7 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 		return nil, ErrNoSnapshot
 	}
 
-	hdr := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(csnapshots)),
-		Len:  size,
-		Cap:  size,
-	}
-	gosnapshots := *(*[]C.struct_lxc_snapshot)(unsafe.Pointer(&hdr))
-
+	gosnapshots := (*[1 << 30]C.struct_lxc_snapshot)(unsafe.Pointer(csnapshots))[:size:size]
 	snapshots := make([]Snapshot, size, size)
 	for i := 0; i < size; i++ {
 		snapshots[i] = Snapshot{

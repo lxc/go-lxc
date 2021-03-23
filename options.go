@@ -111,6 +111,7 @@ type TemplateOptions struct {
 	ExtraArgs []string
 }
 
+// BackendStoreSpecs represents a LXC storage backend.
 type BackendStoreSpecs struct {
 	FSType string
 	FSSize uint64

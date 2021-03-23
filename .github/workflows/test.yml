@@ -1,0 +1,79 @@
+name: CI tests
+on:
+  - push
+  - pull_request
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        go:
+          - 1.13.x
+          - 1.14.x
+          - 1.15.x
+          - 1.16.x
+        os:
+          - ubuntu-18.04
+          - ubuntu-20.04
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo add-apt-repository ppa:ubuntu-lxc/daily -y
+          sudo apt-get install -qq lxc lxc-dev pkg-config uidmap busybox
+
+      - name: Setup test environment
+        run: |
+          # Setup uid/gid and veth allocations
+          echo "${USER}:100000:65536" | sudo tee /etc/subuid
+          echo "${USER}:100000:65536" | sudo tee /etc/subgid
+          echo "${USER} veth lxcbr0 10" | sudo tee -a /etc/lxc/lxc-usernet
+
+          # Local user configuration for userns
+          mkdir -p ~/.config/lxc/
+          cp /etc/lxc/default.conf ~/.config/lxc/default.conf
+          echo "lxc.idmap = u 0 100000 65536" | tee -a ~/.config/lxc/default.conf
+          echo "lxc.idmap = g 0 100000 65536" | tee -a ~/.config/lxc/default.conf
+
+          # Allow traversal to the containers
+          mkdir -p ~/.local/share/lxc
+          chmod +x ~/ ~/.local ~/.local/share ~/.local/share/lxc
+
+      - name: Build the test
+        run:
+          go test -c -coverprofile=profile
+
+      - name: Unprivileged tests
+        env:
+          DOWNLOAD_KEYSERVER: keyserver.ubuntu.com
+        run: |
+          # Make all cgroups writable
+          for d in /sys/fs/cgroup/*; do
+              [ -f $d/cgroup.clone_children ] && echo 1 | sudo tee $d/cgroup.clone_children
+              [ -f $d/cgroup.use_hierarchy ] && echo 1 | sudo tee $d/cgroup.use_hierarchy
+
+              sudo mkdir -p $d/lxc-test
+              sudo chown -R $USER: $d/lxc-test
+              echo $$ | sudo tee $d/lxc-test/cgroup.procs
+          done
+
+          # Run the unprivileged tests
+          ./go-lxc.test -test.v -test.coverprofile=/tmp/unpriv.out
+
+      - name: Privileged tests
+        env:
+          DOWNLOAD_KEYSERVER: keyserver.ubuntu.com
+        run:
+          sudo -E ./go-lxc.test -test.v -test.coverprofile=/tmp/priv.out
+
+      - name: Code coverage
+        run: make cover
