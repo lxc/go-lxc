@@ -473,10 +473,6 @@ func TestStart(t *testing.T) {
 }
 
 func TestWaitIPAddresses(t *testing.T) {
-	if !unprivileged() {
-		t.Skip("skipping test in privileged mode.")
-	}
-
 	c, err := NewContainer(ContainerName())
 	if err != nil {
 		t.Errorf(err.Error())
@@ -1354,10 +1350,6 @@ func TestRemoveDeviceNode(t *testing.T) {
 }
 
 func TestIPv4Addresses(t *testing.T) {
-	if !unprivileged() {
-		t.Skip("skipping test in privileged mode.")
-	}
-
 	c, err := NewContainer(ContainerName())
 	if err != nil {
 		t.Errorf(err.Error())
@@ -1370,10 +1362,6 @@ func TestIPv4Addresses(t *testing.T) {
 }
 
 func TestIPv6Addresses(t *testing.T) {
-	if !unprivileged() {
-		t.Skip("skipping test in privileged mode.")
-	}
-
 	if !ipv6() {
 		t.Skip("skipping test since lxc bridge does not have ipv6 address")
 	}
