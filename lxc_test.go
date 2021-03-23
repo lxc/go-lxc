@@ -201,6 +201,7 @@ func TestExecute(t *testing.T) {
 	}
 	defer c.Release()
 
+	c.SetConfigItem("lxc.apparmor.profile", "unconfined")
 	if _, err := c.Execute("/bin/true"); err != nil {
 		t.Errorf(err.Error())
 	}
