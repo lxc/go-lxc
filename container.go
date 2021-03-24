@@ -295,7 +295,7 @@ func (c *Container) Snapshots() ([]Snapshot, error) {
 		return nil, ErrNoSnapshot
 	}
 
-	gosnapshots := (*[(1 << 30) - 1]C.struct_lxc_snapshot)(unsafe.Pointer(csnapshots))[:size:size]
+	gosnapshots := (*[(1 << 26) - 1]C.struct_lxc_snapshot)(unsafe.Pointer(csnapshots))[:size:size]
 	snapshots := make([]Snapshot, size, size)
 	for i := 0; i < size; i++ {
 		snapshots[i] = Snapshot{
