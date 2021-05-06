@@ -1481,11 +1481,25 @@ func (c *Container) AttachShell(options AttachOptions) error {
 		cwd,
 		cenv,
 		cenvToKeep,
+		C.int(attachFlags(options)),
 	))
 	if ret < 0 {
 		return ErrAttachFailed
 	}
 	return nil
+}
+
+func attachFlags(opts AttachOptions) int {
+	flags := C.LXC_ATTACH_DEFAULT
+
+	if opts.RemountSysProc {
+		flags |= C.LXC_ATTACH_REMOUNT_PROC_SYS
+	}
+
+	if opts.ElevatedPrivileges {
+		flags &^= (C.LXC_ATTACH_MOVE_TO_CGROUP | C.LXC_ATTACH_DROP_CAPABILITIES | C.LXC_ATTACH_LSM_EXEC)
+	}
+	return flags
 }
 
 func makeGroups(groups []int) C.struct_lxc_groups_t {
@@ -1550,6 +1564,7 @@ func (c *Container) runCommandStatus(args []string, options AttachOptions) (int,
 		cenv,
 		cenvToKeep,
 		cargs,
+		C.int(attachFlags(options)),
 	))
 
 	if ret < 0 {
@@ -1624,6 +1639,7 @@ func (c *Container) RunCommandNoWait(args []string, options AttachOptions) (int,
 		cenvToKeep,
 		cargs,
 		&attachedPid,
+		C.int(attachFlags(options)),
 	))
 
 	if ret < 0 {

@@ -65,7 +65,8 @@ extern int go_lxc_attach_run_wait(struct lxc_container *c,
 		char *initial_cwd,
 		char **extra_env_vars,
 		char **extra_keep_env,
-		const char * const argv[]);
+		const char * const argv[],
+		int attach_flags);
 extern int go_lxc_attach(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
@@ -74,7 +75,8 @@ extern int go_lxc_attach(struct lxc_container *c,
 		int stdinfd, int stdoutfd, int stderrfd,
 		char *initial_cwd,
 		char **extra_env_vars,
-		char **extra_keep_env);
+		char **extra_keep_env,
+		int attach_flags);
 extern int go_lxc_attach_no_wait(struct lxc_container *c,
 		bool clear_env,
 		int namespaces,
@@ -85,7 +87,8 @@ extern int go_lxc_attach_no_wait(struct lxc_container *c,
 		char **extra_env_vars,
 		char **extra_keep_env,
 		const char * const argv[],
-		pid_t *attached_pid);
+		pid_t *attached_pid,
+		int attach_flags);
 extern int go_lxc_console_getfd(struct lxc_container *c, int ttynum);
 extern int go_lxc_snapshot_list(struct lxc_container *c, struct lxc_snapshot **ret);
 extern int go_lxc_snapshot(struct lxc_container *c);

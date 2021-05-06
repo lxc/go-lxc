@@ -295,10 +295,13 @@ int go_lxc_attach_no_wait(struct lxc_container *c,
 		char **extra_env_vars,
 		char **extra_keep_env,
 		const char * const argv[],
-		pid_t *attached_pid) {
+		pid_t *attached_pid,
+		int attach_flags) {
 	int ret;
 
 	lxc_attach_options_t attach_options = LXC_ATTACH_OPTIONS_DEFAULT;
+	attach_options.attach_flags = attach_flags;
+
 	lxc_attach_command_t command = (lxc_attach_command_t){.program = NULL};
 
 	attach_options.env_policy = LXC_ATTACH_KEEP_ENV;
@@ -344,11 +347,13 @@ int go_lxc_attach(struct lxc_container *c,
 		int stdinfd, int stdoutfd, int stderrfd,
 		char *initial_cwd,
 		char **extra_env_vars,
-		char **extra_keep_env) {
+		char **extra_keep_env,
+		int attach_flags) {
 	int ret;
 	pid_t pid;
 
 	lxc_attach_options_t attach_options = LXC_ATTACH_OPTIONS_DEFAULT;
+	attach_options.attach_flags = attach_flags;
 
 	attach_options.env_policy = LXC_ATTACH_KEEP_ENV;
 	if (clear_env) {
@@ -375,16 +380,6 @@ int go_lxc_attach(struct lxc_container *c,
 	attach_options.extra_env_vars = extra_env_vars;
 	attach_options.extra_keep_env = extra_keep_env;
 
-	/*
-	   remount_sys_proc
-	   When using -s and the mount namespace is not included, this flag will cause lxc-attach to remount /proc and /sys to reflect the current other namespace contexts.
-	   default_options.attach_flags |= LXC_ATTACH_REMOUNT_PROC_SYS;
-
-	   elevated_privileges
-	   Do  not  drop privileges when running command inside the container. If this option is specified, the new process will not be added to the container's cgroup(s) and it will not drop its capabilities before executing.
-	   default_options.attach_flags &= ~(LXC_ATTACH_MOVE_TO_CGROUP | LXC_ATTACH_DROP_CAPABILITIES | LXC_ATTACH_APPARMOR);
-	   */
-
 	ret = c->attach(c, lxc_attach_run_shell, NULL, &attach_options, &pid);
 	if (ret < 0)
 		return ret;
@@ -408,10 +403,12 @@ int go_lxc_attach_run_wait(struct lxc_container *c,
 		char *initial_cwd,
 		char **extra_env_vars,
 		char **extra_keep_env,
-		const char * const argv[]) {
+		const char * const argv[],
+		int attach_flags) {
 	int ret;
 
 	lxc_attach_options_t attach_options = LXC_ATTACH_OPTIONS_DEFAULT;
+	attach_options.attach_flags = attach_flags;
 
 	attach_options.env_policy = LXC_ATTACH_KEEP_ENV;
 	if (clear_env) {

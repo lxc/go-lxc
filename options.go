@@ -48,22 +48,34 @@ type AttachOptions struct {
 
 	// StderrFd specifies the fd to write error output to.
 	StderrFd uintptr
+
+	// RemountSysProc remounts /sys and /proc for the executed command.
+	// This is required to reflect the container (PID) namespace context
+	// if the command does not attach to the container's mount namespace.
+	RemountSysProc bool
+
+	// ElevatedPrivileges runs the command with elevated privileges.
+	// The capabilities, cgroup and security module restrictions of the container are not applied.
+	// WARNING: This may leak privileges into the container.
+	ElevatedPrivileges bool
 }
 
 // DefaultAttachOptions is a convenient set of options to be used.
 var DefaultAttachOptions = AttachOptions{
-	Namespaces: -1,
-	Arch:       -1,
-	Cwd:        "/",
-	UID:        -1,
-	GID:        -1,
-	Groups:     nil,
-	ClearEnv:   false,
-	Env:        nil,
-	EnvToKeep:  nil,
-	StdinFd:    os.Stdin.Fd(),
-	StdoutFd:   os.Stdout.Fd(),
-	StderrFd:   os.Stderr.Fd(),
+	Namespaces:         -1,
+	Arch:               -1,
+	Cwd:                "/",
+	UID:                -1,
+	GID:                -1,
+	Groups:             nil,
+	ClearEnv:           false,
+	Env:                nil,
+	EnvToKeep:          nil,
+	StdinFd:            os.Stdin.Fd(),
+	StdoutFd:           os.Stdout.Fd(),
+	StderrFd:           os.Stderr.Fd(),
+	RemountSysProc:     false,
+	ElevatedPrivileges: false,
 }
 
 // TemplateOptions type is used for defining various template options.
