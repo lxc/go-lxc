@@ -314,7 +314,7 @@ int go_lxc_attach_no_wait(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
-#if VERSION_AT_LEAST(4, 1, 0)
+#if VERSION_AT_LEAST(4, 0, 9)
 	if ( groups.size > 0 ) {
 		attach_options.groups = groups;
 		attach_options.attach_flags &= LXC_ATTACH_SETGROUPS;
@@ -365,7 +365,7 @@ int go_lxc_attach(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
-#if VERSION_AT_LEAST(4, 1, 0)
+#if VERSION_AT_LEAST(4, 0, 9)
 	if ( groups.size > 0 ) {
 		attach_options.groups = groups;
 		attach_options.attach_flags &= LXC_ATTACH_SETGROUPS;
@@ -420,7 +420,7 @@ int go_lxc_attach_run_wait(struct lxc_container *c,
 
 	attach_options.uid = uid;
 	attach_options.gid = gid;
-#if VERSION_AT_LEAST(4, 1, 0)
+#if VERSION_AT_LEAST(4, 0, 9)
 	if ( groups.size > 0 ) {
 		attach_options.groups = groups;
 		attach_options.attach_flags &= LXC_ATTACH_SETGROUPS;
