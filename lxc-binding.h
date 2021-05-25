@@ -49,7 +49,7 @@ extern char* go_lxc_get_running_config_item(struct lxc_container *c, const char 
 extern const char* go_lxc_get_config_path(struct lxc_container *c);
 extern const char* go_lxc_state(struct lxc_container *c);
 
-#if !VERSION_AT_LEAST(4, 1, 0) && !defined(LXC_ATTACH_SETGROUPS)
+#if !VERSION_AT_LEAST(4, 0, 9) && !defined(LXC_ATTACH_SETGROUPS)
 typedef struct lxc_groups_t {
 	size_t size;
 	gid_t *list;
