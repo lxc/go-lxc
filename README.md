@@ -13,7 +13,7 @@ This package implements [Go](https://golang.org) bindings for the [LXC](https://
 ## Status
 Type            | Service               | Status
 ---             | ---                   | ---
-CI (Linux)      | Travis                | [![Build Status](https://travis-ci.org/lxc/go-lxc.svg?branch=v2)](https://travis-ci.org/lxc/go-lxc/)
+CI (Linux)      | Github                | [![CI tests](https://github.com/lxc/go-lxc/actions/workflows/test.yml/badge.svg?branch=v2)](https://github.com/lxc/go-lxc/actions/workflows/test.yml)
 Go documentation    | Godoc                 | [![GoDoc](https://godoc.org/gopkg.in/lxc/go-lxc.v2?status.svg)](https://godoc.org/gopkg.in/lxc/go-lxc.v2)
 Static analysis     | GoReport              | [![Go Report Card](https://goreportcard.com/badge/gopkg.in/lxc/go-lxc.v2)](https://goreportcard.com/report/gopkg.in/lxc/go-lxc.v2)
 
