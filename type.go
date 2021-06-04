@@ -244,13 +244,13 @@ var unitMap = map[string]ByteSize{
 // "MB", "GB", "TB", "PB" and "EB". You can also use the long
 // format of units, such as "kilobyte" or "kilobytes".
 func ParseBytes(s string) (ByteSize, error) {
-	// Remove leading and trailing whitespace
+	// Remove leading and trailing space
 	s = strings.TrimSpace(s)
 
 	split := make([]string, 0)
 	for i, r := range s {
 		if !unicode.IsDigit(r) {
-			// Split the string by digit and size designator, remove whitespace
+			// Split the string by digit and size designator, remove space
 			split = append(split, strings.TrimSpace(string(s[:i])))
 			split = append(split, strings.TrimSpace(string(s[i:])))
 			break
