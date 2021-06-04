@@ -243,14 +243,14 @@ bool go_lxc_clone(struct lxc_container *c, const char *newname, const char *lxcp
 }
 
 int go_lxc_console_getfd(struct lxc_container *c, int ttynum) {
-	int masterfd;
+	int mainfd;
 	int ret = 0;
 
-	ret = c->console_getfd(c, &ttynum, &masterfd);
+	ret = c->console_getfd(c, &ttynum, &mainfd);
 	if (ret < 0)
 		return ret;
 
-	return masterfd;
+	return mainfd;
 }
 
 bool go_lxc_console(struct lxc_container *c, int ttynum, int stdinfd, int stdoutfd, int stderrfd, int escape) {
