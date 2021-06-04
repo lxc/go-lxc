@@ -166,7 +166,7 @@ func TestConcurrentDefined_Negative(t *testing.T) {
 			}
 			defer c.Release()
 
-			// sleep for a while to simulate some dummy work
+			// sleep for a while to simulate some work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
 			if c.Defined() {
@@ -325,7 +325,7 @@ func TestConcurrentCreate(t *testing.T) {
 			}
 			defer c.Release()
 
-			// sleep for a while to simulate some dummy work
+			// sleep for a while to simulate some work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
 			if err := c.Create(options); err != nil {
@@ -420,7 +420,7 @@ func TestConcurrentDefined_Positive(t *testing.T) {
 			}
 			defer c.Release()
 
-			// sleep for a while to simulate some dummy work
+			// sleep for a while to simulate some work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
 			if !c.Defined() {
@@ -1549,7 +1549,7 @@ func TestConcurrentDestroy(t *testing.T) {
 			}
 			defer c.Release()
 
-			// sleep for a while to simulate some dummy work
+			// sleep for a while to simulate some work
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(250)))
 
 			if err := c.Destroy(); err != nil {
