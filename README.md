@@ -42,18 +42,18 @@ To try examples, run:
 # cd ~/go/src/gopkg.in/lxc/go-lxc.v2/examples/
 
 # make
-==> Running go vet 
+==> Running go vet
 ==> Building ...
 ...
 
 # create/create
 2018/12/27 22:39:27 Creating container...
 
-# start/start 
+# start/start
 2018/12/27 22:39:39 Starting the container...
 2018/12/27 22:39:39 Waiting container to startup networking...
 
-# attach/attach 
+# attach/attach
 2018/12/27 22:39:46 AttachShell
 root@rubik:/# hostname
 rubik
