@@ -35,7 +35,7 @@ cover:
 	@`which go` tool cover -func=/tmp/unpriv.out || true
 
 doc:
-	@`which godoc` gopkg.in/lxc/go-lxc.v2 | less
+	@`which go` doc github.com/lxc/go-lxc | less
 
 vet:
 	@echo "$(OK_COLOR)==> Running go vet $(NO_COLOR)"

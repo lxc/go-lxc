@@ -14,8 +14,8 @@ This package implements [Go](https://golang.org) bindings for the [LXC](https://
 Type            | Service               | Status
 ---             | ---                   | ---
 CI (Linux)      | Github                | [![CI tests](https://github.com/lxc/go-lxc/actions/workflows/test.yml/badge.svg?branch=v2)](https://github.com/lxc/go-lxc/actions/workflows/test.yml)
-Go documentation    | Godoc                 | [![GoDoc](https://godoc.org/gopkg.in/lxc/go-lxc.v2?status.svg)](https://godoc.org/gopkg.in/lxc/go-lxc.v2)
-Static analysis     | GoReport              | [![Go Report Card](https://goreportcard.com/badge/gopkg.in/lxc/go-lxc.v2)](https://goreportcard.com/report/gopkg.in/lxc/go-lxc.v2)
+Go documentation    | Godoc                 | [![GoDoc](https://godoc.org/github.com/lxc/go-lxc?status.svg)](https://godoc.org/github.com/lxc/go-lxc)
+Static analysis     | GoReport              | [![Go Report Card](https://goreportcard.com/badge/github.com/lxc/go-lxc)](https://goreportcard.com/report/github.com/lxc/go-lxc)
 
 ## Requirements
 
@@ -31,7 +31,7 @@ sudo apt install git golang gcc make liblxc1 liblxc-dev lxc-utils pkg-config
 To install it, run:
 
 ```bash
-go get gopkg.in/lxc/go-lxc.v2
+go get github.com/lxc/go-lxc
 ```
 
 ## Trying
@@ -39,7 +39,7 @@ go get gopkg.in/lxc/go-lxc.v2
 To try examples, run:
 
 ```bash
-# cd ~/go/src/gopkg.in/lxc/go-lxc.v2/examples/
+# cd ~/go/src/github.com/lxc/go-lxc/examples/
 
 # make
 ==> Running go vet
@@ -62,16 +62,12 @@ exit
 2018/12/27 22:39:52 RunCommand
 uid=0(root) gid=0(root) groups=0(root)
 
-# stop/stop 
+# stop/stop
 2018/12/27 22:39:54 Stopping the container...
 
-# destroy/destroy 
+# destroy/destroy
 2018/12/27 22:39:57 Destroying container...
 ```
-
-## Stability
-
-The package API will remain stable as described in [gopkg.in](https://gopkg.in).
 
 ## Backwards Compatibility
 
