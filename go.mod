@@ -1,4 +1,4 @@
-module github.com/lxc/go-lxc
+module gopkg.in/lxc/go-lxc.v2
 
 go 1.16
 
