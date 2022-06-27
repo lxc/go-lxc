@@ -241,22 +241,29 @@ func IsSupportedConfigItem(key string) bool {
 	return bool(C.go_lxc_config_item_is_supported(configItem))
 }
 
-// runtimeLiblxcVersionAtLeast checks if the system's liblxc matches the
+// RuntimeLiblxcVersionAtLeast checks if the system's liblxc matches the
 // provided version requirement
-func runtimeLiblxcVersionAtLeast(major int, minor int, micro int) bool {
-	version := Version()
+func RuntimeLiblxcVersionAtLeast(version string, major int, minor int, micro int) bool {
+	// Strip git versioning from pre-release snapshots.
+	version = strings.Split(version, "~")[0]
+
+	// Convert devel indicator into a valid version.
 	version = strings.Replace(version, " (devel)", "-devel", 1)
+
+	// Split the version into its major, minor and micro parts.
 	parts := strings.Split(version, ".")
 	partsLen := len(parts)
 	if partsLen == 0 {
 		return false
 	}
 
+	// If the last part includes -devel, assume everything is supported.
 	develParts := strings.Split(parts[partsLen-1], "-")
 	if len(develParts) == 2 && develParts[1] == "devel" {
 		return true
 	}
 
+	// Actually parse and compare the version string now.
 	maj := -1
 	min := -1
 	mic := -1
@@ -319,7 +326,7 @@ func HasApiExtension(extension string) bool {
 
 // HasAPIExtension returns true if the extension is supported.
 func HasAPIExtension(extension string) bool {
-	if runtimeLiblxcVersionAtLeast(3, 1, 0) {
+	if RuntimeLiblxcVersionAtLeast(Version(), 3, 1, 0) {
 		apiExtension := C.CString(extension)
 		defer C.free(unsafe.Pointer(apiExtension))
 		return bool(C.go_lxc_has_api_extension(apiExtension))

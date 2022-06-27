@@ -1592,3 +1592,65 @@ func TestSupportedConfigItems(t *testing.T) {
 		}
 	}
 }
+
+func TestRuntimeLiblxcVersionAtLeast(t *testing.T) {
+	type args struct {
+		version string
+		major   int
+		minor   int
+		micro   int
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "Check 5.0.0 is at least 2.1.0 returns true",
+			args: args{
+				version: "5.0.0",
+				major:   2,
+				minor:   1,
+				micro:   0,
+			},
+			want: true,
+		},
+		{
+			name: "Check 5.0.0-devel is at least 2.1.0",
+			args: args{
+				version: "5.0.0-devel",
+				major:   2,
+				minor:   1,
+				micro:   0,
+			},
+			want: true,
+		},
+		{
+			name: "Check 5.0.0~git2209-g5a7b9ce67-0ubuntu1 is at least 2.1.0",
+			args: args{
+				version: "5.0.0~git2209-g5a7b9ce67-0ubuntu1",
+				major:   2,
+				minor:   1,
+				micro:   0,
+			},
+			want: true,
+		},
+		{
+			name: "Check 1.0.0 is not at least 2.1.0 returns true",
+			args: args{
+				version: "1.0.0",
+				major:   2,
+				minor:   1,
+				micro:   0,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := RuntimeLiblxcVersionAtLeast(tt.args.version, tt.args.major, tt.args.minor, tt.args.micro); got != tt.want {
+				t.Errorf("RuntimeLiblxcVersionAtLeast() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
