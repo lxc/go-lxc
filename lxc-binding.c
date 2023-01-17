@@ -75,6 +75,17 @@ int go_lxc_seccomp_notify_fd_active(struct lxc_container *c) {
 #endif
 }
 
+int go_lxc_set_timeout(struct lxc_container *c, int timeout) {
+#if VERSION_AT_LEAST(5, 0, 4)
+	if (!c->set_timeout(c, timeout))
+		return ret_errno(EINVAL);
+
+	return 0;
+#else
+	return ret_errno(ENOSYS);
+#endif
+}
+
 int go_lxc_devpts_fd(struct lxc_container *c) {
 #if VERSION_AT_LEAST(4, 0, 5)
 	return c->devpts_fd(c);

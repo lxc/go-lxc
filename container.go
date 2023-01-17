@@ -408,6 +408,23 @@ func (c *Container) SeccompNotifyFdActive() (*os.File, error) {
 	return os.NewFile(uintptr(notifyFd), "seccomp notify"), nil
 }
 
+// SetTimeout sets the response receive timeout for commands
+func (c *Container) SetTimeout(timeout time.Duration) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.container == nil {
+		return ErrNotDefined
+	}
+
+	ret := int(C.go_lxc_set_timeout(c.container, C.int(timeout.Seconds())))
+	if ret < 0 {
+		return unix.Errno(-ret)
+	}
+
+	return nil
+}
+
 // Daemonize returns true if the container wished to be daemonized.
 func (c *Container) Daemonize() bool {
 	c.mu.RLock()
