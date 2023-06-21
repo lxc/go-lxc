@@ -1,5 +1,5 @@
 module github.com/lxc/go-lxc
 
-go 1.16
+go 1.18
 
-require golang.org/x/sys v0.0.0-20220624220833-87e55d714810
+require golang.org/x/sys v0.9.0
