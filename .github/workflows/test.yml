@@ -9,17 +9,15 @@ jobs:
       fail-fast: false
       matrix:
         go:
-          - 1.13.x
-          - 1.14.x
-          - 1.15.x
-          - 1.16.x
+          - 1.18.x
+          - stable
         os:
-          - ubuntu-18.04
           - ubuntu-20.04
+          - ubuntu-22.04
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go }}
 
@@ -29,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo add-apt-repository ppa:ubuntu-lxc/daily -y
-          sudo apt-get install -qq lxc lxc-dev pkg-config uidmap busybox
+          sudo apt-get install -qq lxc lxc-dev pkg-config uidmap busybox libdbus-1-dev libseccomp-dev libcap-dev
 
       - name: Setup test environment
         run: |
