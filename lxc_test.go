@@ -724,13 +724,29 @@ func TestSetCgroupItem(t *testing.T) {
 
 	maxMem := c.CgroupItem("memory.max_usage_in_bytes")[0]
 	currentMem := c.CgroupItem("memory.limit_in_bytes")[0]
-	if err := c.SetCgroupItem("memory.limit_in_bytes", maxMem); err != nil {
-		t.Errorf(err.Error())
-	}
-	newMem := c.CgroupItem("memory.limit_in_bytes")[0]
+	if maxMem == "" && currentMem == "" {
+		// Cgroup2 handling.
+		maxMem := c.CgroupItem("memory.peak")[0]
+		currentMem := c.CgroupItem("memory.max")[0]
 
-	if newMem == currentMem {
-		t.Errorf("SetCgroupItem failed...")
+		if err := c.SetCgroupItem("memory.max", maxMem); err != nil {
+			t.Errorf(err.Error())
+		}
+		newMem := c.CgroupItem("memory.max")[0]
+
+		if newMem == currentMem {
+			t.Errorf("SetCgroupItem failed...")
+		}
+	} else {
+		// Cgroup1 handling.
+		if err := c.SetCgroupItem("memory.limit_in_bytes", maxMem); err != nil {
+			t.Errorf(err.Error())
+		}
+		newMem := c.CgroupItem("memory.limit_in_bytes")[0]
+
+		if newMem == currentMem {
+			t.Errorf("SetCgroupItem failed...")
+		}
 	}
 }
 
