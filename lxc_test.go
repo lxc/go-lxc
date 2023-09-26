@@ -800,6 +800,11 @@ func TestMemoryUsage(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.MemoryUsage(); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -812,6 +817,11 @@ func TestKernelMemoryUsage(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.KernelMemoryUsage(); err != nil {
+		if err == ErrKMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -852,6 +862,11 @@ func TestMemoryLimit(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.MemoryLimit(); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -864,6 +879,11 @@ func TestSoftMemoryLimit(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.SoftMemoryLimit(); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -876,6 +896,11 @@ func TestKernelMemoryLimit(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.KernelMemoryLimit(); err != nil {
+		if err == ErrKMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -905,15 +930,30 @@ func TestSetMemoryLimit(t *testing.T) {
 
 	oldMemLimit, err := c.MemoryLimit()
 	if err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
 	if err := c.SetMemoryLimit(oldMemLimit * 4); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
 	newMemLimit, err := c.MemoryLimit()
 	if err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
@@ -931,15 +971,30 @@ func TestSetSoftMemoryLimit(t *testing.T) {
 
 	oldMemLimit, err := c.MemoryLimit()
 	if err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
 	if err := c.SetSoftMemoryLimit(oldMemLimit * 4); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
 	newMemLimit, err := c.SoftMemoryLimit()
 	if err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
