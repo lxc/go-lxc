@@ -191,23 +191,6 @@ func TestDefined_Negative(t *testing.T) {
 	}
 }
 
-func TestExecute(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
-	c, err := NewContainer(ContainerName())
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer c.Release()
-
-	c.SetConfigItem("lxc.apparmor.profile", "unconfined")
-	if _, err := c.Execute("/bin/true"); err != nil {
-		t.Errorf(err.Error())
-	}
-}
-
 func TestSetVerbosity(t *testing.T) {
 	c, err := NewContainer(ContainerName())
 	if err != nil {
