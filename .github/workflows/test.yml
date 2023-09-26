@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo add-apt-repository ppa:ubuntu-lxc/daily -y
-          sudo apt-get install -qq lxc lxc-dev pkg-config uidmap busybox libdbus-1-dev libseccomp-dev libcap-dev
+          sudo apt-get install -qq apparmor lxc lxc-dev pkg-config uidmap busybox libdbus-1-dev libseccomp-dev libcap-dev libselinux-dev
 
       - name: Setup test environment
         run: |
@@ -65,15 +65,18 @@ jobs:
                 sudo chown -R $USER: $d/lxc-test
                 echo $$ | sudo tee $d/lxc-test/cgroup.procs
             done
+
+            # Run the unprivileged tests
+            ./go-lxc.test -test.v -test.coverprofile=/tmp/unpriv.out
           else
             # CGroup 2
             sudo mkdir -p /sys/fs/cgroup/lxc-test
             sudo chown -R $USER: /sys/fs/cgroup/lxc-test
             echo $$ | sudo tee /sys/fs/cgroup/lxc-test/cgroup.procs
-          fi
 
-          # Run the unprivileged tests
-          ./go-lxc.test -test.v -test.coverprofile=/tmp/unpriv.out
+            # Run the unprivileged tests
+            systemd-run --unit=go-lxc-test --user --scope -p "Delegate=yes" ./go-lxc.test -test.v -test.coverprofile=/tmp/unpriv.out
+          fi
 
       - name: Privileged tests
         env:
