@@ -97,6 +97,7 @@ extern int go_lxc_init_pidfd(struct lxc_container *c);
 extern int go_lxc_devpts_fd(struct lxc_container *c);
 extern int go_lxc_seccomp_notify_fd(struct lxc_container *c);
 extern int go_lxc_seccomp_notify_fd_active(struct lxc_container *c);
+extern int go_lxc_set_timeout(struct lxc_container *c, int timeout);
 extern bool go_lxc_checkpoint(struct lxc_container *c, char *directory, bool stop, bool verbose);
 extern bool go_lxc_restore(struct lxc_container *c, char *directory, bool verbose);
 extern bool go_lxc_config_item_is_supported(const char *key);
