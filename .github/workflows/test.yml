@@ -55,14 +55,22 @@ jobs:
           DOWNLOAD_KEYSERVER: keyserver.ubuntu.com
         run: |
           # Make all cgroups writable
-          for d in /sys/fs/cgroup/*; do
-              [ -f $d/cgroup.clone_children ] && echo 1 | sudo tee $d/cgroup.clone_children
-              [ -f $d/cgroup.use_hierarchy ] && echo 1 | sudo tee $d/cgroup.use_hierarchy
+          if [ ! -e /sys/fs/cgroup/cgroup.controllers ]; then
+            # CGroup 1
+            for d in /sys/fs/cgroup/*; do
+                [ -f $d/cgroup.clone_children ] && echo 1 | sudo tee $d/cgroup.clone_children
+                [ -f $d/cgroup.use_hierarchy ] && echo 1 | sudo tee $d/cgroup.use_hierarchy
 
-              sudo mkdir -p $d/lxc-test
-              sudo chown -R $USER: $d/lxc-test
-              echo $$ | sudo tee $d/lxc-test/cgroup.procs
-          done
+                sudo mkdir -p $d/lxc-test
+                sudo chown -R $USER: $d/lxc-test
+                echo $$ | sudo tee $d/lxc-test/cgroup.procs
+            done
+          else
+            # CGroup 2
+            sudo mkdir -p /sys/fs/cgroup/lxc-test
+            sudo chown -R $USER: /sys/fs/cgroup/lxc-test
+            echo $$ | sudo tee /sys/fs/cgroup/lxc-test/cgroup.procs
+          fi
 
           # Run the unprivileged tests
           ./go-lxc.test -test.v -test.coverprofile=/tmp/unpriv.out
