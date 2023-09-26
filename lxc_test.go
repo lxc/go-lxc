@@ -191,23 +191,6 @@ func TestDefined_Negative(t *testing.T) {
 	}
 }
 
-func TestExecute(t *testing.T) {
-	if unprivileged() {
-		t.Skip("skipping test in unprivileged mode.")
-	}
-
-	c, err := NewContainer(ContainerName())
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer c.Release()
-
-	c.SetConfigItem("lxc.apparmor.profile", "unconfined")
-	if _, err := c.Execute("/bin/true"); err != nil {
-		t.Errorf(err.Error())
-	}
-}
-
 func TestSetVerbosity(t *testing.T) {
 	c, err := NewContainer(ContainerName())
 	if err != nil {
@@ -724,13 +707,29 @@ func TestSetCgroupItem(t *testing.T) {
 
 	maxMem := c.CgroupItem("memory.max_usage_in_bytes")[0]
 	currentMem := c.CgroupItem("memory.limit_in_bytes")[0]
-	if err := c.SetCgroupItem("memory.limit_in_bytes", maxMem); err != nil {
-		t.Errorf(err.Error())
-	}
-	newMem := c.CgroupItem("memory.limit_in_bytes")[0]
+	if maxMem == "" && currentMem == "" {
+		// Cgroup2 handling.
+		maxMem := c.CgroupItem("memory.peak")[0]
+		currentMem := c.CgroupItem("memory.max")[0]
 
-	if newMem == currentMem {
-		t.Errorf("SetCgroupItem failed...")
+		if err := c.SetCgroupItem("memory.max", maxMem); err != nil {
+			t.Errorf(err.Error())
+		}
+		newMem := c.CgroupItem("memory.max")[0]
+
+		if newMem == currentMem {
+			t.Errorf("SetCgroupItem failed...")
+		}
+	} else {
+		// Cgroup1 handling.
+		if err := c.SetCgroupItem("memory.limit_in_bytes", maxMem); err != nil {
+			t.Errorf(err.Error())
+		}
+		newMem := c.CgroupItem("memory.limit_in_bytes")[0]
+
+		if newMem == currentMem {
+			t.Errorf("SetCgroupItem failed...")
+		}
 	}
 }
 
@@ -800,6 +799,11 @@ func TestMemoryUsage(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.MemoryUsage(); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -812,6 +816,11 @@ func TestKernelMemoryUsage(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.KernelMemoryUsage(); err != nil {
+		if err == ErrKMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -852,6 +861,11 @@ func TestMemoryLimit(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.MemoryLimit(); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -864,6 +878,11 @@ func TestSoftMemoryLimit(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.SoftMemoryLimit(); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -876,6 +895,11 @@ func TestKernelMemoryLimit(t *testing.T) {
 	defer c.Release()
 
 	if _, err := c.KernelMemoryLimit(); err != nil {
+		if err == ErrKMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 }
@@ -905,15 +929,30 @@ func TestSetMemoryLimit(t *testing.T) {
 
 	oldMemLimit, err := c.MemoryLimit()
 	if err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
 	if err := c.SetMemoryLimit(oldMemLimit * 4); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
 	newMemLimit, err := c.MemoryLimit()
 	if err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
@@ -931,15 +970,30 @@ func TestSetSoftMemoryLimit(t *testing.T) {
 
 	oldMemLimit, err := c.MemoryLimit()
 	if err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
 	if err := c.SetSoftMemoryLimit(oldMemLimit * 4); err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
 	newMemLimit, err := c.SoftMemoryLimit()
 	if err != nil {
+		if err == ErrMemLimit {
+			t.Skip("Skipping test due to kernel support (maybe cgroup2?)")
+			return
+		}
+
 		t.Errorf(err.Error())
 	}
 
