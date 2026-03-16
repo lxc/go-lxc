@@ -2115,7 +2115,7 @@ func (c *Container) Migrate(cmd uint, opts MigrateOptions) error {
 		return ErrNotDefined
 	}
 
-	if err := c.makeSure(isNotDefined | isGreaterEqualThanLXC20); err != nil {
+	if err := c.makeSure(isGreaterEqualThanLXC20); err != nil {
 		return err
 	}
 
